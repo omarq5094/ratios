@@ -141,28 +141,42 @@
               </div>
             </div>
 
-            <details class="optional-block">
-              <summary>بيانات إضافية لنتائج أدق <span>اختياري</span></summary>
-              <div class="fields-grid four-columns optional-fields">
-                <label class="field"><span>أصول السنة السابقة</span><div class="number-field"><input id="previousAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>حقوق السنة السابقة</span><div class="number-field"><input id="previousEquity" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>التدفق النقدي التشغيلي</span><div class="number-field"><input id="operatingCashFlow" type="number" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>مصروف التمويل</span><div class="number-field"><input id="interestExpense" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+            <details class="optional-block" open>
+              <summary>بيانات النسب المتقدمة <span>اختياري — أدخل المتوفر فقط</span></summary>
+              <div class="optional-content">
+                <section class="optional-group" aria-labelledby="advanced-statements-title">
+                  <div class="optional-group-heading">
+                    <h4 id="advanced-statements-title">بيانات القوائم والتدفقات</h4>
+                    <p>تُستخدم لحساب المتوسطات، وكفاءة التشغيل، والتدفق النقدي، وقدرة الشركة على تغطية التمويل.</p>
+                  </div>
+                  <div class="fields-grid four-columns optional-fields">
+                    <label class="field"><span>أصول السنة السابقة</span><div class="number-field"><input id="previousAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>حقوق السنة السابقة</span><div class="number-field"><input id="previousEquity" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>مخزون السنة السابقة</span><div class="number-field"><input id="previousInventory" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>التدفق النقدي التشغيلي</span><div class="number-field"><input id="operatingCashFlow" type="number" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>التدفق النقدي الحر</span><div class="number-field"><input id="freeCashFlow" type="number" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>EBITDA</span><div class="number-field"><input id="ebitda" type="number" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>النقد وما في حكمه</span><div class="number-field"><input id="cashAndEquivalents" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>مصروف التمويل</span><div class="number-field"><input id="interestExpense" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                  </div>
+                </section>
+
+                <section class="optional-group" aria-labelledby="advanced-market-title">
+                  <div class="optional-group-heading">
+                    <h4 id="advanced-market-title">بيانات السوق والتقييم</h4>
+                    <p>تُستخدم لحساب مضاعفات التقييم، وعوائد التدفق النقدي، والتوزيعات، والنمو.</p>
+                  </div>
+                  <div class="fields-grid four-columns optional-fields">
+                    <label class="field"><span>القيمة السوقية</span><div class="number-field"><input id="marketCap" type="number" min="0.01" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>قيمة المنشأة</span><div class="number-field"><input id="enterpriseValue" type="number" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>سعر السهم</span><div class="number-field"><input id="sharePrice" type="number" min="0.01" step="0.01" /><small>ر.س/سهم</small></div></label>
+                    <label class="field"><span>التوزيعات السنوية للسهم</span><div class="number-field"><input id="annualDividendPerShare" type="number" min="0" step="0.01" /><small>ر.س/سهم</small></div></label>
+                    <label class="field"><span>إجمالي توزيعات الأرباح</span><div class="number-field"><input id="totalDividends" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>معدل نمو الأرباح</span><div class="number-field"><input id="earningsGrowthPercent" type="number" step="0.01" /><small>٪</small></div></label>
+                  </div>
+                </section>
               </div>
             </details>
-
-            <div class="supplemental-data-store" hidden aria-hidden="true">
-              <input id="marketCap" type="hidden" />
-              <input id="freeCashFlow" type="hidden" />
-              <input id="enterpriseValue" type="hidden" />
-              <input id="ebitda" type="hidden" />
-              <input id="cashAndEquivalents" type="hidden" />
-              <input id="previousInventory" type="hidden" />
-              <input id="annualDividendPerShare" type="hidden" />
-              <input id="sharePrice" type="hidden" />
-              <input id="totalDividends" type="hidden" />
-              <input id="earningsGrowthPercent" type="hidden" />
-            </div>
 
             <div class="form-actions">
               <button id="submitButton" class="primary-button" type="submit">احسب النسب</button>
@@ -199,8 +213,8 @@
           </div>
           <section id="missingDataPanel" class="missing-data-panel" hidden>
             <div class="missing-data-heading">
-              <div><span>استكمال النتائج</span><h3>بعض البيانات غير متوفرة من Yahoo</h3></div>
-              <p>أدخل القيم الناقصة مرة واحدة، وسيعيد الموقع حساب النسب المرتبطة بها.</p>
+              <div><span>استكمال النتائج</span><h3>بعض البيانات المطلوبة غير متوفرة</h3></div>
+              <p>أدخل القيم الناقصة هنا أو في قسم البيانات المتقدمة، وسيعيد الموقع حساب النسب المرتبطة بها.</p>
             </div>
             <div id="missingFieldsGrid" class="missing-fields-grid"></div>
             <button id="applyMissingFieldsButton" class="primary-button" type="button">احسب بعد إدخال الناقص</button>
