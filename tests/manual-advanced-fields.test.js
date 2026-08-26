@@ -26,3 +26,13 @@ test("advanced ratio fields are visible and manually editable", async () => {
     assert.doesNotMatch(html, new RegExp(`id="${fieldId}"\\s+type="hidden"`));
   }
 });
+
+test("واجهة الإصدار الجديد تعرض الهوية وبيانات المصدر وطريقة الحساب", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /محلل النسب المالية/);
+  assert.doesNotMatch(html, /المقارن المالي/);
+  assert.match(html, /id="importSourceBadge"/);
+  assert.match(html, /id="importPeriodBadge"/);
+  assert.match(html, /class="result-formula"/);
+});

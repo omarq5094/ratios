@@ -46,6 +46,8 @@ function createBrowserContext(nowRef) {
     "projectName",
     "importCompanyName",
     "importCompanyMeta",
+    "importSourceBadge",
+    "importPeriodBadge",
     "importCurrencyBadge",
     "importCoverageBadge",
     "importSourceLink",
@@ -110,9 +112,10 @@ function createBrowserContext(nowRef) {
     companyName: "شركة اختبار",
     currency: "SAR",
     fields: Object.fromEntries(Object.keys(elements).map((key) => [key, 100])),
-    availableFieldCount: 14,
-    totalFieldCount: 14,
+    availableFieldCount: 24,
+    totalFieldCount: 24,
     missingFields: [],
+    period: "2025",
     source: { provider: "Yahoo Finance", url: "https://finance.yahoo.com/" },
   };
 
@@ -151,6 +154,10 @@ test("يمنع طلب Yahoo جديدًا لمدة 15 ثانية ويستمر ب�
   assert.equal(elements.fetchCompanyButton.disabled, true);
   assert.equal(elements.fetchCompanyButton.dataset.state, "cooldown");
   assert.match(elements.fetchCompanyButton.textContent, /15/);
+  assert.equal(elements.importCoverageBadge.textContent, "تم جلب 24 من 24 حقلًا");
+  assert.equal(elements.importSourceBadge.textContent, "المصدر: Yahoo Finance");
+  assert.equal(elements.importPeriodBadge.textContent, "السنة المالية: 2025");
+  assert.equal(elements.importCurrencyBadge.textContent, "العملة: SAR");
   assert.equal(storage.get("financialBenchmarkYahooNextFetchAt"), "16000");
 
   nowRef.value = 16_000;

@@ -68,5 +68,7 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
   assert.equal(result.fields.sharePrice, 25);
   assert.equal(result.fields.totalDividends, 12);
   assert.equal(result.fields.earningsGrowthPercent, 8);
+  assert.equal(result.availableFieldCount, 24);
+  assert.equal(result.totalFieldCount, 24);
   assert.equal(result.missingFields.length, 0);
 });

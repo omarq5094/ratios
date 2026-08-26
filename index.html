@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
-    <title>المقارن المالي</title>
+    <title>محلل النسب المالية</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -15,7 +15,7 @@
       <div class="container nav-content">
         <a class="brand" href="#top">
           <span class="brand-mark">م</span>
-          <span class="brand-copy">المقارن المالي<small>FINANCIAL INTELLIGENCE</small></span>
+          <span class="brand-copy">محلل النسب المالية<small>FINANCIAL RATIO ANALYZER</small></span>
         </a>
         <nav aria-label="التنقل الرئيسي">
           <a href="#top">الرئيسية</a>
@@ -105,6 +105,8 @@
                   <a id="importSourceLink" href="#" target="_blank" rel="noopener noreferrer">عرض المصدر</a>
                 </div>
                 <div class="import-badges">
+                  <span id="importSourceBadge">المصدر: —</span>
+                  <span id="importPeriodBadge">السنة المالية: —</span>
                   <span id="importCurrencyBadge">العملة: —</span>
                   <span id="importCoverageBadge">الحقول: —</span>
                 </div>
@@ -137,7 +139,7 @@
                 <label class="field"><span>الالتزامات المتداولة <b>*</b></span><div class="number-field"><input id="currentLiabilities" type="number" min="0.01" step="0.01" required /><small>ر.س</small></div></label>
                 <label class="field"><span>إجمالي الأصول <b>*</b></span><div class="number-field"><input id="totalAssets" type="number" min="0.01" step="0.01" required /><small>ر.س</small></div></label>
                 <label class="field"><span>إجمالي الديون <b>*</b></span><div class="number-field"><input id="totalDebt" type="number" min="0" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>حقوق الملكية <b>*</b></span><div class="number-field"><input id="equity" type="number" min="0.01" step="0.01" required /><small>ر.س</small></div></label>
+                <label class="field"><span>حقوق الملكية <b>*</b></span><div class="number-field"><input id="equity" type="number" step="0.01" required /><small>ر.س</small></div></label>
               </div>
             </div>
 
@@ -151,7 +153,7 @@
                   </div>
                   <div class="fields-grid four-columns optional-fields">
                     <label class="field"><span>أصول السنة السابقة</span><div class="number-field"><input id="previousAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>حقوق السنة السابقة</span><div class="number-field"><input id="previousEquity" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                    <label class="field"><span>حقوق السنة السابقة</span><div class="number-field"><input id="previousEquity" type="number" step="0.01" /><small>ر.س</small></div></label>
                     <label class="field"><span>مخزون السنة السابقة</span><div class="number-field"><input id="previousInventory" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
                     <label class="field"><span>التدفق النقدي التشغيلي</span><div class="number-field"><input id="operatingCashFlow" type="number" step="0.01" /><small>ر.س</small></div></label>
                     <label class="field"><span>التدفق النقدي الحر</span><div class="number-field"><input id="freeCashFlow" type="number" step="0.01" /><small>ر.س</small></div></label>
@@ -197,10 +199,10 @@
           <div class="additional-panel">
             <div class="panel-heading"><div><span>مؤشرات إضافية</span><h3>قراءة المركز المالي</h3></div></div>
             <div class="additional-grid">
-              <article><span>نسبة التداول</span><strong id="currentRatioValue">—</strong><p>الأصول المتداولة مقابل الالتزامات المتداولة.</p></article>
-              <article><span>النسبة السريعة</span><strong id="quickRatioValue">—</strong><p>السيولة بعد استبعاد المخزون.</p></article>
-              <article><span>العائد على الأصول</span><strong id="roaValue">—</strong><p>كفاءة الأصول في توليد الربح.</p></article>
-              <article><span>تغطية التمويل</span><strong id="coverageValue">—</strong><p>قدرة الربح التشغيلي على تغطية تكلفة التمويل.</p></article>
+              <article><span>نسبة التداول</span><strong id="currentRatioValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> الأصول المتداولة ÷ الالتزامات المتداولة</small><p><b>التفسير المبسط:</b> الأصول المتداولة مقابل الالتزامات المتداولة.</p></article>
+              <article><span>النسبة السريعة</span><strong id="quickRatioValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> (الأصول المتداولة − المخزون) ÷ الالتزامات المتداولة</small><p><b>التفسير المبسط:</b> السيولة بعد استبعاد المخزون.</p></article>
+              <article><span>العائد على الأصول</span><strong id="roaValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> صافي الربح ÷ متوسط إجمالي الأصول</small><p><b>التفسير المبسط:</b> كفاءة الأصول في توليد الربح.</p></article>
+              <article><span>تغطية التمويل</span><strong id="coverageValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> الربح التشغيلي ÷ مصروف التمويل</small><p><b>التفسير المبسط:</b> قدرة الربح التشغيلي على تغطية تكلفة التمويل.</p></article>
             </div>
           </div>
           <div class="ratio-section-panel">
@@ -226,7 +228,7 @@
 
     <footer>
       <div class="container footer-content">
-        <div class="footer-brand"><span class="brand-mark">م</span><div><strong>المقارن المالي</strong><p>قراءة مالية أوضح من بياناتك.</p></div></div>
+        <div class="footer-brand"><span class="brand-mark">م</span><div><strong>محلل النسب المالية</strong><p>قراءة مالية أوضح من بياناتك.</p></div></div>
         <div class="footer-links">
           <a href="https://www.linkedin.com/in/omar-al-ghrman-1b5795382/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://x.com/omar_saeed3" target="_blank" rel="noopener noreferrer">X</a>

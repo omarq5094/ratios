@@ -4,27 +4,37 @@ const ratioMeta = {
   gross_margin: {
     label: "هامش مجمل الربح",
     type: "percent",
+    formula: "(الإيرادات − تكلفة المبيعات) ÷ الإيرادات",
     description: "المتبقي من الإيرادات بعد تكلفة المبيعات.",
+    negativeDescription: "النتيجة سالبة لأن تكلفة المبيعات تجاوزت الإيرادات.",
   },
   operating_margin: {
     label: "هامش التشغيل",
     type: "percent",
+    formula: "الربح التشغيلي ÷ الإيرادات",
     description: "نتيجة النشاط التشغيلي مقارنة بالإيرادات.",
+    negativeDescription: "النتيجة سالبة لأن النشاط سجل خسارة تشغيلية.",
   },
   net_margin: {
     label: "هامش صافي الربح",
     type: "percent",
+    formula: "صافي الربح ÷ الإيرادات",
     description: "صافي الربح المتحقق من إجمالي الإيرادات.",
+    negativeDescription: "النتيجة سالبة لأن الشركة سجلت صافي خسارة.",
   },
   roe: {
     label: "العائد على حقوق الملكية",
     type: "percent",
+    formula: "صافي الربح ÷ متوسط حقوق الملكية",
     description: "كفاءة حقوق الملكية في توليد صافي الربح.",
+    negativeDescription: "النتيجة سالبة بسبب وجود قيمة سالبة في صافي الربح أو حقوق الملكية المستخدمة.",
   },
   debt_to_equity: {
     label: "الديون إلى حقوق الملكية",
     type: "multiple",
+    formula: "إجمالي الديون ÷ حقوق الملكية",
     description: "حجم الديون مقارنة بحقوق الملكية.",
+    negativeDescription: "النتيجة سالبة لأن حقوق الملكية المستخدمة في الحساب سالبة.",
   },
 };
 
@@ -231,16 +241,27 @@ function applyImportedData(data) {
     }
   });
 
-  const missingLabels = (data.missingFields || []).map((key) => importedFieldLabels[key]).filter(Boolean);
-  const metaParts = [data.symbol, data.source?.provider].filter(Boolean);
+  const importedKeys = Object.keys(importedFieldLabels);
+  const missingKeys = importedKeys.filter((key) => {
+    const value = data.fields?.[key];
+    return typeof value !== "number" || !Number.isFinite(value);
+  });
+  const missingLabels = missingKeys.map((key) => importedFieldLabels[key]);
+  const availableFieldCount = importedKeys.length - missingKeys.length;
   document.querySelector("#importCompanyName").textContent = data.companyName || data.symbol;
-  document.querySelector("#importCompanyMeta").textContent = metaParts.join(" · ");
+  document.querySelector("#importCompanyMeta").textContent = `الرمز: ${data.symbol || "غير محدد"}`;
+  document.querySelector("#importSourceBadge").textContent = `المصدر: ${data.source?.provider || "غير محدد"}`;
+  document.querySelector("#importPeriodBadge").textContent = `السنة المالية: ${data.period || "غير محددة"}`;
   document.querySelector("#importCurrencyBadge").textContent = `العملة: ${data.currency || "غير محددة"}`;
-  document.querySelector("#importCoverageBadge").textContent = `تم جلب ${data.availableFieldCount} من ${data.totalFieldCount} حقلًا`;
+  document.querySelector("#importCoverageBadge").textContent = `تم جلب ${availableFieldCount} من ${importedKeys.length} حقلًا`;
   document.querySelector("#importSourceLink").href = data.source?.url || "#";
 
   const notes = [];
-  if (missingLabels.length) notes.push(`راجع الحقول الناقصة يدويًا: ${missingLabels.join("، ")}.`);
+  if (missingLabels.length) {
+    notes.push(`الحقول التي لم يوفرها Yahoo Finance: ${missingLabels.join("، ")}.`);
+  } else {
+    notes.push("اكتملت جميع الحقول الأربعة والعشرون من Yahoo Finance.");
+  }
   notes.push("راجع الأرقام مع القوائم المنشورة قبل اعتماد النتيجة.");
   document.querySelector("#importMissingNote").textContent = notes.join(" ");
   importSummary.hidden = false;
@@ -256,7 +277,7 @@ function applyImportedData(data) {
     "totalAssets",
     "totalDebt",
     "equity",
-  ].filter((key) => data.missingFields?.includes(key));
+  ].filter((key) => missingKeys.includes(key));
 
   if (requiredMissing.length) {
     showFetchStatus("تم جلب البيانات المتاحة. أكمل المراجعة والحقول المعلّمة قبل الحساب.", "warning");
@@ -318,7 +339,9 @@ async function fetchCompanyData() {
 
 function calculate(values) {
   const averageAssets = values.previousAssets > 0 ? (values.totalAssets + values.previousAssets) / 2 : values.totalAssets;
-  const averageEquity = values.previousEquity > 0 ? (values.equity + values.previousEquity) / 2 : values.equity;
+  const averageEquity = values.previousEquity !== null
+    ? (values.equity + values.previousEquity) / 2
+    : values.equity;
 
   return {
     gross_margin: (values.revenue - values.costOfSales) / values.revenue,
@@ -348,11 +371,17 @@ function renderPrimaryRatios(ratios) {
     title.textContent = meta.label;
     const value = document.createElement("strong");
     value.textContent = formatRatio(ratios[code], meta.type);
+    const formula = document.createElement("p");
+    formula.className = "ratio-formula";
+    formula.textContent = `طريقة الحساب: ${meta.formula}`;
     const note = document.createElement("p");
     note.className = "ratio-result-note";
-    note.textContent = meta.description;
+    const interpretation = ratios[code] < 0 && meta.negativeDescription
+      ? meta.negativeDescription
+      : meta.description;
+    note.textContent = `التفسير المبسط: ${interpretation}`;
 
-    card.append(title, value, note);
+    card.append(title, value, formula, note);
     ratioGrid.append(card);
   });
 }
@@ -366,9 +395,16 @@ function renderAdvancedCard(item) {
   const english = document.createElement("small");
   english.textContent = item.english;
   const value = document.createElement("strong");
+  const formula = document.createElement("p");
+  formula.className = "ratio-formula";
+  formula.textContent = `طريقة الحساب: ${item.formula}`;
   const description = document.createElement("p");
-  description.textContent = item.description;
-  card.append(title, english, value, description);
+  description.className = "ratio-result-note";
+  const interpretation = item.status === "available" && item.value < 0
+    ? item.negativeDescription || "النتيجة سالبة بسبب وجود قيمة سالبة ضمن عناصر المعادلة."
+    : item.description;
+  description.textContent = `التفسير المبسط: ${interpretation}`;
+  card.append(title, english, value, formula, description);
 
   if (item.status === "available") {
     value.textContent = formatAdvancedValue(item.value, item.type);
@@ -382,7 +418,7 @@ function renderAdvancedCard(item) {
     const labels = item.missingFields.map((key) => advancedRatioApi.fieldLabels[key] || key);
     status.textContent = `ينقص: ${labels.join("، ")}.`;
   } else {
-    value.textContent = "غير قابل للتفسير";
+    value.textContent = "غير قابل للحساب";
     status.textContent = item.invalidReason;
   }
   card.append(status);

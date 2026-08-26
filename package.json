@@ -1,6 +1,6 @@
 {
-  "name": "financial-benchmark-yahoo",
-  "version": "2.4.0",
+  "name": "financial-ratio-analyzer-yahoo",
+  "version": "2.5.0",
   "private": true,
   "type": "module",
   "engines": {

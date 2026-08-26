@@ -40,6 +40,10 @@ test("يحسب المؤشرات السبعة عشر الجديدة من القي
   );
 
   assert.equal(Object.keys(results).length, 17);
+  for (const item of Object.values(results)) {
+    assert.equal(typeof item.formula, "string");
+    assert.ok(item.formula.length > 0);
+  }
   assert.equal(results.market_cap.value, 1_000);
   assert.equal(results.pe.value, 20);
   assert.equal(results.pb.value, 2.5);
@@ -73,7 +77,7 @@ test("يحدد القيمة الناقصة بدل افتراض الصفر", asyn
   assert.equal(results.free_cash_flow_yield.status, "missing");
 });
 
-test("لا يعرض P/E كمضاعف صالح عند وجود خسارة", async () => {
+test("يعرض النسب السالبة كما حُسبت عند وجود خسارة", async () => {
   const calculator = await loadCalculator();
   const values = completeValues();
   values.netProfit = -10;
@@ -81,8 +85,24 @@ test("لا يعرض P/E كمضاعف صالح عند وجود خسارة", async
     calculator.calculate(values).map((item) => [item.code, item]),
   );
 
-  assert.equal(results.pe.status, "invalid");
-  assert.equal(results.pe.value, null);
-  assert.match(results.pe.invalidReason, /خسارة/);
-  assert.equal(results.peg.status, "invalid");
+  assert.equal(results.pe.status, "available");
+  assert.equal(results.pe.value, -100);
+  assert.equal(results.peg.status, "available");
+  assert.equal(results.peg.value, -10);
+  assert.equal(results.dividend_payout.value, -2);
+});
+
+test("يمنع القسمة على صفر دون إخفاء القيم السالبة", async () => {
+  const calculator = await loadCalculator();
+  const values = completeValues();
+  values.freeCashFlow = -40;
+  values.ebitda = 0;
+  const results = Object.fromEntries(
+    calculator.calculate(values).map((item) => [item.code, item]),
+  );
+
+  assert.equal(results.p_fcf.value, -25);
+  assert.equal(results.free_cash_flow_yield.value, -0.04);
+  assert.equal(results.ev_ebitda.status, "invalid");
+  assert.equal(results.ev_ebitda.value, null);
 });
