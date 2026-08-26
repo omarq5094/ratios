@@ -38,6 +38,11 @@ function createBrowserContext(nowRef) {
     "fetchCompanyButton",
     "dataFetchStatus",
     "importSummary",
+    "valuationRatioGrid",
+    "operationsRatioGrid",
+    "missingDataPanel",
+    "missingFieldsGrid",
+    "applyMissingFieldsButton",
     "projectName",
     "importCompanyName",
     "importCompanyMeta",
@@ -67,6 +72,16 @@ function createBrowserContext(nowRef) {
     "previousEquity",
     "operatingCashFlow",
     "interestExpense",
+    "marketCap",
+    "freeCashFlow",
+    "enterpriseValue",
+    "ebitda",
+    "cashAndEquivalents",
+    "previousInventory",
+    "annualDividendPerShare",
+    "sharePrice",
+    "totalDividends",
+    "earningsGrowthPercent",
   ];
   const elements = Object.fromEntries(ids.map((id) => [id, new FakeElement()]));
   const storage = new Map();
@@ -124,7 +139,10 @@ function createBrowserContext(nowRef) {
 test("يمنع طلب Yahoo جديدًا لمدة 15 ثانية ويستمر بعد الطلب", async () => {
   const nowRef = { value: 1_000 };
   const { context, elements, storage } = createBrowserContext(nowRef);
+  const advancedSource = await readFile(new URL("../lib/advanced-ratios.js", import.meta.url), "utf8");
   const source = await readFile(new URL("../script.js", import.meta.url), "utf8");
+  vm.runInContext(advancedSource, context);
+  context.window.AdvancedFinancialRatios = context.AdvancedFinancialRatios;
   vm.runInContext(source, context);
 
   elements.tickerInput.value = "2222";

@@ -36,7 +36,9 @@ export default async function handler(request, response) {
 
   try {
     const [quoteSummary, annualSeries] = await Promise.all([
-      yahooFinance.quoteSummary(symbol, { modules: ["price"] }),
+      yahooFinance.quoteSummary(symbol, {
+        modules: ["price", "defaultKeyStatistics", "summaryDetail", "financialData"],
+      }),
       yahooFinance.fundamentalsTimeSeries(symbol, {
         period1,
         type: "annual",

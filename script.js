@@ -1,3 +1,5 @@
+const advancedRatioApi = window.AdvancedFinancialRatios;
+
 const ratioMeta = {
   gross_margin: {
     label: "هامش مجمل الربح",
@@ -37,6 +39,11 @@ const tickerInput = document.querySelector("#tickerInput");
 const fetchCompanyButton = document.querySelector("#fetchCompanyButton");
 const dataFetchStatus = document.querySelector("#dataFetchStatus");
 const importSummary = document.querySelector("#importSummary");
+const valuationRatioGrid = document.querySelector("#valuationRatioGrid");
+const operationsRatioGrid = document.querySelector("#operationsRatioGrid");
+const missingDataPanel = document.querySelector("#missingDataPanel");
+const missingFieldsGrid = document.querySelector("#missingFieldsGrid");
+const applyMissingFieldsButton = document.querySelector("#applyMissingFieldsButton");
 
 const importedFieldLabels = {
   revenue: "الإيرادات",
@@ -53,16 +60,38 @@ const importedFieldLabels = {
   previousEquity: "حقوق السنة السابقة",
   operatingCashFlow: "التدفق النقدي التشغيلي",
   interestExpense: "مصروف التمويل",
+  marketCap: "القيمة السوقية",
+  freeCashFlow: "التدفق النقدي الحر",
+  enterpriseValue: "قيمة المنشأة",
+  ebitda: "الأرباح قبل الفوائد والضرائب والاستهلاك والإطفاء",
+  cashAndEquivalents: "النقد وما في حكمه",
+  previousInventory: "مخزون السنة السابقة",
+  annualDividendPerShare: "التوزيعات السنوية للسهم",
+  sharePrice: "سعر السهم",
+  totalDividends: "إجمالي توزيعات الأرباح",
+  earningsGrowthPercent: "معدل نمو الأرباح",
 };
 
 const numberFormatter = new Intl.NumberFormat("ar-SA", { maximumFractionDigits: 2 });
+const compactNumberFormatter = new Intl.NumberFormat("ar-SA", {
+  maximumFractionDigits: 2,
+  notation: "compact",
+});
 let fetchInProgress = false;
 let cooldownTimer = 0;
 let nextFetchAt = readCooldownDeadline();
+let currencyUnit = "ر.س";
 
 function valueOf(id) {
   const value = Number(document.querySelector(`#${id}`).value);
   return Number.isFinite(value) ? value : 0;
+}
+
+function nullableValueOf(id) {
+  const rawValue = document.querySelector(`#${id}`).value.trim();
+  if (rawValue === "") return null;
+  const value = Number(rawValue);
+  return Number.isFinite(value) ? value : null;
 }
 
 function textOf(id) {
@@ -77,6 +106,12 @@ function formatRatio(value, type) {
   if (value === null || !Number.isFinite(value)) return "غير متاح";
   if (type === "percent") return `${numberFormatter.format(value * 100)}٪`;
   return `${numberFormatter.format(value)} مرة`;
+}
+
+function formatAdvancedValue(value, type) {
+  if (value === null || !Number.isFinite(value)) return "غير متاح";
+  if (type === "currency") return `${compactNumberFormatter.format(value)} ${currencyUnit}`;
+  return formatRatio(value, type);
 }
 
 function showMessage(text, type = "") {
@@ -170,6 +205,7 @@ function clearFinancialFields() {
 
 function updateCurrencyUnits(currency) {
   const unit = currency === "SAR" ? "ر.س" : currency || "عملة التقرير";
+  currencyUnit = unit;
   document.querySelectorAll(".number-field small").forEach((element) => {
     element.textContent = unit;
   });
@@ -294,7 +330,10 @@ function calculate(values) {
     roa: values.netProfit / averageAssets,
     roe: values.netProfit / averageEquity,
     interest_coverage: values.interestExpense > 0 ? values.operatingProfit / values.interestExpense : null,
-    cash_quality: values.operatingCashFlow !== 0 && values.netProfit !== 0 ? values.operatingCashFlow / values.netProfit : null,
+    cash_quality:
+      values.operatingCashFlow !== null && values.netProfit !== 0
+        ? values.operatingCashFlow / values.netProfit
+        : null,
   };
 }
 
@@ -318,7 +357,103 @@ function renderPrimaryRatios(ratios) {
   });
 }
 
-function renderResults(values, ratios) {
+function renderAdvancedCard(item) {
+  const card = document.createElement("article");
+  card.className = `expanded-ratio-card ${item.status === "available" ? "" : item.status}`.trim();
+
+  const title = document.createElement("span");
+  title.textContent = item.label;
+  const english = document.createElement("small");
+  english.textContent = item.english;
+  const value = document.createElement("strong");
+  const description = document.createElement("p");
+  description.textContent = item.description;
+  card.append(title, english, value, description);
+
+  if (item.status === "available") {
+    value.textContent = formatAdvancedValue(item.value, item.type);
+    return card;
+  }
+
+  const status = document.createElement("p");
+  status.className = "ratio-data-status";
+  if (item.status === "missing") {
+    value.textContent = "بيانات ناقصة";
+    const labels = item.missingFields.map((key) => advancedRatioApi.fieldLabels[key] || key);
+    status.textContent = `ينقص: ${labels.join("، ")}.`;
+  } else {
+    value.textContent = "غير قابل للتفسير";
+    status.textContent = item.invalidReason;
+  }
+  card.append(status);
+  return card;
+}
+
+function renderAdvancedRatios(values, ratios) {
+  const results = advancedRatioApi.calculate(values);
+  valuationRatioGrid.replaceChildren();
+  operationsRatioGrid.replaceChildren();
+
+  results.forEach((item) => {
+    const target = item.group === "valuation" ? valuationRatioGrid : operationsRatioGrid;
+    target.append(renderAdvancedCard(item));
+  });
+
+  const missingResults = [...results];
+  if (ratios.interest_coverage === null && values.interestExpense === null) {
+    missingResults.push({ status: "missing", missingFields: ["interestExpense"] });
+  }
+  renderMissingFields(missingResults);
+}
+
+function unitLabelFor(fieldName) {
+  const unit = advancedRatioApi.inputMeta[fieldName]?.unit;
+  if (unit === "percent") return "٪";
+  if (unit === "currency_per_share") return `${currencyUnit} للسهم`;
+  return currencyUnit;
+}
+
+function renderMissingFields(results) {
+  const missingFields = [
+    ...new Set(
+      results
+        .filter((item) => item.status === "missing")
+        .flatMap((item) => item.missingFields)
+        .filter((fieldName) => advancedRatioApi.fieldLabels[fieldName]),
+    ),
+  ];
+
+  missingFieldsGrid.replaceChildren();
+  missingDataPanel.hidden = missingFields.length === 0;
+  if (!missingFields.length) return;
+
+  missingFields.forEach((fieldName) => {
+    const meta = advancedRatioApi.inputMeta[fieldName] || {};
+    const label = document.createElement("label");
+    label.className = "missing-input-card";
+    const title = document.createElement("span");
+    title.textContent = advancedRatioApi.fieldLabels[fieldName];
+    const helper = document.createElement("small");
+    helper.textContent = "أدخل القيمة من القوائم أو المصدر الرسمي.";
+    const wrap = document.createElement("div");
+    wrap.className = "missing-input-wrap";
+    const input = document.createElement("input");
+    input.type = "number";
+    input.step = "any";
+    input.dataset.field = fieldName;
+    input.setAttribute("aria-label", advancedRatioApi.fieldLabels[fieldName]);
+    if (typeof meta.min === "number") input.min = String(meta.min);
+    const savedValue = document.querySelector(`#${fieldName}`)?.value;
+    if (savedValue) input.value = savedValue;
+    const unit = document.createElement("b");
+    unit.textContent = unitLabelFor(fieldName);
+    wrap.append(input, unit);
+    label.append(title, helper, wrap);
+    missingFieldsGrid.append(label);
+  });
+}
+
+function renderResults(values, ratios, shouldScroll = true) {
   setText("resultTitle", values.projectName || "مشروعك");
   setText("currentRatioValue", formatRatio(ratios.current_ratio, "multiple"));
   setText("quickRatioValue", formatRatio(ratios.quick_ratio, "multiple"));
@@ -326,12 +461,13 @@ function renderResults(values, ratios) {
   setText("coverageValue", formatRatio(ratios.interest_coverage, "multiple"));
   setText(
     "resultSummary",
-    "تم حساب نسب الربحية والعائد والمديونية والسيولة من البيانات المدخلة. لا تُفسّر ارتفاع أو انخفاض أي نسبة منفردة على أنه جيد أو سيئ دون مراجعة نشاط الشركة وتاريخها وقوائمها الرسمية.",
+    "تم حساب المؤشرات من البيانات المتاحة والمدخلة. تعتمد مؤشرات التقييم السوقي على أحدث قيمة سوقية متاحة مع أحدث بيانات سنوية مكتملة؛ لذلك يجب مراجعة المصدر والقوائم الرسمية قبل تفسير النتائج.",
   );
   renderPrimaryRatios(ratios);
+  renderAdvancedRatios(values, ratios);
 
   resultsSection.hidden = false;
-  resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (shouldScroll) resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function collectValues() {
@@ -347,10 +483,20 @@ function collectValues() {
     totalAssets: valueOf("totalAssets"),
     totalDebt: valueOf("totalDebt"),
     equity: valueOf("equity"),
-    previousAssets: valueOf("previousAssets"),
-    previousEquity: valueOf("previousEquity"),
-    operatingCashFlow: valueOf("operatingCashFlow"),
-    interestExpense: valueOf("interestExpense"),
+    previousAssets: nullableValueOf("previousAssets"),
+    previousEquity: nullableValueOf("previousEquity"),
+    operatingCashFlow: nullableValueOf("operatingCashFlow"),
+    interestExpense: nullableValueOf("interestExpense"),
+    marketCap: nullableValueOf("marketCap"),
+    freeCashFlow: nullableValueOf("freeCashFlow"),
+    enterpriseValue: nullableValueOf("enterpriseValue"),
+    ebitda: nullableValueOf("ebitda"),
+    cashAndEquivalents: nullableValueOf("cashAndEquivalents"),
+    previousInventory: nullableValueOf("previousInventory"),
+    annualDividendPerShare: nullableValueOf("annualDividendPerShare"),
+    sharePrice: nullableValueOf("sharePrice"),
+    totalDividends: nullableValueOf("totalDividends"),
+    earningsGrowthPercent: nullableValueOf("earningsGrowthPercent"),
   };
 }
 
@@ -373,11 +519,46 @@ form.addEventListener("submit", (event) => {
   showMessage("تم الحساب محليًا داخل جهازك، ولم تُحفظ بياناتك المالية.", "success");
 });
 
+applyMissingFieldsButton.addEventListener("click", () => {
+  const inputs = [...missingFieldsGrid.querySelectorAll("input[data-field]")];
+  let updatedCount = 0;
+
+  for (const input of inputs) {
+    const rawValue = input.value.trim();
+    if (rawValue === "") continue;
+    const value = Number(rawValue);
+    const minimum = input.min === "" ? null : Number(input.min);
+    if (!Number.isFinite(value) || (minimum !== null && value < minimum)) {
+      input.focus();
+      showMessage(`راجع قيمة ${advancedRatioApi.fieldLabels[input.dataset.field]}.`, "error");
+      return;
+    }
+
+    const target = document.querySelector(`#${input.dataset.field}`);
+    if (target) {
+      target.value = String(value);
+      updatedCount += 1;
+    }
+  }
+
+  if (!updatedCount) {
+    showMessage("أدخل قيمة واحدة على الأقل من البيانات الناقصة.", "warning");
+    return;
+  }
+
+  const values = collectValues();
+  const ratios = calculate(values);
+  renderResults(values, ratios, false);
+  showMessage("تم تحديث النسب باستخدام البيانات التي أدخلتها.", "success");
+});
+
 document.querySelector("#resetButton").addEventListener("click", () => {
   form.reset();
   resultsSection.hidden = true;
   showMessage("");
   resetImportPresentation();
+  missingDataPanel.hidden = true;
+  missingFieldsGrid.replaceChildren();
   updateCurrencyUnits("SAR");
   updateFetchButton();
   document.querySelector("#calculator").scrollIntoView({ behavior: "smooth", block: "start" });

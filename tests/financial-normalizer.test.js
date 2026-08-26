@@ -13,8 +13,14 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
   const result = buildCompanyPayload(
     "2222.SR",
     {
-      price: { longName: "Saudi Arabian Oil Company", currency: "SAR" },
-      assetProfile: { sector: "Energy", industry: "Oil & Gas Integrated" },
+      price: {
+        longName: "Saudi Arabian Oil Company",
+        currency: "SAR",
+        regularMarketPrice: 25,
+        marketCap: 1_000,
+      },
+      defaultKeyStatistics: { enterpriseValue: 1_150, earningsQuarterlyGrowth: 0.08 },
+      summaryDetail: { dividendRate: 1.5 },
     },
     [
       {
@@ -30,6 +36,10 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
         totalDebt: 50,
         stockholdersEquity: 120,
         operatingCashFlow: 25,
+        freeCashFlow: 15,
+        EBITDA: 35,
+        cashAndCashEquivalents: 20,
+        cashDividendsPaid: -12,
         interestExpense: -3,
       },
       {
@@ -37,6 +47,7 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
         totalRevenue: 90,
         totalAssets: 180,
         stockholdersEquity: 110,
+        inventory: 8,
         netIncome: 18,
       },
     ],
@@ -47,5 +58,15 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
   assert.equal(result.fields.previousAssets, 180);
   assert.equal(result.fields.previousEquity, 110);
   assert.equal(result.fields.interestExpense, 3);
+  assert.equal(result.fields.marketCap, 1_000);
+  assert.equal(result.fields.enterpriseValue, 1_150);
+  assert.equal(result.fields.freeCashFlow, 15);
+  assert.equal(result.fields.ebitda, 35);
+  assert.equal(result.fields.cashAndEquivalents, 20);
+  assert.equal(result.fields.previousInventory, 8);
+  assert.equal(result.fields.annualDividendPerShare, 1.5);
+  assert.equal(result.fields.sharePrice, 25);
+  assert.equal(result.fields.totalDividends, 12);
+  assert.equal(result.fields.earningsGrowthPercent, 8);
   assert.equal(result.missingFields.length, 0);
 });

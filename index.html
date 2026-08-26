@@ -44,7 +44,7 @@
           <div class="visual-glow" aria-hidden="true"></div>
           <article class="insight-card main-insight">
             <div class="insight-head"><span>ملخص التحليل المالي</span><small>نسب محسوبة</small></div>
-            <strong>9<small> نسب</small></strong>
+            <strong>26<small> مؤشرًا</small></strong>
             <div class="spark-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <p>قراءة مباشرة للربحية والسيولة والمديونية والعائد</p>
           </article>
@@ -94,7 +94,7 @@
                 />
                 <button id="fetchCompanyButton" class="fetch-button" type="button">جلب البيانات</button>
               </div>
-              <p class="ticker-help"></p>
+              <p class="ticker-help">يمكنك تعديل أي رقم بعد الجلب. يتاح طلب جديد كل 15 ثانية، ويجب مراجعة العملة والحقول الناقصة.</p>
               <div id="dataFetchStatus" class="fetch-status" aria-live="polite" hidden></div>
               <div id="importSummary" class="import-summary" hidden>
                 <div class="import-summary-head">
@@ -151,6 +151,19 @@
               </div>
             </details>
 
+            <div class="supplemental-data-store" hidden aria-hidden="true">
+              <input id="marketCap" type="hidden" />
+              <input id="freeCashFlow" type="hidden" />
+              <input id="enterpriseValue" type="hidden" />
+              <input id="ebitda" type="hidden" />
+              <input id="cashAndEquivalents" type="hidden" />
+              <input id="previousInventory" type="hidden" />
+              <input id="annualDividendPerShare" type="hidden" />
+              <input id="sharePrice" type="hidden" />
+              <input id="totalDividends" type="hidden" />
+              <input id="earningsGrowthPercent" type="hidden" />
+            </div>
+
             <div class="form-actions">
               <button id="submitButton" class="primary-button" type="submit">احسب النسب</button>
               <button id="resetButton" class="secondary-button" type="button">مسح البيانات</button>
@@ -176,6 +189,22 @@
               <article><span>تغطية التمويل</span><strong id="coverageValue">—</strong><p>قدرة الربح التشغيلي على تغطية تكلفة التمويل.</p></article>
             </div>
           </div>
+          <div class="ratio-section-panel">
+            <div class="panel-heading"><div><span>بيانات السوق</span><h3>التقييم والتوزيعات</h3></div><small>وفق البيانات المتاحة</small></div>
+            <div id="valuationRatioGrid" class="expanded-ratio-grid"></div>
+          </div>
+          <div class="ratio-section-panel">
+            <div class="panel-heading"><div><span>الكفاءة والتمويل</span><h3>مؤشرات تشغيلية متقدمة</h3></div><small>حسب البيانات المدخلة</small></div>
+            <div id="operationsRatioGrid" class="expanded-ratio-grid"></div>
+          </div>
+          <section id="missingDataPanel" class="missing-data-panel" hidden>
+            <div class="missing-data-heading">
+              <div><span>استكمال النتائج</span><h3>بعض البيانات غير متوفرة من Yahoo</h3></div>
+              <p>أدخل القيم الناقصة مرة واحدة، وسيعيد الموقع حساب النسب المرتبطة بها.</p>
+            </div>
+            <div id="missingFieldsGrid" class="missing-fields-grid"></div>
+            <button id="applyMissingFieldsButton" class="primary-button" type="button">احسب بعد إدخال الناقص</button>
+          </section>
           <div class="result-note"><strong>قراءة سريعة</strong><p id="resultSummary"></p><small>هذه النتائج تعليمية وتحليلية وليست توصية استثمارية. تحقّق من القوائم والإعلانات الرسمية قبل اتخاذ أي قرار.</small></div>
         </div>
       </section>
@@ -193,6 +222,7 @@
       </div>
     </footer>
 
+    <script src="lib/advanced-ratios.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
