@@ -3,6 +3,9 @@
   "functions": {
     "api/company-data.js": {
       "maxDuration": 60
+    },
+    "api/ai-assistant.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
