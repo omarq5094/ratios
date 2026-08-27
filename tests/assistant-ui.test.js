@@ -18,6 +18,9 @@ test("واجهة المساعد تتضمن عناصر الوصول والخصو�
   assert.match(source, /aria-controls="aiAssistantPanel"/);
   assert.match(source, /aria-live="polite"/);
   assert.match(source, /تُرسل رسائل المحادثة فقط/);
+  assert.match(source, /بيانات الشاشة مرفقة/);
+  assert.match(source, /financial-analysis-context/);
+  assert.match(source, /analysisContext: state\.analysisContext/);
   assert.match(source, /sessionStorage/);
   assert.doesNotMatch(source, /OPENAI_API_KEY/);
 });
@@ -25,6 +28,7 @@ test("واجهة المساعد تتضمن عناصر الوصول والخصو�
 test("الثيم يتضمن العرض المتجاوب للمساعد", async () => {
   const css = await readFile(new URL("style.css", root), "utf8");
   assert.match(css, /\.ai-assistant-panel/);
+  assert.match(css, /\.ai-screen-context/);
   assert.match(css, /backdrop-filter: blur\(36px\)/);
   assert.match(css, /@media \(max-width: 600px\)[\s\S]*\.ai-assistant-panel/);
 });

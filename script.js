@@ -38,6 +38,15 @@ const ratioMeta = {
   },
 };
 
+const summaryRatioMeta = {
+  current_ratio: { label: "نسبة التداول", type: "multiple" },
+  quick_ratio: { label: "النسبة السريعة", type: "multiple" },
+  roa: { label: "العائد على الأصول", type: "percent" },
+  interest_coverage: { label: "تغطية التمويل", type: "multiple" },
+};
+
+const ASSISTANT_CONTEXT_EVENT = "financial-analysis-context";
+
 const FETCH_COOLDOWN_MS = 15_000;
 const FETCH_COOLDOWN_KEY = "financialBenchmarkYahooNextFetchAt";
 
@@ -257,10 +266,19 @@ function applyImportedData(data) {
   clearFinancialFields();
 
   importedCompanyContext = {
+    symbol: data.symbol || "",
+    companyName: data.companyName || data.symbol || "",
     companyInfo: data.companyInfo || {},
     dividendHistory: data.dividendHistory || null,
     currency: data.currency || "SAR",
+    period: data.period || "",
+    periodEnd: data.periodEnd || "",
+    missingFields: Array.isArray(data.missingFields) ? data.missingFields : [],
+    source: data.source || {},
   };
+
+  resultsSection.hidden = true;
+  publishAssistantContext(null);
 
   document.querySelector("#projectName").value = data.companyName || data.symbol;
   updateCurrencyUnits(data.currency);
@@ -601,6 +619,59 @@ function renderDividendHistory() {
   });
 }
 
+function assistantRatio(code, meta, value) {
+  return {
+    code,
+    label: meta.label,
+    type: meta.type,
+    status: typeof value === "number" && Number.isFinite(value) ? "available" : "invalid",
+    value: typeof value === "number" && Number.isFinite(value) ? value : null,
+  };
+}
+
+function buildAssistantContext(values, ratios) {
+  const primaryRatios = [
+    ...Object.entries(ratioMeta).map(([code, meta]) => assistantRatio(code, meta, ratios[code])),
+    ...Object.entries(summaryRatioMeta).map(([code, meta]) => assistantRatio(code, meta, ratios[code])),
+  ];
+  const advancedRatios = advancedRatioApi.calculate(values).map((item) => ({
+    code: item.code,
+    label: item.label,
+    type: item.type,
+    status: item.status,
+    value: item.status === "available" ? item.value : null,
+    missingFields: item.status === "missing" ? item.missingFields : [],
+    invalidReason: item.status === "invalid" ? item.invalidReason : "",
+  }));
+  const imported = importedCompanyContext;
+
+  return {
+    schemaVersion: 1,
+    sourceType: imported ? "yahoo" : "manual",
+    company: {
+      name: values.projectName || imported?.companyName || "النتائج الحالية",
+      symbol: imported?.symbol || "",
+      currency: imported?.currency || currencyUnit,
+      period: imported?.period || "",
+      periodEnd: imported?.periodEnd || "",
+    },
+    companyInfo: imported?.companyInfo || {},
+    source: imported?.source || { provider: "إدخال يدوي" },
+    missingFields: imported?.missingFields || [],
+    financialInputs: Object.fromEntries(
+      Object.entries(values).filter(([key, value]) => key !== "projectName" && (value === null || Number.isFinite(value))),
+    ),
+    ratios: [...primaryRatios, ...advancedRatios],
+    dividendHistory: imported?.dividendHistory || null,
+  };
+}
+
+function publishAssistantContext(context) {
+  window.financialAnalysisContext = context;
+  if (typeof window.dispatchEvent !== "function" || typeof window.CustomEvent !== "function") return;
+  window.dispatchEvent(new window.CustomEvent(ASSISTANT_CONTEXT_EVENT, { detail: context }));
+}
+
 function renderResults(values, ratios, shouldScroll = true) {
   setText("resultTitle", values.projectName || "مشروعك");
   setText("currentRatioValue", formatRatio(ratios.current_ratio, "multiple"));
@@ -617,6 +688,7 @@ function renderResults(values, ratios, shouldScroll = true) {
   renderDividendHistory();
 
   resultsSection.hidden = false;
+  publishAssistantContext(buildAssistantContext(values, ratios));
   if (shouldScroll) resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -706,6 +778,7 @@ document.querySelector("#resetButton").addEventListener("click", () => {
   form.reset();
   resultsSection.hidden = true;
   importedCompanyContext = null;
+  publishAssistantContext(null);
   companyInfoPanel.hidden = true;
   dividendHistoryPanel.hidden = true;
   dividendHistoryRows.replaceChildren();

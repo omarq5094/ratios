@@ -7,6 +7,7 @@
   const state = {
     busy: false,
     history: loadHistory(),
+    analysisContext: null,
   };
 
   function loadHistory() {
@@ -51,9 +52,13 @@
       </header>
       <div class="ai-assistant-body">
         <div class="ai-assistant-messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <div class="ai-screen-context" hidden>
+          <span aria-hidden="true">◆</span>
+          <strong></strong>
+        </div>
         <div class="ai-quick-prompts" aria-label="أسئلة مقترحة"></div>
       </div>
-      <div class="ai-privacy-note"><span aria-hidden="true">◇</span> تُرسل رسائل المحادثة فقط إلى خدمة الذكاء الاصطناعي.</div>
+      <div class="ai-privacy-note"><span aria-hidden="true">◇</span><b>تُرسل رسائل المحادثة فقط إلى خدمة الذكاء الاصطناعي.</b></div>
       <form class="ai-composer">
         <label class="sr-only" for="aiAssistantInput">اكتب سؤالك</label>
         <textarea id="aiAssistantInput" maxlength="${MAX_MESSAGE_LENGTH}" rows="1" placeholder="اكتب سؤالك عن النسب المالية..."></textarea>
@@ -72,10 +77,13 @@
   const input = root.querySelector("textarea");
   const sendButton = root.querySelector(".ai-send-button");
   const messages = root.querySelector(".ai-assistant-messages");
+  const screenContext = root.querySelector(".ai-screen-context");
+  const screenContextLabel = screenContext.querySelector("strong");
   const quickPrompts = root.querySelector(".ai-quick-prompts");
+  const privacyNoteText = root.querySelector(".ai-privacy-note b");
 
   const page = document.body.classList.contains("ratios-page") ? "guide" : "calculator";
-  const promptLabels = page === "guide"
+  const basePromptLabels = page === "guide"
     ? ["ما أهم نسب التقييم؟", "كيف أقرأ النسبة السالبة؟", "ما الفرق بين P/E وP/B؟"]
     : ["كيف أستخدم المحلل؟", "لماذا تظهر بيانات غير متوفرة؟", "ما الفرق بين السيولة والربحية؟"];
 
@@ -112,6 +120,9 @@
 
   function renderQuickPrompts() {
     quickPrompts.replaceChildren();
+    const promptLabels = state.analysisContext
+      ? ["حلل النتائج الحالية", "ما أبرز نقاط القوة؟", "ما المخاطر الظاهرة؟"]
+      : basePromptLabels;
     promptLabels.forEach((label) => {
       const button = document.createElement("button");
       button.type = "button";
@@ -119,6 +130,28 @@
       button.addEventListener("click", () => sendMessage(label));
       quickPrompts.append(button);
     });
+  }
+
+  function setAnalysisContext(context) {
+    const company = context?.company;
+    const ratios = Array.isArray(context?.ratios) ? context.ratios : [];
+    state.analysisContext = company && ratios.length ? context : null;
+    quickPrompts.hidden = false;
+
+    if (!state.analysisContext) {
+      screenContext.hidden = true;
+      screenContextLabel.textContent = "";
+      privacyNoteText.textContent = "تُرسل رسائل المحادثة فقط إلى خدمة الذكاء الاصطناعي.";
+      renderQuickPrompts();
+      return;
+    }
+
+    const name = String(company.name || "النتائج الحالية").trim();
+    const symbol = String(company.symbol || "").replace(/\.SR$/i, "").trim();
+    screenContextLabel.textContent = `بيانات الشاشة مرفقة: ${name}${symbol ? ` (${symbol})` : ""}`;
+    screenContext.hidden = false;
+    privacyNoteText.textContent = "عند الإرسال، تُرسل رسالتك وبيانات النتائج الظاهرة إلى خدمة الذكاء الاصطناعي.";
+    renderQuickPrompts();
   }
 
   function setOpen(open) {
@@ -170,7 +203,12 @@
       const response = await fetch("/api/ai-assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, history: previousHistory, page }),
+        body: JSON.stringify({
+          message,
+          history: previousHistory,
+          page,
+          analysisContext: state.analysisContext,
+        }),
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(errorText(response.status, payload)), { status: response.status });
@@ -214,7 +252,8 @@
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && root.classList.contains("is-open")) setOpen(false);
   });
+  window.addEventListener("financial-analysis-context", (event) => setAnalysisContext(event.detail));
 
   renderConversation();
-  renderQuickPrompts();
+  setAnalysisContext(window.financialAnalysisContext || null);
 })();
