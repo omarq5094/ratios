@@ -49,6 +49,7 @@ const ASSISTANT_CONTEXT_EVENT = "financial-analysis-context";
 
 const FETCH_COOLDOWN_MS = 15_000;
 const FETCH_COOLDOWN_KEY = "financialBenchmarkYahooNextFetchAt";
+const SITE_URL = "https://ratios-ashy.vercel.app";
 
 const form = document.querySelector("#financialForm");
 const message = document.querySelector("#formMessage");
@@ -68,6 +69,11 @@ const dividendHistoryPanel = document.querySelector("#dividendHistoryPanel");
 const dividendHistoryRows = document.querySelector("#dividendHistoryRows");
 const dividendTableWrap = document.querySelector("#dividendTableWrap");
 const dividendHistoryEmpty = document.querySelector("#dividendHistoryEmpty");
+const shareAnalysisPanel = document.querySelector("#shareAnalysisPanel");
+const shareAnalysisButton = document.querySelector("#shareAnalysisButton");
+const downloadAnalysisButton = document.querySelector("#downloadAnalysisButton");
+const copyCompanyLinkButton = document.querySelector("#copyCompanyLinkButton");
+const shareAnalysisFeedback = document.querySelector("#shareAnalysisFeedback");
 
 const importedFieldLabels = {
   revenue: "الإيرادات",
@@ -106,6 +112,7 @@ let cooldownTimer = 0;
 let nextFetchAt = readCooldownDeadline();
 let currencyUnit = "ر.س";
 let importedCompanyContext = null;
+let latestShareState = null;
 
 function valueOf(id) {
   const value = Number(document.querySelector(`#${id}`).value);
@@ -146,6 +153,35 @@ function safeHttpUrl(value) {
   } catch {
     return null;
   }
+}
+
+function cleanCompanySymbol(value) {
+  const match = String(value || "").match(/(\d{4})/);
+  return match ? match[1] : "";
+}
+
+function companyUrlFor(symbol) {
+  const cleanSymbol = cleanCompanySymbol(symbol);
+  return cleanSymbol ? `${SITE_URL}/company/${cleanSymbol}` : SITE_URL;
+}
+
+function updateCompanyLocation(data, addHistoryEntry = true) {
+  const symbol = cleanCompanySymbol(data?.symbol);
+  if (!symbol) return;
+
+  const companyUrl = `/company/${symbol}`;
+  if (window.history && typeof window.history.pushState === "function") {
+    const currentPath = window.location.pathname || "/";
+    if (currentPath !== companyUrl) {
+      const method = addHistoryEntry ? "pushState" : "replaceState";
+      window.history[method]({}, "", companyUrl);
+    }
+  }
+
+  const companyName = data.companyName || data.shortName || symbol;
+  document.title = `تحليل ${companyName} (${symbol}) والنسب المالية | محلل النسب المالية`;
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.href = companyUrlFor(symbol);
 }
 
 function formatDividendAmount(value) {
@@ -379,6 +415,7 @@ async function fetchCompanyData() {
     }
 
     applyImportedData(payload);
+    updateCompanyLocation(payload);
   } catch (error) {
     const isTimeout = error?.name === "AbortError";
     const localHint = window.location.protocol === "file:" ? " تعمل الميزة بعد النشر على Vercel أو التشغيل عبر vercel dev." : "";
@@ -619,6 +656,287 @@ function renderDividendHistory() {
   });
 }
 
+function shareMetrics(ratios) {
+  return [
+    { label: "هامش صافي الربح", value: ratios.net_margin, type: "percent" },
+    { label: "العائد على حقوق الملكية", value: ratios.roe, type: "percent" },
+    { label: "الديون إلى حقوق الملكية", value: ratios.debt_to_equity, type: "multiple" },
+    { label: "نسبة التداول", value: ratios.current_ratio, type: "multiple" },
+  ].filter((item) => Number.isFinite(item.value)).slice(0, 3);
+}
+
+function dividendShareSummary() {
+  const history = importedCompanyContext?.dividendHistory;
+  if (!history || history.status !== "available") return "سجل التوزيعات غير متوفر";
+  return `انتظام التوزيع: ${history.regularity || "غير متوفر"}`;
+}
+
+function showShareFeedback(text, isError = false) {
+  if (!shareAnalysisFeedback) return;
+  shareAnalysisFeedback.textContent = text;
+  shareAnalysisFeedback.classList.toggle("is-error", isError);
+}
+
+function renderSharePanel(values, ratios) {
+  if (!shareAnalysisPanel || !importedCompanyContext) {
+    if (shareAnalysisPanel) shareAnalysisPanel.hidden = true;
+    latestShareState = null;
+    return;
+  }
+
+  const symbol = cleanCompanySymbol(importedCompanyContext.symbol);
+  const companyName = values.projectName || importedCompanyContext.companyName || symbol;
+  const permalink = companyUrlFor(symbol);
+  const period = importedCompanyContext.period || "أحدث سنة متاحة";
+  const dividendSummary = dividendShareSummary();
+
+  setText("sharePreviewSymbol", symbol ? `تداول: ${symbol}` : "تداول");
+  setText("sharePreviewCompany", companyName);
+  setText("sharePreviewMeta", `السنة المالية ${period} · ${dividendSummary}`);
+  const permalinkElement = document.querySelector("#companyPermalink");
+  permalinkElement.href = permalink;
+  permalinkElement.textContent = permalink;
+
+  latestShareState = {
+    companyName,
+    symbol,
+    period,
+    permalink,
+    dividendSummary,
+    metrics: shareMetrics(ratios),
+    source: importedCompanyContext.source?.provider || "Yahoo Finance",
+  };
+  showShareFeedback("");
+  shareAnalysisPanel.hidden = false;
+}
+
+function roundedRectPath(context, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + width, y, x + width, y + height, r);
+  context.arcTo(x + width, y + height, x, y + height, r);
+  context.arcTo(x, y + height, x, y, r);
+  context.arcTo(x, y, x + width, y, r);
+  context.closePath();
+}
+
+function fillRoundedRect(context, x, y, width, height, radius, fillStyle) {
+  roundedRectPath(context, x, y, width, height, radius);
+  context.fillStyle = fillStyle;
+  context.fill();
+}
+
+function fitCanvasText(context, text, maxWidth, maxSize, minSize = 30) {
+  let size = maxSize;
+  do {
+    context.font = `800 ${size}px "Segoe UI", Tahoma, Arial, sans-serif`;
+    if (context.measureText(text).width <= maxWidth) return size;
+    size -= 2;
+  } while (size > minSize);
+  return minSize;
+}
+
+function drawMetricCard(context, metric, x, y, width) {
+  fillRoundedRect(context, x, y, width, 210, 28, "rgba(255,255,255,.075)");
+  context.strokeStyle = "rgba(255,255,255,.11)";
+  context.lineWidth = 2;
+  roundedRectPath(context, x, y, width, 210, 28);
+  context.stroke();
+
+  context.direction = "rtl";
+  context.textAlign = "right";
+  context.fillStyle = "rgba(255,255,255,.65)";
+  context.font = '600 25px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText(metric.label, x + width - 24, y + 58);
+  context.fillStyle = "#ffffff";
+  context.font = '800 39px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText(formatRatio(metric.value, metric.type), x + width - 24, y + 126);
+  context.fillStyle = "#5de0d0";
+  context.font = '700 20px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("من النتائج الحالية", x + width - 24, y + 172);
+}
+
+async function createAnalysisImageBlob() {
+  if (!latestShareState) throw new Error("احسب نتائج الشركة أولًا قبل إنشاء الصورة.");
+  if (document.fonts?.ready) await document.fonts.ready;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1350;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("المتصفح لا يدعم إنشاء صورة التحليل.");
+
+  const background = context.createLinearGradient(0, 0, 1080, 1350);
+  background.addColorStop(0, "#13172f");
+  background.addColorStop(.53, "#2b245a");
+  background.addColorStop(1, "#123c49");
+  context.fillStyle = background;
+  context.fillRect(0, 0, 1080, 1350);
+
+  const glowOne = context.createRadialGradient(130, 120, 10, 130, 120, 390);
+  glowOne.addColorStop(0, "rgba(56,214,197,.42)");
+  glowOne.addColorStop(1, "rgba(56,214,197,0)");
+  context.fillStyle = glowOne;
+  context.fillRect(0, 0, 650, 650);
+  const glowTwo = context.createRadialGradient(940, 1040, 10, 940, 1040, 440);
+  glowTwo.addColorStop(0, "rgba(139,105,244,.55)");
+  glowTwo.addColorStop(1, "rgba(139,105,244,0)");
+  context.fillStyle = glowTwo;
+  context.fillRect(460, 560, 620, 790);
+
+  fillRoundedRect(context, 56, 56, 968, 1238, 46, "rgba(255,255,255,.055)");
+  context.strokeStyle = "rgba(255,255,255,.13)";
+  context.lineWidth = 2;
+  roundedRectPath(context, 56, 56, 968, 1238, 46);
+  context.stroke();
+
+  const brandGradient = context.createLinearGradient(868, 104, 950, 186);
+  brandGradient.addColorStop(0, "#8b6ff4");
+  brandGradient.addColorStop(1, "#35c8b8");
+  fillRoundedRect(context, 900, 105, 74, 74, 22, brandGradient);
+  context.direction = "rtl";
+  context.textAlign = "center";
+  context.fillStyle = "#ffffff";
+  context.font = '900 39px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("م", 937, 157);
+  context.textAlign = "right";
+  context.font = '800 30px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("محلل النسب المالية", 878, 137);
+  context.fillStyle = "rgba(255,255,255,.54)";
+  context.font = '600 18px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("تحليل مالي مبسّط وقابل للمشاركة", 878, 169);
+
+  fillRoundedRect(context, 742, 220, 232, 57, 28, "rgba(255,255,255,.09)");
+  context.fillStyle = "#d0c8ff";
+  context.font = '800 23px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText(`تداول: ${latestShareState.symbol}`, 946, 257);
+
+  const titleSize = fitCanvasText(context, latestShareState.companyName, 870, 58, 34);
+  context.fillStyle = "#ffffff";
+  context.font = `800 ${titleSize}px "Segoe UI", Tahoma, Arial, sans-serif`;
+  context.fillText(latestShareState.companyName, 974, 357);
+  context.fillStyle = "rgba(255,255,255,.62)";
+  context.font = '600 24px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText(`نتائج السنة المالية ${latestShareState.period} · المصدر: ${latestShareState.source}`, 974, 407);
+
+  context.fillStyle = "rgba(255,255,255,.13)";
+  context.fillRect(106, 461, 868, 2);
+  context.fillStyle = "#65e2d3";
+  context.font = '800 25px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("أبرز المؤشرات", 974, 516);
+
+  const metrics = latestShareState.metrics;
+  const cardWidth = 274;
+  const cardGap = 24;
+  metrics.forEach((metric, index) => {
+    const x = 106 + (metrics.length - 1 - index) * (cardWidth + cardGap);
+    drawMetricCard(context, metric, x, 555, cardWidth);
+  });
+
+  fillRoundedRect(context, 106, 810, 868, 145, 28, "rgba(255,255,255,.075)");
+  context.fillStyle = "rgba(255,255,255,.58)";
+  context.font = '700 23px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("سجل التوزيعات", 936, 859);
+  context.fillStyle = "#ffffff";
+  context.font = '800 35px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText(latestShareState.dividendSummary, 936, 914);
+
+  fillRoundedRect(context, 106, 995, 868, 108, 25, "rgba(87,221,207,.1)");
+  context.fillStyle = "#72e6d9";
+  context.font = '800 25px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("اقرأ النسب في سياقها، وليس كأرقام منفردة.", 936, 1058);
+
+  context.fillStyle = "rgba(255,255,255,.5)";
+  context.font = '600 20px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("هذه النتائج تعليمية وتحليلية وليست توصية استثمارية.", 974, 1162);
+  context.fillStyle = "rgba(255,255,255,.15)";
+  context.fillRect(106, 1197, 868, 2);
+  context.direction = "ltr";
+  context.textAlign = "left";
+  context.fillStyle = "#ffffff";
+  context.font = '800 27px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("https://ratios-ashy.vercel.app/", 106, 1250);
+  context.textAlign = "right";
+  context.fillStyle = "rgba(255,255,255,.46)";
+  context.font = '600 19px "Segoe UI", Tahoma, Arial, sans-serif';
+  const today = new Intl.DateTimeFormat("ar-SA", { dateStyle: "long" }).format(new Date());
+  context.fillText(today, 974, 1248);
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("تعذر تحويل البطاقة إلى صورة."));
+    }, "image/png");
+  });
+}
+
+function downloadBlob(blob, filename) {
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1_000);
+}
+
+function shareImageFilename() {
+  return `تحليل-${latestShareState?.symbol || "مالي"}.png`;
+}
+
+async function downloadAnalysisImage() {
+  downloadAnalysisButton.disabled = true;
+  showShareFeedback("يجري تجهيز الصورة...");
+  try {
+    const blob = await createAnalysisImageBlob();
+    downloadBlob(blob, shareImageFilename());
+    showShareFeedback("تم تنزيل الصورة وأصبحت جاهزة للنشر.");
+  } catch (error) {
+    showShareFeedback(error.message || "تعذر إنشاء الصورة.", true);
+  } finally {
+    downloadAnalysisButton.disabled = false;
+  }
+}
+
+async function shareAnalysisImage() {
+  shareAnalysisButton.disabled = true;
+  showShareFeedback("يجري تجهيز بطاقة المشاركة...");
+  try {
+    const blob = await createAnalysisImageBlob();
+    const file = new File([blob], shareImageFilename(), { type: "image/png" });
+    const shareData = {
+      title: `تحليل ${latestShareState.companyName}`,
+      text: `تحليل مالي مبسّط لشركة ${latestShareState.companyName}`,
+      url: `${latestShareState.permalink}#results`,
+      files: [file],
+    };
+
+    const supportsFileSharing = typeof navigator.share === "function"
+      && (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] }));
+    if (supportsFileSharing) {
+      await navigator.share(shareData);
+      showShareFeedback("تم فتح خيارات المشاركة.");
+    } else {
+      downloadBlob(blob, shareImageFilename());
+      showShareFeedback("جهازك لا يدعم مشاركة الصور مباشرة؛ نُزّلت الصورة لتتمكن من نشرها.");
+    }
+  } catch (error) {
+    if (error?.name !== "AbortError") showShareFeedback(error.message || "تعذرت المشاركة.", true);
+  } finally {
+    shareAnalysisButton.disabled = false;
+  }
+}
+
+async function copyCompanyLink() {
+  if (!latestShareState) return;
+  try {
+    await navigator.clipboard.writeText(latestShareState.permalink);
+    showShareFeedback("تم نسخ رابط تحليل الشركة.");
+  } catch {
+    showShareFeedback("تعذر النسخ تلقائيًا؛ يمكنك نسخ الرابط الظاهر يدويًا.", true);
+  }
+}
+
 function assistantRatio(code, meta, value) {
   return {
     code,
@@ -686,6 +1004,7 @@ function renderResults(values, ratios, shouldScroll = true) {
   renderPrimaryRatios(ratios);
   renderAdvancedRatios(values, ratios);
   renderDividendHistory();
+  renderSharePanel(values, ratios);
 
   resultsSection.hidden = false;
   publishAssistantContext(buildAssistantContext(values, ratios));
@@ -782,12 +1101,18 @@ document.querySelector("#resetButton").addEventListener("click", () => {
   companyInfoPanel.hidden = true;
   dividendHistoryPanel.hidden = true;
   dividendHistoryRows.replaceChildren();
+  if (shareAnalysisPanel) shareAnalysisPanel.hidden = true;
+  latestShareState = null;
   showMessage("");
   resetImportPresentation();
   missingDataPanel.hidden = true;
   missingFieldsGrid.replaceChildren();
   updateCurrencyUnits("SAR");
   updateFetchButton();
+  if (window.history && typeof window.history.pushState === "function" && /^\/company\//.test(window.location.pathname || "")) {
+    window.history.pushState({}, "", "/");
+    document.title = "محلل النسب المالية";
+  }
   document.querySelector("#calculator").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
@@ -799,4 +1124,50 @@ tickerInput.addEventListener("keydown", (event) => {
   }
 });
 
+shareAnalysisButton?.addEventListener("click", shareAnalysisImage);
+downloadAnalysisButton?.addEventListener("click", downloadAnalysisImage);
+copyCompanyLinkButton?.addEventListener("click", copyCompanyLink);
+
+function readCompanyBootstrap() {
+  const element = document.querySelector("#companyBootstrap");
+  if (!element?.textContent) return null;
+  try {
+    return JSON.parse(element.textContent);
+  } catch {
+    return null;
+  }
+}
+
+function initializeCompanyPage() {
+  const payload = readCompanyBootstrap();
+  if (!payload) return;
+
+  tickerInput.value = cleanCompanySymbol(payload.symbol);
+  applyImportedData(payload);
+  updateCompanyLocation(payload, false);
+
+  const requiredFields = [
+    "revenue",
+    "costOfSales",
+    "operatingProfit",
+    "netProfit",
+    "currentAssets",
+    "inventory",
+    "currentLiabilities",
+    "totalAssets",
+    "totalDebt",
+    "equity",
+  ];
+  const canCalculate = requiredFields.every((key) => Number.isFinite(payload.fields?.[key]));
+  if (canCalculate) {
+    const values = collectValues();
+    renderResults(values, calculate(values), false);
+    showFetchStatus("تم تحميل صفحة الشركة ونتائجها من الرابط الدائم.", "success");
+    if (window.location.hash === "#results") {
+      window.setTimeout(() => resultsSection.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+    }
+  }
+}
+
 updateFetchButton();
+initializeCompanyPage();

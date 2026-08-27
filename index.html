@@ -4,8 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="محلل النسب المالية" />
+    <meta property="og:description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
+    <meta property="og:url" content="https://ratios-ashy.vercel.app/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="محلل النسب المالية" />
+    <meta name="twitter:description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
+    <link rel="canonical" href="https://ratios-ashy.vercel.app/" />
     <title>محلل النسب المالية</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -19,7 +27,7 @@
         </a>
         <nav aria-label="التنقل الرئيسي">
           <a href="#top">الرئيسية</a>
-          <a href="ratios.html">دليل النسب</a>
+          <a href="/ratios.html">دليل النسب</a>
           <a class="nav-cta" href="#calculator">ابدأ التحليل</a>
         </nav>
       </div>
@@ -33,7 +41,7 @@
           <p>أدخل القوائم المالية يدويًا أو اجلب أحدث بيانات الشركة المتاحة، ثم احصل على نسب مالية واضحة خلال لحظات.</p>
           <div class="hero-actions">
             <a class="primary-button" href="#calculator">ابدأ التحليل</a>
-            <a class="secondary-button" href="ratios.html">استكشف المؤشرات</a>
+            <a class="secondary-button" href="/ratios.html">استكشف المؤشرات</a>
           </div>
           <div class="trust-row">
             <span><b>دون حفظ</b> الحساب داخل جهازك</span>
@@ -53,6 +61,8 @@
           <div class="privacy-chip"><span>✓</span> تعبئة ذكية من Yahoo Finance</div>
         </div>
       </section>
+
+      <!-- COMPANY_SEO_CONTENT -->
 
       <section class="container features" id="features" aria-label="مزايا الأداة">
         <article class="feature-card"><span class="feature-icon">%</span><h2>نسب الربحية</h2><p>هامش مجمل الربح والتشغيل وصافي الربح.</p></article>
@@ -243,6 +253,31 @@
             </div>
             <p class="dividend-history-note">تعتمد القيم على توزيعات Yahoo Finance المسجلة حسب السنة الميلادية. السنة الحالية غير مكتملة، وقد تتغير بعد توزيعات لاحقة.</p>
           </section>
+          <section id="shareAnalysisPanel" class="share-analysis-panel" aria-labelledby="shareAnalysisTitle" hidden>
+            <div class="share-card-preview" aria-hidden="true">
+              <div class="share-card-brand"><span class="brand-mark">م</span><strong>محلل النسب المالية</strong></div>
+              <span id="sharePreviewSymbol" class="share-preview-symbol">—</span>
+              <h3 id="sharePreviewCompany">اسم الشركة</h3>
+              <p id="sharePreviewMeta">تحليل مالي مبسّط</p>
+              <div class="share-preview-line"></div>
+              <strong class="share-preview-url">ratios-ashy.vercel.app</strong>
+            </div>
+            <div class="share-analysis-copy">
+              <span class="section-kicker">جاهزة للنشر</span>
+              <h3 id="shareAnalysisTitle">شارك تحليل الشركة بصورة احترافية</h3>
+              <p>ينشئ الموقع صورة جذابة من النتائج الحالية، مع اسم الشركة وأبرز المؤشرات والتوزيعات ورابط الموقع.</p>
+              <div class="share-company-link">
+                <span>رابط التحليل الدائم</span>
+                <a id="companyPermalink" href="#" target="_blank" rel="noopener">—</a>
+              </div>
+              <div class="share-analysis-actions">
+                <button id="shareAnalysisButton" class="primary-button" type="button">مشاركة التحليل</button>
+                <button id="downloadAnalysisButton" class="secondary-button" type="button">تنزيل الصورة</button>
+                <button id="copyCompanyLinkButton" class="secondary-button compact-button" type="button">نسخ الرابط</button>
+              </div>
+              <p id="shareAnalysisFeedback" class="share-analysis-feedback" aria-live="polite"></p>
+            </div>
+          </section>
           <section id="missingDataPanel" class="missing-data-panel" hidden>
             <div class="missing-data-heading">
               <div><span>استكمال النتائج</span><h3>بعض البيانات المطلوبة غير متوفرة</h3></div>
@@ -268,8 +303,9 @@
       </div>
     </footer>
 
-    <script src="lib/advanced-ratios.js"></script>
-    <script src="script.js"></script>
-    <script src="assistant.js"></script>
+    <!-- COMPANY_BOOTSTRAP -->
+    <script src="/lib/advanced-ratios.js"></script>
+    <script src="/script.js"></script>
+    <script src="/assistant.js"></script>
   </body>
 </html>

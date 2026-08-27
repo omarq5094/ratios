@@ -9,8 +9,8 @@ test("واجهة المساعد محملة في صفحتي الموقع", async 
     readFile(new URL("index.html", root), "utf8"),
     readFile(new URL("ratios.html", root), "utf8"),
   ]);
-  assert.match(indexHtml, /<script src="assistant\.js"><\/script>/);
-  assert.match(ratiosHtml, /<script src="assistant\.js"><\/script>/);
+  assert.match(indexHtml, /<script src="\/assistant\.js"><\/script>/);
+  assert.match(ratiosHtml, /<script src="\/assistant\.js"><\/script>/);
 });
 
 test("واجهة المساعد تتضمن عناصر الوصول والخصوصية", async () => {

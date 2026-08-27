@@ -19,12 +19,12 @@ test("تظهر معلومات الشركة قبل النسب وسجل التوز
 });
 
 test("تجلب الخدمة ملف الشركة وسجل التوزيعات من Yahoo", async () => {
-  const api = await readFile(new URL("../api/company-data.js", import.meta.url), "utf8");
+  const service = await readFile(new URL("../lib/company-service.js", import.meta.url), "utf8");
   const script = await readFile(new URL("../script.js", import.meta.url), "utf8");
 
-  assert.match(api, /"assetProfile"/);
-  assert.match(api, /yahooFinance\.chart/);
-  assert.match(api, /events: "div"/);
+  assert.match(service, /"assetProfile"/);
+  assert.match(service, /yahooFinance\.chart/);
+  assert.match(service, /events: "div"/);
   assert.match(script, /function renderCompanyInfo/);
   assert.match(script, /function renderDividendHistory/);
 });

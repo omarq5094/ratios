@@ -4,10 +4,27 @@
     "api/company-data.js": {
       "maxDuration": 60
     },
+    "api/company-page.js": {
+      "maxDuration": 60,
+      "includeFiles": "index.html"
+    },
+    "api/sitemap.js": {
+      "maxDuration": 10
+    },
     "api/ai-assistant.js": {
       "maxDuration": 30
     }
   },
+  "rewrites": [
+    {
+      "source": "/company/:symbol",
+      "destination": "/api/company-page?symbol=:symbol"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
