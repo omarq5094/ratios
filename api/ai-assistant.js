@@ -198,7 +198,7 @@ export default async function handler(request, response) {
         text: { verbosity: "low" },
         max_output_tokens: 700,
         safety_identifier: safetyIdentifier(request),
-        store: false,
+        store: true,
       }),
     });
 

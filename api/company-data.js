@@ -33,11 +33,12 @@ export default async function handler(request, response) {
 
   const currentYear = new Date().getUTCFullYear();
   const period1 = `${currentYear - 6}-01-01`;
+  const dividendPeriod1 = `${currentYear - 4}-01-01`;
 
   try {
-    const [quoteSummary, annualSeries] = await Promise.all([
+    const [quoteSummary, annualSeries, dividendEvents] = await Promise.all([
       yahooFinance.quoteSummary(symbol, {
-        modules: ["price", "defaultKeyStatistics", "summaryDetail", "financialData"],
+        modules: ["price", "assetProfile", "defaultKeyStatistics", "summaryDetail", "financialData"],
       }),
       yahooFinance.fundamentalsTimeSeries(symbol, {
         period1,
@@ -46,9 +47,27 @@ export default async function handler(request, response) {
         merge: true,
         padTimeSeries: false,
       }),
+      yahooFinance.chart(symbol, {
+        period1: dividendPeriod1,
+        period2: new Date(),
+        interval: "1mo",
+        events: "div",
+        return: "array",
+      }).then((chartData) => (
+        chartData.events?.dividends?.map((event) => ({
+          date: event.date,
+          dividends: event.amount,
+        })) || []
+      )).catch((error) => {
+        console.warn("Yahoo Finance dividend history unavailable", {
+          symbol,
+          details: String(error?.message || error || ""),
+        });
+        return null;
+      }),
     ]);
 
-    const payload = buildCompanyPayload(symbol, quoteSummary, annualSeries);
+    const payload = buildCompanyPayload(symbol, quoteSummary, annualSeries, dividendEvents);
     if (!payload) {
       sendJson(response, 404, {
         error: "NO_ANNUAL_DATA",

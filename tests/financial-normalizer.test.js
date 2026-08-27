@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildCompanyPayload, normalizeSaudiSymbol } from "../lib/financial-normalizer.js";
+import {
+  buildCompanyPayload,
+  buildDividendHistory,
+  normalizeSaudiSymbol,
+} from "../lib/financial-normalizer.js";
 
 test("يحوّل رمز تداول إلى صيغة Yahoo", () => {
   assert.equal(normalizeSaudiSymbol("2222"), "2222.SR");
@@ -21,6 +25,12 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
       },
       defaultKeyStatistics: { enterpriseValue: 1_150, earningsQuarterlyGrowth: 0.08 },
       summaryDetail: { dividendRate: 1.5 },
+      assetProfile: {
+        sector: "Energy",
+        industry: "Integrated Oil & Gas",
+        website: "https://www.aramco.com/",
+        longBusinessSummary: "تعمل الشركة في قطاع الطاقة وتقدم منتجات وخدمات مرتبطة بأعمالها الأساسية.",
+      },
     },
     [
       {
@@ -71,4 +81,41 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
   assert.equal(result.availableFieldCount, 24);
   assert.equal(result.totalFieldCount, 24);
   assert.equal(result.missingFields.length, 0);
+  assert.equal(result.companyInfo.sector, "Energy");
+  assert.equal(result.companyInfo.industry, "Integrated Oil & Gas");
+  assert.equal(result.companyInfo.website, "https://www.aramco.com/");
+  assert.match(result.companyInfo.description, /قطاع الطاقة/);
+});
+
+test("يجمع توزيعات آخر خمس سنوات ويحسب انتظامها والتغير السنوي", () => {
+  const result = buildDividendHistory(
+    [
+      { date: new Date("2022-03-01"), dividends: 0.5 },
+      { date: new Date("2022-09-01"), dividends: 0.5 },
+      { date: new Date("2023-03-01"), dividends: 0.6 },
+      { date: new Date("2023-09-01"), dividends: 0.6 },
+      { date: new Date("2024-06-01"), dividends: 1.2 },
+      { date: new Date("2025-06-01"), dividends: 1.5 },
+      { date: new Date("2026-06-01"), dividends: 0.8 },
+      { date: new Date("2021-06-01"), dividends: 9 },
+    ],
+    new Date("2026-08-27T00:00:00Z"),
+  );
+
+  assert.equal(result.status, "available");
+  assert.equal(result.years.length, 5);
+  assert.equal(result.regularity, "منتظمة سنويًا");
+  assert.equal(result.yearsWithDividends, 4);
+  assert.equal(result.evaluatedYears, 4);
+  assert.equal(result.years[0].year, 2026);
+  assert.equal(result.years[0].isPartial, true);
+  assert.equal(result.years[0].totalPerShare, 0.8);
+  assert.equal(result.years[1].annualChangeAmount, 0.3);
+  assert.equal(result.years.at(-1).paymentCount, 2);
+});
+
+test("يميز تعذر جلب سجل التوزيعات عن عدم وجود توزيعات", () => {
+  const result = buildDividendHistory(null, new Date("2026-08-27T00:00:00Z"));
+  assert.equal(result.status, "unavailable");
+  assert.deepEqual(result.years, []);
 });

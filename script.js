@@ -54,6 +54,11 @@ const operationsRatioGrid = document.querySelector("#operationsRatioGrid");
 const missingDataPanel = document.querySelector("#missingDataPanel");
 const missingFieldsGrid = document.querySelector("#missingFieldsGrid");
 const applyMissingFieldsButton = document.querySelector("#applyMissingFieldsButton");
+const companyInfoPanel = document.querySelector("#companyInfoPanel");
+const dividendHistoryPanel = document.querySelector("#dividendHistoryPanel");
+const dividendHistoryRows = document.querySelector("#dividendHistoryRows");
+const dividendTableWrap = document.querySelector("#dividendTableWrap");
+const dividendHistoryEmpty = document.querySelector("#dividendHistoryEmpty");
 
 const importedFieldLabels = {
   revenue: "الإيرادات",
@@ -91,6 +96,7 @@ let fetchInProgress = false;
 let cooldownTimer = 0;
 let nextFetchAt = readCooldownDeadline();
 let currencyUnit = "ر.س";
+let importedCompanyContext = null;
 
 function valueOf(id) {
   const value = Number(document.querySelector(`#${id}`).value);
@@ -122,6 +128,31 @@ function formatAdvancedValue(value, type) {
   if (value === null || !Number.isFinite(value)) return "غير متاح";
   if (type === "currency") return `${compactNumberFormatter.format(value)} ${currencyUnit}`;
   return formatRatio(value, type);
+}
+
+function safeHttpUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+function formatDividendAmount(value) {
+  return `${numberFormatter.format(value)} ${currencyUnit}`;
+}
+
+function formatAnnualDividendChange(item) {
+  const amount = item.annualChangeAmount;
+  if (amount === null || !Number.isFinite(amount)) return "سنة الأساس";
+  if (amount === 0) return "دون تغير";
+
+  const direction = amount > 0 ? "زيادة" : "انخفاض";
+  const amountText = formatDividendAmount(Math.abs(amount));
+  const percent = item.annualChangePercent;
+  if (percent === null || !Number.isFinite(percent)) return `${direction} ${amountText} دون أساس نسبي`;
+  return `${direction} ${amountText} (${numberFormatter.format(Math.abs(percent))}٪)`;
 }
 
 function showMessage(text, type = "") {
@@ -224,6 +255,12 @@ function updateCurrencyUnits(currency) {
 function applyImportedData(data) {
   resetImportPresentation();
   clearFinancialFields();
+
+  importedCompanyContext = {
+    companyInfo: data.companyInfo || {},
+    dividendHistory: data.dividendHistory || null,
+    currency: data.currency || "SAR",
+  };
 
   document.querySelector("#projectName").value = data.companyName || data.symbol;
   updateCurrencyUnits(data.currency);
@@ -489,6 +526,81 @@ function renderMissingFields(results) {
   });
 }
 
+function renderCompanyInfo() {
+  if (!importedCompanyContext) {
+    companyInfoPanel.hidden = true;
+    return;
+  }
+
+  const info = importedCompanyContext.companyInfo || {};
+  setText("companySector", info.sector || "غير متوفر");
+  setText("companyIndustry", info.industry || "غير متوفر");
+  setText("companyDescription", info.description || "لم يوفر Yahoo Finance وصفًا لنشاط الشركة.");
+
+  const websiteElement = document.querySelector("#companyWebsite");
+  const website = safeHttpUrl(info.website);
+  if (website) {
+    websiteElement.href = website.href;
+    websiteElement.target = "_blank";
+    websiteElement.rel = "noopener noreferrer";
+    websiteElement.textContent = website.hostname.replace(/^www\./, "");
+  } else {
+    websiteElement.removeAttribute("href");
+    websiteElement.removeAttribute("target");
+    websiteElement.removeAttribute("rel");
+    websiteElement.textContent = "غير متوفر";
+  }
+
+  companyInfoPanel.hidden = false;
+}
+
+function renderDividendHistory() {
+  if (!importedCompanyContext) {
+    dividendHistoryPanel.hidden = true;
+    return;
+  }
+
+  const history = importedCompanyContext.dividendHistory;
+  dividendHistoryRows.replaceChildren();
+  dividendHistoryPanel.hidden = false;
+
+  if (!history || history.status !== "available" || !Array.isArray(history.years)) {
+    setText("dividendRegularity", "غير متوفر");
+    setText("dividendRegularityDetail", "تعذر جلب السجل من Yahoo Finance مع بقاء النسب قابلة للحساب.");
+    dividendHistoryEmpty.textContent = "سجل التوزيعات غير متوفر حاليًا من مصدر البيانات.";
+    dividendHistoryEmpty.hidden = false;
+    dividendTableWrap.hidden = true;
+    return;
+  }
+
+  setText("dividendRegularity", history.regularity || "غير متوفر");
+  setText(
+    "dividendRegularityDetail",
+    `تم رصد توزيعات في ${numberFormatter.format(history.yearsWithDividends || 0)} من ${numberFormatter.format(history.evaluatedYears || 0)} سنوات مكتملة.`,
+  );
+  dividendHistoryEmpty.hidden = true;
+  dividendTableWrap.hidden = false;
+
+  history.years.forEach((item) => {
+    const row = document.createElement("tr");
+    const year = document.createElement("th");
+    year.scope = "row";
+    year.textContent = item.isPartial ? `${item.year} (حتى تاريخه)` : String(item.year);
+
+    const amount = document.createElement("td");
+    amount.textContent = formatDividendAmount(item.totalPerShare || 0);
+    const payments = document.createElement("td");
+    payments.textContent = numberFormatter.format(item.paymentCount || 0);
+    const change = document.createElement("td");
+    change.textContent = formatAnnualDividendChange(item);
+    if (item.annualChangeAmount > 0) change.className = "positive-change";
+    if (item.annualChangeAmount < 0) change.className = "negative-change";
+
+    row.append(year, amount, payments, change);
+    dividendHistoryRows.append(row);
+  });
+}
+
 function renderResults(values, ratios, shouldScroll = true) {
   setText("resultTitle", values.projectName || "مشروعك");
   setText("currentRatioValue", formatRatio(ratios.current_ratio, "multiple"));
@@ -499,8 +611,10 @@ function renderResults(values, ratios, shouldScroll = true) {
     "resultSummary",
     "تم حساب المؤشرات من البيانات المتاحة والمدخلة. تعتمد مؤشرات التقييم السوقي على أحدث قيمة سوقية متاحة مع أحدث بيانات سنوية مكتملة؛ لذلك يجب مراجعة المصدر والقوائم الرسمية قبل تفسير النتائج.",
   );
+  renderCompanyInfo();
   renderPrimaryRatios(ratios);
   renderAdvancedRatios(values, ratios);
+  renderDividendHistory();
 
   resultsSection.hidden = false;
   if (shouldScroll) resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -591,6 +705,10 @@ applyMissingFieldsButton.addEventListener("click", () => {
 document.querySelector("#resetButton").addEventListener("click", () => {
   form.reset();
   resultsSection.hidden = true;
+  importedCompanyContext = null;
+  companyInfoPanel.hidden = true;
+  dividendHistoryPanel.hidden = true;
+  dividendHistoryRows.replaceChildren();
   showMessage("");
   resetImportPresentation();
   missingDataPanel.hidden = true;

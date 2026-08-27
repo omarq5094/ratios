@@ -195,6 +195,18 @@
           <div class="result-header">
             <div><span class="section-kicker">نتيجة التحليل</span><h2 id="resultTitle">مشروعك</h2></div>
           </div>
+          <section id="companyInfoPanel" class="company-info-panel" aria-labelledby="companyInfoTitle" hidden>
+            <div class="panel-heading">
+              <div><span>نبذة تعريفية</span><h3 id="companyInfoTitle">معلومات الشركة</h3></div>
+              <small>وفق بيانات Yahoo Finance</small>
+            </div>
+            <div class="company-info-grid">
+              <article><span>القطاع</span><strong id="companySector">غير متوفر</strong></article>
+              <article><span>الصناعة</span><strong id="companyIndustry">غير متوفر</strong></article>
+              <article><span>الموقع الإلكتروني</span><a id="companyWebsite">غير متوفر</a></article>
+              <article class="company-description-card"><span>وصف مختصر للنشاط</span><p id="companyDescription">غير متوفر</p></article>
+            </div>
+          </section>
           <div id="ratioGrid" class="ratio-results-grid"></div>
           <div class="additional-panel">
             <div class="panel-heading"><div><span>مؤشرات إضافية</span><h3>قراءة المركز المالي</h3></div></div>
@@ -213,6 +225,24 @@
             <div class="panel-heading"><div><span>الكفاءة والتمويل</span><h3>مؤشرات تشغيلية متقدمة</h3></div><small>حسب البيانات المدخلة</small></div>
             <div id="operationsRatioGrid" class="expanded-ratio-grid"></div>
           </div>
+          <section id="dividendHistoryPanel" class="dividend-history-panel" aria-labelledby="dividendHistoryTitle" hidden>
+            <div class="panel-heading">
+              <div><span>آخر خمس سنوات</span><h3 id="dividendHistoryTitle">سجل التوزيعات</h3></div>
+              <small>القيمة السنوية للسهم</small>
+            </div>
+            <div class="dividend-summary-grid">
+              <article><span>انتظام التوزيع</span><strong id="dividendRegularity">غير متوفر</strong><small id="dividendRegularityDetail"></small></article>
+              <article><span>الفترة المعروضة</span><strong>خمس سنوات</strong><small>تشمل السنة الحالية حتى تاريخ الجلب.</small></article>
+            </div>
+            <p id="dividendHistoryEmpty" class="dividend-history-empty" hidden></p>
+            <div id="dividendTableWrap" class="dividend-table-wrap">
+              <table>
+                <thead><tr><th>السنة</th><th>إجمالي التوزيع للسهم</th><th>عدد الدفعات المسجلة</th><th>التغير السنوي</th></tr></thead>
+                <tbody id="dividendHistoryRows"></tbody>
+              </table>
+            </div>
+            <p class="dividend-history-note">تعتمد القيم على توزيعات Yahoo Finance المسجلة حسب السنة الميلادية. السنة الحالية غير مكتملة، وقد تتغير بعد توزيعات لاحقة.</p>
+          </section>
           <section id="missingDataPanel" class="missing-data-panel" hidden>
             <div class="missing-data-heading">
               <div><span>استكمال النتائج</span><h3>بعض البيانات المطلوبة غير متوفرة</h3></div>
