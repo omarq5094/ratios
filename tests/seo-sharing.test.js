@@ -21,7 +21,7 @@ const samplePayload = {
 };
 
 test("ينشئ صفحة شركة بعنوان ووصف ورابط مستقلين", async () => {
-  const template = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const template = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
   const html = renderCompanyDocument(template, samplePayload);
 
   assert.match(html, /<title>تحليل أرامكو السعودية \(2222\)/);
@@ -33,7 +33,7 @@ test("ينشئ صفحة شركة بعنوان ووصف ورابط مستقلين
 });
 
 test("يمنع كسر HTML عند وجود نص غير موثوق في بيانات الشركة", async () => {
-  const template = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const template = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
   const html = renderCompanyDocument(template, {
     ...samplePayload,
     companyName: "شركة </title><script>alert(1)</script>",
@@ -61,7 +61,7 @@ test("لكل شركة مفهرسة اسم عربي مستخدم في Google وا
 });
 
 test("تظهر المشاركة تحت سجل التوزيعات وتستخدم صورة بلا QR", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const html = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
   const script = await readFile(new URL("../script.js", import.meta.url), "utf8");
   const dividendPosition = html.indexOf('id="dividendHistoryPanel"');
   const sharePosition = html.indexOf('id="shareAnalysisPanel"');
@@ -82,5 +82,9 @@ test("يوجه Vercel رابط الشركة وملف sitemap إلى الوظائ
   assert.deepEqual(config.rewrites[1], {
     source: "/sitemap.xml",
     destination: "/api/sitemap",
+  });
+  assert.deepEqual(config.rewrites[2], {
+    source: "/services/financial-ratios",
+    destination: "/financial-ratios.html",
   });
 });

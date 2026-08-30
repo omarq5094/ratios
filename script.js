@@ -909,7 +909,7 @@ function renderSharePanel(values, ratios) {
   const imported = importedCompanyContext;
   const symbol = cleanCompanySymbol(imported?.symbol);
   const companyName = values.projectName || imported?.companyName || symbol || "تحليل مالي";
-  const permalink = symbol ? companyUrlFor(symbol) : SITE_URL;
+  const permalink = symbol ? companyUrlFor(symbol) : `${SITE_URL}/services/financial-ratios`;
   const period = imported?.period || "غير محددة";
   const dividendSummary = dividendShareSummary();
   const typeLabel = values.companyType === "bank"
@@ -1369,8 +1369,10 @@ document.querySelector("#resetButton").addEventListener("click", () => {
   updateCurrencyUnits("SAR");
   updateFetchButton();
   if (window.history && typeof window.history.pushState === "function" && /^\/company\//.test(window.location.pathname || "")) {
-    window.history.pushState({}, "", "/");
-    document.title = "محلل النسب المالية";
+    window.history.pushState({}, "", "/services/financial-ratios");
+    document.title = "حاسبة ودليل النسب المالية | منصة الأدوات المحاسبية";
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.href = `${SITE_URL}/services/financial-ratios`;
   }
   document.querySelector("#calculator").scrollIntoView({ behavior: "smooth", block: "start" });
 });

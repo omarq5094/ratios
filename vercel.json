@@ -6,7 +6,7 @@
     },
     "api/company-page.js": {
       "maxDuration": 60,
-      "includeFiles": "index.html"
+      "includeFiles": "financial-ratios.html"
     },
     "api/sitemap.js": {
       "maxDuration": 10
@@ -15,6 +15,13 @@
       "maxDuration": 30
     }
   },
+  "redirects": [
+    {
+      "source": "/financial-ratios.html",
+      "destination": "/services/financial-ratios",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/company/:symbol",
@@ -23,6 +30,10 @@
     {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
+    },
+    {
+      "source": "/services/financial-ratios",
+      "destination": "/financial-ratios.html"
     }
   ],
   "headers": [

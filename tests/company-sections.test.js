@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("تظهر معلومات الشركة قبل النسب وسجل التوزيعات بعدها", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const html = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
   const companyPosition = html.indexOf('id="companyInfoPanel"');
   const ratioPosition = html.indexOf('id="ratioGrid"');
   const operationsPosition = html.indexOf('id="operationsRatioGrid"');

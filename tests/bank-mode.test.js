@@ -75,7 +75,7 @@ test("يحسب المؤشرات المصرفية ويمنع القسمة على 
 });
 
 test("واجهة الإدخال اليدوي ونافذة المشاركة تطابقان وضع البنوك", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const html = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
   const script = await readFile(new URL("../script.js", import.meta.url), "utf8");
   const resultNotePosition = html.indexOf('class="result-note"');
   const shareLauncherPosition = html.indexOf('id="shareAnalysisLauncher"');

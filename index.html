@@ -3,348 +3,160 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
+    <meta name="description" content="منصة عربية تجمع أدوات محاسبية ومالية عملية، تبدأ بحاسبة النسب المالية للشركات والبنوك." />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="محلل النسب المالية" />
-    <meta property="og:description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
+    <meta property="og:title" content="منصة الأدوات المحاسبية" />
+    <meta property="og:description" content="أدوات محاسبية عملية تجعل الأرقام أوضح، وتساعدك على الفهم والتحليل." />
     <meta property="og:url" content="https://ratios-ashy.vercel.app/" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="محلل النسب المالية" />
-    <meta name="twitter:description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
+    <meta name="twitter:title" content="منصة الأدوات المحاسبية" />
+    <meta name="twitter:description" content="أدوات محاسبية عملية تجعل الأرقام أوضح." />
     <link rel="canonical" href="https://ratios-ashy.vercel.app/" />
-    <title>محلل النسب المالية</title>
+    <title>منصة الأدوات المحاسبية | أدوات مالية ومحاسبية عربية</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
-  <body>
+  <body class="home-page">
     <div class="ambient ambient-one" aria-hidden="true"></div>
     <div class="ambient ambient-two" aria-hidden="true"></div>
     <div class="ambient ambient-three" aria-hidden="true"></div>
-    <header class="navbar">
+
+    <header class="navbar home-navbar">
       <div class="container nav-content">
-        <a class="brand" href="#top">
+        <a class="brand" href="#top" aria-label="منصة الأدوات المحاسبية">
           <span class="brand-mark">م</span>
-          <span class="brand-copy">محلل النسب المالية<small>FINANCIAL RATIO ANALYZER</small></span>
+          <span class="brand-copy">الأدوات المحاسبية<small>ACCOUNTING TOOLS</small></span>
         </a>
         <nav aria-label="التنقل الرئيسي">
           <a href="#top">الرئيسية</a>
-          <a href="/ratios.html">دليل النسب</a>
-          <a class="nav-cta" href="#calculator">ابدأ التحليل</a>
+          <a href="#aboutAccounting">عن المحاسبة</a>
+          <a href="#services">خدماتنا</a>
+          <a class="nav-cta" href="/services/financial-ratios">ابدأ الآن</a>
         </nav>
       </div>
     </header>
 
     <main id="top">
-      <section class="container hero">
-        <div class="hero-copy">
-          <span class="hero-kicker"><i></i> تحليل مالي ذكي ومبسّط</span>
-          <h1>قرارات أوضح.<br /><em>أرقام في سياقها.</em></h1>
-          <p>أدخل القوائم المالية يدويًا أو اجلب أحدث بيانات الشركة المتاحة، ثم احصل على نسب مالية واضحة خلال لحظات.</p>
+      <section class="container platform-hero">
+        <div class="platform-hero-copy">
+          <span class="hero-kicker"><i></i> منصة عربية للأدوات المحاسبية</span>
+          <h1>حوّل الأرقام إلى<br /><em>فهم وقرار.</em></h1>
+          <p>خدمات محاسبية ومالية عملية تساعدك على الحساب والتحليل وفهم النتائج بوضوح، في مكان واحد قابل للتوسع.</p>
           <div class="hero-actions">
-            <a class="primary-button" href="#calculator">ابدأ التحليل</a>
-            <a class="secondary-button" href="/ratios.html">استكشف المؤشرات</a>
+            <a class="primary-button" href="#services">استكشف الخدمات</a>
+            <a class="secondary-button" href="#aboutAccounting">ما هي المحاسبة؟</a>
           </div>
-          <div class="trust-row">
-            <span><b>دون حفظ</b> الحساب داخل جهازك</span>
-            <span><b>تحليل مرن</b> إدخال يدوي أو تعبئة تلقائية</span>
+          <div class="platform-trust-row">
+            <span><b>أدوات عملية</b><small>نتائج واضحة وقابلة للفهم</small></span>
+            <span><b>خصوصية أفضل</b><small>الحسابات تتم داخل جهازك</small></span>
+            <span><b>تطوير مستمر</b><small>خدمات جديدة تُضاف تدريجيًا</small></span>
           </div>
         </div>
-        <div class="hero-visual" aria-label="نموذج لنتائج التحليل المالي">
-          <div class="visual-glow" aria-hidden="true"></div>
-          <article class="insight-card main-insight">
-            <div class="insight-head"><span>ملخص التحليل المالي</span><small>نسب محسوبة</small></div>
-            <strong>26<small> مؤشرًا</small></strong>
-            <div class="spark-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            <p>قراءة مباشرة للربحية والسيولة والمديونية والعائد</p>
+        <div class="platform-hero-visual" aria-label="تصور لمنصة الأدوات المحاسبية">
+          <div class="platform-orbit orbit-one" aria-hidden="true"></div>
+          <div class="platform-orbit orbit-two" aria-hidden="true"></div>
+          <article class="platform-dashboard-card">
+            <div class="platform-card-head"><span>لوحة الأدوات</span><i>متصلة</i></div>
+            <strong>الأرقام في سياقها</strong>
+            <p>احسب، افهم، ثم اتخذ قرارك بناءً على قراءة أوضح.</p>
+            <div class="platform-mini-grid">
+              <span><b>%</b><small>نسب مالية</small></span>
+              <span><b>✦</b><small>مساعد ذكي</small></span>
+              <span><b>+</b><small>خدمات قادمة</small></span>
+            </div>
           </article>
-          <article class="insight-card floating-card top-card"><span>هامش التشغيل</span><strong>12.5٪</strong><small>محسوب تلقائيًا</small></article>
-          <article class="insight-card floating-card bottom-card"><span>السيولة</span><strong>1.87</strong><small>مستوى متوازن</small></article>
-          <div class="privacy-chip"><span>✓</span> تعبئة ذكية من Yahoo Finance</div>
+          <div class="platform-float-card float-analysis"><span>تحليل</span><strong>واضح</strong></div>
+          <div class="platform-float-card float-growth"><span>المنصة</span><strong>تنمو</strong></div>
         </div>
       </section>
 
-      <!-- COMPANY_SEO_CONTENT -->
-
-      <section class="container features" id="features" aria-label="مزايا الأداة">
-        <article class="feature-card"><span class="feature-icon">%</span><h2>نسب الربحية</h2><p>هامش مجمل الربح والتشغيل وصافي الربح.</p></article>
-        <article class="feature-card"><span class="feature-icon">▤</span><h2>تعبئة تلقائية</h2><p>اكتب رمز الشركة لجلب أحدث قائمة مالية سنوية متاحة.</p></article>
-        <article class="feature-card"><span class="feature-icon">◎</span><h2>إدخال يدوي</h2><p>اختر شركة تشغيلية أو بنكًا، ثم أدخل البيانات المناسبة فقط.</p></article>
-        <article class="feature-card"><span class="feature-icon">◫</span><h2>السيولة</h2><p>نسبة التداول والنسبة السريعة وقدرة المشروع على الوفاء بالتزاماته.</p></article>
-        <article class="feature-card"><span class="feature-icon">◇</span><h2>المديونية والعائد</h2><p>الديون إلى حقوق الملكية والعائد على الأصول وحقوق الملاك.</p></article>
-        <article class="feature-card"><span class="feature-icon">✓</span><h2>نتيجة مفهومة</h2><p>عرض واضح للنسب الأساسية مع وصف مختصر لكل مؤشر.</p></article>
+      <section class="container quick-services-dock" aria-labelledby="quickServicesTitle">
+        <div class="quick-services-label">
+          <span>الوصول السريع</span>
+          <h2 id="quickServicesTitle">افتح خدمتك مباشرة</h2>
+        </div>
+        <div class="quick-services-list">
+          <a class="quick-service-item is-available" href="/services/financial-ratios">
+            <span class="quick-service-icon">%</span>
+            <span><b>حاسبة النسب المالية</b><small>للشركات والبنوك</small></span>
+            <i>متاحة الآن</i>
+          </a>
+          <div class="quick-service-item is-upcoming" aria-label="خدمات جديدة قريبًا">
+            <span class="quick-service-icon">+</span>
+            <span><b>خدمات جديدة</b><small>تُضاف تدريجيًا</small></span>
+            <i>قريبًا</i>
+          </div>
+        </div>
       </section>
 
-      <section class="calculator-section" id="calculator">
+      <section id="aboutAccounting" class="container accounting-definition">
+        <div class="accounting-definition-copy">
+          <span class="section-kicker">فهم الأساس</span>
+          <h2>المحاسبة ليست تسجيل أرقام فقط.</h2>
+          <p>المحاسبة نظام لقياس العمليات المالية وتسجيلها وتنظيمها، ثم تحويلها إلى معلومات تساعد على فهم الأداء والالتزامات والموارد.</p>
+          <p>القيمة الحقيقية تبدأ عندما تنتقل من الرقم الخام إلى سؤال واضح: ماذا حدث، ولماذا، وما القرار المناسب بعد ذلك؟</p>
+        </div>
+        <div class="accounting-flow" aria-label="مراحل الاستفادة من المحاسبة">
+          <article><span>01</span><div><b>تسجيل</b><small>توثيق العمليات المالية بدقة.</small></div></article>
+          <article><span>02</span><div><b>تنظيم وتحليل</b><small>ربط الأرقام واستخراج المؤشرات.</small></div></article>
+          <article><span>03</span><div><b>قرار</b><small>تحويل النتائج إلى فهم قابل للاستخدام.</small></div></article>
+        </div>
+      </section>
+
+      <section id="services" class="platform-services-section">
         <div class="container">
-          <div class="section-heading">
-            <span class="section-kicker">حاسبة النسب</span>
-            <h2>أدخل بيانات المشروع</h2>
-            <p>أدخل البيانات يدويًا أو استخدم رمز الشركة لتعبئة أحدث بيانات سنوية متاحة.</p>
+          <div class="platform-section-heading">
+            <div><span class="section-kicker">من خدماتنا</span><h2>ابدأ بالأداة المتاحة اليوم.</h2></div>
+            <p>كل خدمة تحصل على صفحة مستقلة، بينما تبقى المنصة الرئيسية بوابة موحدة للوصول إلى جميع الأدوات الحالية والمستقبلية.</p>
           </div>
-
-          <form id="financialForm" class="form-card">
-            <div class="smart-import-block">
-              <div class="smart-import-head">
-                <div>
-                  <span class="smart-import-kicker">تعبئة تلقائية</span>
-                  <h3>اجلب القوائم المالية برمز الشركة</h3>
-                  <p>اكتب رمز الشركة في تداول فقط، مثل 2222 لأرامكو، وسنستخدم أحدث سنة مالية مكتملة متاحة.</p>
-                </div>
-                <span class="data-provider">Yahoo Finance</span>
-              </div>
-              <div class="ticker-search">
-                <span class="market-label">تداول</span>
-                <input
-                  id="tickerInput"
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="7"
-                  autocomplete="off"
-                  aria-label="رمز الشركة في تداول"
-                  placeholder="مثال: 2222"
-                />
-                <button id="fetchCompanyButton" class="fetch-button" type="button">جلب البيانات</button>
-              </div>
-              <p class="ticker-help">يمكنك تعديل أي رقم بعد الجلب. يتاح طلب جديد كل 15 ثانية، ويجب مراجعة العملة والحقول الناقصة.</p>
-              <div id="dataFetchStatus" class="fetch-status" aria-live="polite" hidden></div>
-              <div id="importSummary" class="import-summary" hidden>
-                <div class="import-summary-head">
-                  <div>
-                    <strong id="importCompanyName">—</strong>
-                    <span id="importCompanyMeta">—</span>
-                  </div>
-                  <a id="importSourceLink" href="#" target="_blank" rel="noopener noreferrer">عرض المصدر</a>
-                </div>
-                <div class="import-badges">
-                  <span id="importSourceBadge">المصدر: —</span>
-                  <span id="importPeriodBadge">السنة المالية: —</span>
-                  <span id="importCurrencyBadge">العملة: —</span>
-                  <span id="importCoverageBadge">الحقول: —</span>
-                </div>
-                <p id="importMissingNote" class="import-missing-note"></p>
-              </div>
+          <article class="featured-service-card">
+            <div class="service-visual" aria-hidden="true">
+              <span class="service-visual-icon">%</span>
+              <div class="service-ratio-bars"><i></i><i></i><i></i><i></i><i></i></div>
+              <small>تحليل مالي مبسّط</small>
             </div>
-
-            <div class="form-block">
-              <div class="block-title"><span>1</span><div><h3>تعريف المنشأة</h3><p>حدد نوع المنشأة حتى لا تُطبَّق نسب الشركات التشغيلية على البنوك.</p></div></div>
-              <div class="fields-grid project-field-grid">
-                <label class="field"><span>اسم المشروع <small>اختياري</small></span><input id="projectName" type="text" maxlength="100" placeholder="مثال: مزرعة الوادي" /></label>
-                <label class="field company-type-field">
-                  <span>نوع المنشأة <b>*</b></span>
-                  <select id="companyType" required>
-                    <option value="" selected disabled>اختر نوع المنشأة</option>
-                    <option value="operating">شركة تشغيلية</option>
-                    <option value="bank">بنك</option>
-                    <option value="unclassified">غير محدد</option>
-                  </select>
-                  <small id="companyTypeHelp">عند الجلب التلقائي يحدد الموقع نوع المنشأة، ويمكنك مراجعته.</small>
-                </label>
-              </div>
+            <div class="service-content">
+              <div class="service-status"><span>الخدمة الأولى</span><i>متاحة الآن</i></div>
+              <h3>حاسبة النسب المالية</h3>
+              <p>احسب نسب الشركات التشغيلية والبنوك يدويًا، أو اجلب أحدث البيانات المتاحة برمز الشركة، ثم افهم النتائج من دليل النسب المدمج والمحلل الذكي.</p>
+              <ul>
+                <li>وضع مستقل للشركات والبنوك</li>
+                <li>تعبئة تلقائية وحقول يدوية</li>
+                <li>دليل النسب داخل الخدمة نفسها</li>
+                <li>بطاقة تحليل قابلة للمشاركة</li>
+              </ul>
+              <a class="primary-button" href="/services/financial-ratios">استخدم حاسبة النسب</a>
             </div>
-
-            <div class="form-block">
-              <div class="block-title"><span>2</span><div><h3>قائمة الدخل</h3><p>أدخل الأرقام من الفترة نفسها.</p></div></div>
-              <div class="fields-grid four-columns">
-                <label class="field"><span>الإيرادات <b>*</b></span><div class="number-field"><input id="revenue" type="number" min="0.01" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>تكلفة المبيعات <b>*</b></span><div class="number-field"><input id="costOfSales" type="number" min="0" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>الربح التشغيلي <b>*</b></span><div class="number-field"><input id="operatingProfit" type="number" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>صافي الربح <b>*</b></span><div class="number-field"><input id="netProfit" type="number" step="0.01" required /><small>ر.س</small></div></label>
-              </div>
-            </div>
-
-            <div class="form-block">
-              <div class="block-title"><span>3</span><div><h3>المركز المالي</h3><p>تُستخدم هذه البيانات لقياس السيولة والمديونية والعائد.</p></div></div>
-              <div class="fields-grid four-columns">
-                <label class="field"><span>الأصول المتداولة <b>*</b></span><div class="number-field"><input id="currentAssets" type="number" min="0" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>المخزون <b>*</b></span><div class="number-field"><input id="inventory" type="number" min="0" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>الالتزامات المتداولة <b>*</b></span><div class="number-field"><input id="currentLiabilities" type="number" min="0.01" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>إجمالي الأصول <b>*</b></span><div class="number-field"><input id="totalAssets" type="number" min="0.01" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>إجمالي الديون <b>*</b></span><div class="number-field"><input id="totalDebt" type="number" min="0" step="0.01" required /><small>ر.س</small></div></label>
-                <label class="field"><span>حقوق الملكية <b>*</b></span><div class="number-field"><input id="equity" type="number" step="0.01" required /><small>ر.س</small></div></label>
-              </div>
-            </div>
-
-            <div id="bankFieldsBlock" class="form-block bank-fields-block" hidden>
-              <div class="block-title"><span>4</span><div><h3>بيانات البنك</h3><p>أدخل المتوفر فقط؛ تظهر النسبة المصرفية عند اكتمال عناصرها.</p></div></div>
-              <div class="bank-mode-note">لا يستخدم وضع البنك نسبة التداول أو النسبة السريعة أو التدفق النقدي الحر؛ لأنها لا تعكس طبيعة النشاط المصرفي بصورة سليمة.</div>
-              <div class="fields-grid four-columns">
-                <label class="field"><span>صافي دخل العمولات الخاصة</span><div class="number-field"><input id="netInterestIncome" type="number" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>متوسط الأصول المدرة للدخل</span><div class="number-field"><input id="averageEarningAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>المصروفات التشغيلية</span><div class="number-field"><input id="operatingExpenses" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>الدخل التشغيلي</span><div class="number-field"><input id="operatingIncome" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>إجمالي القروض والسلف</span><div class="number-field"><input id="totalLoans" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>ودائع العملاء</span><div class="number-field"><input id="customerDeposits" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>القروض غير العاملة</span><div class="number-field"><input id="nonPerformingLoans" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>مخصصات خسائر الائتمان</span><div class="number-field"><input id="loanLossProvisions" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>رأس المال التنظيمي</span><div class="number-field"><input id="regulatoryCapital" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                <label class="field"><span>الأصول المرجحة بالمخاطر</span><div class="number-field"><input id="riskWeightedAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-              </div>
-            </div>
-
-            <details class="optional-block" open>
-              <summary>بيانات النسب المتقدمة <span>اختياري — أدخل المتوفر فقط</span></summary>
-              <div class="optional-content">
-                <section class="optional-group" aria-labelledby="advanced-statements-title">
-                  <div class="optional-group-heading">
-                    <h4 id="advanced-statements-title">بيانات القوائم والتدفقات</h4>
-                    <p>تُستخدم لحساب المتوسطات، وكفاءة التشغيل، والتدفق النقدي، وقدرة الشركة على تغطية التمويل.</p>
-                  </div>
-                  <div class="fields-grid four-columns optional-fields">
-                    <label class="field"><span>أصول السنة السابقة</span><div class="number-field"><input id="previousAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>حقوق السنة السابقة</span><div class="number-field"><input id="previousEquity" type="number" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>مخزون السنة السابقة</span><div class="number-field"><input id="previousInventory" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>التدفق النقدي التشغيلي</span><div class="number-field"><input id="operatingCashFlow" type="number" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>التدفق النقدي الحر</span><div class="number-field"><input id="freeCashFlow" type="number" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>EBITDA</span><div class="number-field"><input id="ebitda" type="number" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>النقد وما في حكمه</span><div class="number-field"><input id="cashAndEquivalents" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>مصروف التمويل</span><div class="number-field"><input id="interestExpense" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                  </div>
-                </section>
-
-                <section class="optional-group" aria-labelledby="advanced-market-title">
-                  <div class="optional-group-heading">
-                    <h4 id="advanced-market-title">بيانات السوق والتقييم</h4>
-                    <p>تُستخدم لحساب مضاعفات التقييم، وعوائد التدفق النقدي، والتوزيعات، والنمو.</p>
-                  </div>
-                  <div class="fields-grid four-columns optional-fields">
-                    <label class="field"><span>القيمة السوقية</span><div class="number-field"><input id="marketCap" type="number" min="0.01" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>قيمة المنشأة</span><div class="number-field"><input id="enterpriseValue" type="number" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>سعر السهم</span><div class="number-field"><input id="sharePrice" type="number" min="0.01" step="0.01" /><small>ر.س/سهم</small></div></label>
-                    <label class="field"><span>التوزيعات السنوية للسهم</span><div class="number-field"><input id="annualDividendPerShare" type="number" min="0" step="0.01" /><small>ر.س/سهم</small></div></label>
-                    <label class="field"><span>إجمالي توزيعات الأرباح</span><div class="number-field"><input id="totalDividends" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
-                    <label class="field"><span>معدل نمو الأرباح</span><div class="number-field"><input id="earningsGrowthPercent" type="number" step="0.01" /><small>٪</small></div></label>
-                  </div>
-                </section>
-              </div>
-            </details>
-
-            <div class="form-actions">
-              <button id="submitButton" class="primary-button" type="submit">احسب النسب</button>
-              <button id="resetButton" class="secondary-button" type="button">مسح البيانات</button>
-            </div>
-            <p class="privacy-note">تُحسب النسب داخل جهازك ولا تُحفظ مدخلاتك. عند استخدام التعبئة التلقائية يُرسل رمز الشركة فقط لجلب البيانات.</p>
-            <p id="formMessage" class="form-message" aria-live="polite"></p>
-          </form>
+          </article>
+          <div class="future-services-note">
+            <span>+</span>
+            <div><strong>هذه بداية المنصة.</strong><p>عند إضافة أي خدمة محاسبية جديدة ستظهر هنا وفي شريط الوصول السريع دون ازدحام الصفحة الرئيسية.</p></div>
+          </div>
         </div>
       </section>
 
-      <section id="results" class="results-section" hidden>
-        <div class="container">
-          <div class="result-header">
-            <div><span class="section-kicker">نتيجة التحليل</span><h2 id="resultTitle">مشروعك</h2></div>
-          </div>
-          <section id="companyInfoPanel" class="company-info-panel" aria-labelledby="companyInfoTitle" hidden>
-            <div class="panel-heading">
-              <div><span>نبذة تعريفية</span><h3 id="companyInfoTitle">معلومات الشركة</h3></div>
-              <small>وفق بيانات Yahoo Finance</small>
-            </div>
-            <div class="company-info-grid">
-              <article><span>القطاع</span><strong id="companySector">غير متوفر</strong></article>
-              <article><span>الصناعة</span><strong id="companyIndustry">غير متوفر</strong></article>
-              <article><span>الموقع الإلكتروني</span><a id="companyWebsite">غير متوفر</a></article>
-              <article class="company-description-card"><span>وصف مختصر للنشاط</span><p id="companyDescription">غير متوفر</p></article>
-            </div>
-          </section>
-          <div id="ratioGrid" class="ratio-results-grid"></div>
-          <div id="financialPositionPanel" class="additional-panel">
-            <div class="panel-heading"><div><span>مؤشرات إضافية</span><h3>قراءة المركز المالي</h3></div></div>
-            <div class="additional-grid">
-              <article><span>نسبة التداول</span><strong id="currentRatioValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> الأصول المتداولة ÷ الالتزامات المتداولة</small><p><b>التفسير المبسط:</b> الأصول المتداولة مقابل الالتزامات المتداولة.</p></article>
-              <article><span>النسبة السريعة</span><strong id="quickRatioValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> (الأصول المتداولة − المخزون) ÷ الالتزامات المتداولة</small><p><b>التفسير المبسط:</b> السيولة بعد استبعاد المخزون.</p></article>
-              <article><span>العائد على الأصول</span><strong id="roaValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> صافي الربح ÷ متوسط إجمالي الأصول</small><p><b>التفسير المبسط:</b> كفاءة الأصول في توليد الربح.</p></article>
-              <article><span>تغطية التمويل</span><strong id="coverageValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> الربح التشغيلي ÷ مصروف التمويل</small><p><b>التفسير المبسط:</b> قدرة الربح التشغيلي على تغطية تكلفة التمويل.</p></article>
-            </div>
-          </div>
-          <div id="valuationRatioPanel" class="ratio-section-panel">
-            <div class="panel-heading"><div><span>بيانات السوق</span><h3 id="valuationRatioTitle">التقييم والتوزيعات</h3></div><small>وفق البيانات المتاحة</small></div>
-            <div id="valuationRatioGrid" class="expanded-ratio-grid"></div>
-          </div>
-          <div id="operationsRatioPanel" class="ratio-section-panel">
-            <div class="panel-heading"><div><span id="operationsRatioKicker">الكفاءة والتمويل</span><h3 id="operationsRatioTitle">مؤشرات تشغيلية متقدمة</h3></div><small>حسب البيانات المدخلة</small></div>
-            <div id="operationsRatioGrid" class="expanded-ratio-grid"></div>
-          </div>
-          <section id="dividendHistoryPanel" class="dividend-history-panel" aria-labelledby="dividendHistoryTitle" hidden>
-            <div class="panel-heading">
-              <div><span>آخر خمس سنوات</span><h3 id="dividendHistoryTitle">سجل التوزيعات</h3></div>
-              <small>القيمة السنوية للسهم</small>
-            </div>
-            <div class="dividend-summary-grid">
-              <article><span>انتظام التوزيع</span><strong id="dividendRegularity">غير متوفر</strong><small id="dividendRegularityDetail"></small></article>
-              <article><span>الفترة المعروضة</span><strong>خمس سنوات</strong><small>تشمل السنة الحالية حتى تاريخ الجلب.</small></article>
-            </div>
-            <p id="dividendHistoryEmpty" class="dividend-history-empty" hidden></p>
-            <div id="dividendTableWrap" class="dividend-table-wrap">
-              <table>
-                <thead><tr><th>السنة</th><th>إجمالي التوزيع للسهم</th><th>عدد الدفعات المسجلة</th><th>التغير السنوي</th></tr></thead>
-                <tbody id="dividendHistoryRows"></tbody>
-              </table>
-            </div>
-            <p class="dividend-history-note">تعتمد القيم على توزيعات Yahoo Finance المسجلة حسب السنة الميلادية. السنة الحالية غير مكتملة، وقد تتغير بعد توزيعات لاحقة.</p>
-          </section>
-          <section id="missingDataPanel" class="missing-data-panel" hidden>
-            <div class="missing-data-heading">
-              <div><span>استكمال النتائج</span><h3>بعض البيانات المطلوبة غير متوفرة</h3></div>
-              <p>أدخل القيم الناقصة هنا أو في قسم البيانات المتقدمة، وسيعيد الموقع حساب النسب المرتبطة بها.</p>
-            </div>
-            <div id="missingFieldsGrid" class="missing-fields-grid"></div>
-            <button id="applyMissingFieldsButton" class="primary-button" type="button">احسب بعد إدخال الناقص</button>
-          </section>
-          <div class="result-note"><strong>قراءة سريعة</strong><p id="resultSummary"></p><small>هذه النتائج تعليمية وتحليلية وليست توصية استثمارية. تحقّق من القوائم والإعلانات الرسمية قبل اتخاذ أي قرار.</small></div>
-          <div id="shareAnalysisLauncher" class="share-analysis-launcher" hidden>
-            <button id="openShareAnalysisButton" class="primary-button" type="button">مشاركة التحليل</button>
-            <small>أنشئ صورة للنتائج أو انسخ رابط الشركة.</small>
-          </div>
+      <section class="container platform-ai-section">
+        <div>
+          <span class="section-kicker">مساعد واحد في كل الصفحات</span>
+          <h2>المحلل الذكي ينتقل معك.</h2>
+          <p>يشرح المنصة من الصفحة الرئيسية، ويفهم سياق الحاسبة ونتائج الشركات داخل الخدمة، وسيكون جاهزًا لفهم الخدمات الجديدة مستقبلًا.</p>
         </div>
+        <div class="platform-ai-badge"><span>✦</span><b>اسأل المحلل</b><small>متاح في جميع الصفحات</small></div>
       </section>
     </main>
 
-    <div id="shareAnalysisModal" class="share-analysis-modal" role="dialog" aria-modal="true" aria-labelledby="shareAnalysisTitle" hidden>
-      <div class="share-analysis-backdrop" data-close-share-modal></div>
-      <div class="share-modal-dialog" tabindex="-1">
-        <button id="closeShareAnalysisButton" class="share-modal-close" type="button" aria-label="إغلاق نافذة المشاركة">×</button>
-        <section id="shareAnalysisPanel" class="share-analysis-panel">
-          <div class="share-card-preview" aria-hidden="true">
-            <div class="share-card-brand"><span class="brand-mark">م</span><strong>محلل النسب المالية</strong></div>
-            <span id="sharePreviewSymbol" class="share-preview-symbol">—</span>
-            <h3 id="sharePreviewCompany">اسم الشركة</h3>
-            <p id="sharePreviewMeta">تحليل مالي مبسّط</p>
-            <div class="share-preview-line"></div>
-            <strong class="share-preview-url">ratios-ashy.vercel.app</strong>
-          </div>
-          <div class="share-analysis-copy">
-            <span class="section-kicker">جاهزة للنشر</span>
-            <h3 id="shareAnalysisTitle">شارك تحليل الشركة بصورة احترافية</h3>
-            <p>ينشئ الموقع صورة من النتائج الحالية، مع اسم الشركة وأبرز المؤشرات والسنة المالية والمصدر ورابط الموقع.</p>
-            <div class="share-company-link">
-              <span id="companyPermalinkLabel">رابط التحليل الدائم</span>
-              <a id="companyPermalink" href="#" target="_blank" rel="noopener">—</a>
-            </div>
-            <div class="share-analysis-actions">
-              <button id="shareAnalysisButton" class="primary-button" type="button">مشاركة الصورة</button>
-              <button id="downloadAnalysisButton" class="secondary-button" type="button">تنزيل الصورة</button>
-              <button id="copyCompanyLinkButton" class="secondary-button compact-button" type="button">نسخ الرابط</button>
-            </div>
-            <p id="shareAnalysisFeedback" class="share-analysis-feedback" aria-live="polite"></p>
-          </div>
-        </section>
-      </div>
-    </div>
-
     <footer>
       <div class="container footer-content">
-        <div class="footer-brand"><span class="brand-mark">م</span><div><strong>محلل النسب المالية</strong><p>قراءة مالية أوضح من بياناتك.</p></div></div>
+        <div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية تجعل الأرقام أوضح.</p></div></div>
         <div class="footer-links">
+          <a href="#aboutAccounting">عن المحاسبة</a>
+          <a href="#services">خدماتنا</a>
           <a href="https://www.linkedin.com/in/omar-al-ghrman-1b5795382/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://x.com/omar_saeed3" target="_blank" rel="noopener noreferrer">X</a>
-          <a href="tel:0533172872">0533172872</a>
           <a href="mailto:wcoffeebusiness@gmail.com">البريد الإلكتروني</a>
         </div>
       </div>
     </footer>
 
-    <!-- COMPANY_BOOTSTRAP -->
-    <script src="/lib/advanced-ratios.js"></script>
-    <script src="/lib/bank-ratios.js"></script>
-    <script src="/script.js"></script>
     <script src="/assistant.js"></script>
   </body>
 </html>

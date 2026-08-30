@@ -14,7 +14,7 @@ function urlEntry(path, priority, changeFrequency) {
 export function buildSitemap() {
   const entries = [
     urlEntry("/", "1.0", "weekly"),
-    urlEntry("/ratios.html", "0.7", "monthly"),
+    urlEntry("/services/financial-ratios", "0.9", "weekly"),
     ...MAIN_MARKET_COMPANY_SYMBOLS.map((symbol) => urlEntry(`/company/${symbol}`, "0.8", "weekly")),
   ];
 

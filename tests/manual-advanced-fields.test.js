@@ -16,7 +16,7 @@ const advancedFieldIds = [
 ];
 
 test("advanced ratio fields are visible and manually editable", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const html = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
 
   assert.match(html, /<details class="optional-block" open>/);
   assert.doesNotMatch(html, /class="supplemental-data-store"/);
@@ -28,7 +28,7 @@ test("advanced ratio fields are visible and manually editable", async () => {
 });
 
 test("واجهة الإصدار الجديد تعرض الهوية وبيانات المصدر وطريقة الحساب", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const html = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
 
   assert.match(html, /محلل النسب المالية/);
   assert.doesNotMatch(html, /المقارن المالي/);

@@ -37,7 +37,7 @@
   root.innerHTML = `
     <button class="ai-assistant-toggle" type="button" aria-expanded="false" aria-controls="aiAssistantPanel">
       <span class="ai-toggle-icon" aria-hidden="true">✦</span>
-      <span class="ai-toggle-copy"><b>اسأل المحلل</b><small>مساعد مالي ذكي</small></span>
+      <span class="ai-toggle-copy"><b>اسأل المحلل</b><small>مساعد محاسبي ذكي</small></span>
     </button>
     <aside id="aiAssistantPanel" class="ai-assistant-panel" aria-label="المحلل الذكي" aria-hidden="true">
       <header class="ai-assistant-header">
@@ -61,7 +61,7 @@
       <div class="ai-privacy-note"><span aria-hidden="true">◇</span><b>تُرسل رسائل المحادثة فقط إلى خدمة الذكاء الاصطناعي.</b></div>
       <form class="ai-composer">
         <label class="sr-only" for="aiAssistantInput">اكتب سؤالك</label>
-        <textarea id="aiAssistantInput" maxlength="${MAX_MESSAGE_LENGTH}" rows="1" placeholder="اكتب سؤالك عن النسب المالية..."></textarea>
+        <textarea id="aiAssistantInput" maxlength="${MAX_MESSAGE_LENGTH}" rows="1" placeholder="اكتب سؤالك عن المحاسبة أو الخدمة..."></textarea>
         <button class="ai-send-button" type="submit">إرسال</button>
       </form>
       <p class="ai-disclaimer">للتعليم والتحليل، وليست الإجابات توصية استثمارية.</p>
@@ -82,10 +82,19 @@
   const quickPrompts = root.querySelector(".ai-quick-prompts");
   const privacyNoteText = root.querySelector(".ai-privacy-note b");
 
-  const page = document.body.classList.contains("ratios-page") ? "guide" : "calculator";
-  const basePromptLabels = page === "guide"
-    ? ["ما أهم نسب التقييم؟", "كيف أقرأ النسبة السالبة؟", "ما الفرق بين P/E وP/B؟"]
-    : ["كيف أستخدم المحلل؟", "لماذا تظهر بيانات غير متوفرة؟", "ما الفرق بين السيولة والربحية؟"];
+  const page = document.body.classList.contains("home-page")
+    ? "home"
+    : document.body.classList.contains("financial-ratios-page")
+      ? "calculator"
+      : "site";
+  const basePromptLabels = page === "home"
+    ? ["ما خدمات المنصة؟", "ما فائدة المحاسبة؟", "كيف أبدأ؟"]
+    : page === "calculator"
+      ? ["كيف أستخدم الحاسبة؟", "كيف أقرأ دليل النسب؟", "ما الفرق بين نسب الشركات والبنوك؟"]
+      : ["ما الذي تقدمه المنصة؟", "كيف أصل إلى حاسبة النسب؟", "كيف يساعدني المحلل؟"];
+  const welcomeMessage = page === "home"
+    ? "مرحبًا، أنا المحلل الذكي. أشرح لك المنصة والمحاسبة، وأساعدك في اختيار الخدمة المناسبة."
+    : "مرحبًا، أنا المحلل الذكي. أساعدك في استخدام الحاسبة وفهم النسب والنتائج الحالية.";
 
   function createMessage(role, content, options = {}) {
     const article = document.createElement("article");
@@ -114,7 +123,7 @@
 
   function renderConversation() {
     messages.replaceChildren();
-    createMessage("assistant", "مرحبًا، أنا المحلل الذكي. اسألني عن طريقة استخدام الأداة أو معنى أي نسبة مالية.");
+    createMessage("assistant", welcomeMessage);
     state.history.forEach((item) => createMessage(item.role, item.content));
   }
 

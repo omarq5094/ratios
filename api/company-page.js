@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { fetchCompanyPayload, toCompanyHttpError } from "../lib/company-service.js";
 import { renderCompanyDocument, renderCompanyErrorDocument } from "../lib/company-page-renderer.js";
 
-const indexTemplatePromise = readFile(new URL("../index.html", import.meta.url), "utf8");
+const indexTemplatePromise = readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
 
 export default async function handler(request, response) {
   if (request.method !== "GET") {
