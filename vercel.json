@@ -20,6 +20,11 @@
       "source": "/financial-ratios.html",
       "destination": "/services/financial-ratios",
       "permanent": true
+    },
+    {
+      "source": "/financial-ratios-guide.html",
+      "destination": "/services/financial-ratios/guide",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -34,6 +39,10 @@
     {
       "source": "/services/financial-ratios",
       "destination": "/financial-ratios.html"
+    },
+    {
+      "source": "/services/financial-ratios/guide",
+      "destination": "/financial-ratios-guide.html"
     }
   ],
   "headers": [

@@ -87,4 +87,8 @@ test("يوجه Vercel رابط الشركة وملف sitemap إلى الوظائ
     source: "/services/financial-ratios",
     destination: "/financial-ratios.html",
   });
+  assert.deepEqual(config.rewrites[3], {
+    source: "/services/financial-ratios/guide",
+    destination: "/financial-ratios-guide.html",
+  });
 });

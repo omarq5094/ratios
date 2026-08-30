@@ -1370,7 +1370,7 @@ document.querySelector("#resetButton").addEventListener("click", () => {
   updateFetchButton();
   if (window.history && typeof window.history.pushState === "function" && /^\/company\//.test(window.location.pathname || "")) {
     window.history.pushState({}, "", "/services/financial-ratios");
-    document.title = "حاسبة ودليل النسب المالية | منصة الأدوات المحاسبية";
+    document.title = "حاسبة النسب المالية | منصة الأدوات المحاسبية";
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.href = `${SITE_URL}/services/financial-ratios`;
   }

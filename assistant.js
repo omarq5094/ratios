@@ -84,17 +84,23 @@
 
   const page = document.body.classList.contains("home-page")
     ? "home"
+    : document.body.classList.contains("financial-ratios-guide-page")
+      ? "guide"
     : document.body.classList.contains("financial-ratios-page")
       ? "calculator"
       : "site";
   const basePromptLabels = page === "home"
     ? ["ما خدمات المنصة؟", "ما فائدة المحاسبة؟", "كيف أبدأ؟"]
     : page === "calculator"
-      ? ["كيف أستخدم الحاسبة؟", "كيف أقرأ دليل النسب؟", "ما الفرق بين نسب الشركات والبنوك؟"]
+      ? ["كيف أستخدم الحاسبة؟", "أين أجد دليل النسب؟", "ما الفرق بين نسب الشركات والبنوك؟"]
+      : page === "guide"
+        ? ["ما أهم نسب التقييم؟", "ما الفرق بين P/E وP/B؟", "ما أهم نسب البنوك؟"]
       : ["ما الذي تقدمه المنصة؟", "كيف أصل إلى حاسبة النسب؟", "كيف يساعدني المحلل؟"];
   const welcomeMessage = page === "home"
     ? "مرحبًا، أنا المحلل الذكي. أشرح لك المنصة والمحاسبة، وأساعدك في اختيار الخدمة المناسبة."
-    : "مرحبًا، أنا المحلل الذكي. أساعدك في استخدام الحاسبة وفهم النسب والنتائج الحالية.";
+    : page === "guide"
+      ? "مرحبًا، أنا المحلل الذكي. أساعدك في فهم معادلات النسب واختيار المؤشرات المناسبة لنوع المنشأة."
+      : "مرحبًا، أنا المحلل الذكي. أساعدك في استخدام الحاسبة وفهم النسب والنتائج الحالية.";
 
   function createMessage(role, content, options = {}) {
     const article = document.createElement("article");

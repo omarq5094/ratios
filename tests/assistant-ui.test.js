@@ -4,13 +4,15 @@ import test from "node:test";
 
 const root = new URL("../", import.meta.url);
 
-test("واجهة المساعد محملة في صفحتي الموقع", async () => {
-  const [indexHtml, ratiosHtml] = await Promise.all([
+test("واجهة المساعد محملة في صفحات الموقع الأساسية", async () => {
+  const [indexHtml, ratiosHtml, guideHtml] = await Promise.all([
     readFile(new URL("index.html", root), "utf8"),
     readFile(new URL("financial-ratios.html", root), "utf8"),
+    readFile(new URL("financial-ratios-guide.html", root), "utf8"),
   ]);
   assert.match(indexHtml, /<script src="\/assistant\.js"><\/script>/);
   assert.match(ratiosHtml, /<script src="\/assistant\.js"><\/script>/);
+  assert.match(guideHtml, /<script src="\/assistant\.js"><\/script>/);
 });
 
 test("واجهة المساعد تتضمن عناصر الوصول والخصوصية", async () => {
@@ -30,5 +32,7 @@ test("الثيم يتضمن العرض المتجاوب للمساعد", async (
   assert.match(css, /\.ai-assistant-panel/);
   assert.match(css, /\.ai-screen-context/);
   assert.match(css, /backdrop-filter: blur\(36px\)/);
+  assert.match(css, /\.ai-assistant \{[\s\S]*?bottom: 88px;/);
+  assert.match(css, /@media \(max-width: 600px\)[\s\S]*?\.ai-assistant \{ left: 12px; bottom: 72px; \}/);
   assert.match(css, /@media \(max-width: 600px\)[\s\S]*\.ai-assistant-panel/);
 });

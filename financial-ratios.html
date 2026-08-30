@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="حاسبة عربية للنسب المالية للشركات والبنوك، مع دليل النسب والتعبئة التلقائية من أحدث بيانات Yahoo Finance المتاحة." />
+    <meta name="description" content="حاسبة عربية للنسب المالية للشركات والبنوك، مع إدخال يدوي وتعبئة تلقائية من أحدث بيانات Yahoo Finance المتاحة." />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="محلل النسب المالية" />
     <meta property="og:description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
@@ -12,7 +12,7 @@
     <meta name="twitter:title" content="محلل النسب المالية" />
     <meta name="twitter:description" content="حاسبة عربية للنسب المالية مع تعبئة تلقائية من أحدث قوائم Yahoo Finance المتاحة." />
     <link rel="canonical" href="https://ratios-ashy.vercel.app/services/financial-ratios" />
-    <title>حاسبة ودليل النسب المالية | منصة الأدوات المحاسبية</title>
+    <title>حاسبة النسب المالية | منصة الأدوات المحاسبية</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body class="financial-ratios-page">
@@ -28,7 +28,7 @@
         <nav aria-label="التنقل الرئيسي">
           <a href="/">الرئيسية</a>
           <a href="#calculator">الحاسبة</a>
-          <a href="#ratioGuide">دليل النسب</a>
+          <a href="/services/financial-ratios/guide">دليل النسب</a>
           <a class="nav-cta" href="#calculator">ابدأ التحليل</a>
         </nav>
       </div>
@@ -42,7 +42,7 @@
           <p>أدخل القوائم المالية يدويًا أو اجلب أحدث بيانات الشركة المتاحة، ثم احصل على نسب مالية واضحة خلال لحظات.</p>
           <div class="hero-actions">
             <a class="primary-button" href="#calculator">ابدأ التحليل</a>
-            <a class="secondary-button" href="#ratioGuide">استكشف المؤشرات</a>
+            <a class="secondary-button" href="/services/financial-ratios/guide">استكشف المؤشرات</a>
           </div>
           <div class="trust-row">
             <span><b>دون حفظ</b> الحساب داخل جهازك</span>
@@ -297,27 +297,6 @@
         </div>
       </section>
 
-      <section id="ratioGuide" class="ratio-guide-service" aria-labelledby="ratioGuideTitle">
-        <div class="container">
-          <div class="guide-service-heading">
-            <div>
-              <span class="section-kicker">الدليل داخل الخدمة</span>
-              <h2 id="ratioGuideTitle">افهم النسبة قبل أن تحكم على الرقم</h2>
-              <p>اختر نوع المنشأة، ثم راجع معنى كل نسبة وطريقة حسابها. لا توجد نسبة مثالية لكل الأنشطة، والنتيجة لا تُفسّر منفردة.</p>
-            </div>
-            <div class="guide-mode-switch" role="group" aria-label="نوع دليل النسب">
-              <button class="is-active" type="button" data-guide-mode="operating" aria-pressed="true">الشركات التشغيلية</button>
-              <button type="button" data-guide-mode="bank" aria-pressed="false">البنوك</button>
-            </div>
-          </div>
-          <div id="ratioGuideGroups" class="guide-service-groups" aria-live="polite"></div>
-          <div class="interpretation-note guide-service-note">
-            <div class="note-mark">!</div>
-            <div><span>قاعدة مهمة</span><h2>الرقم ليس حكمًا نهائيًا</h2><p>اقرأ كل نسبة مع طبيعة النشاط، وبقية القوائم المالية، والعوامل الاستثنائية المؤثرة في النتائج.</p></div>
-            <a class="primary-button" href="#calculator">احسب النسب</a>
-          </div>
-        </div>
-      </section>
     </main>
 
     <div id="shareAnalysisModal" class="share-analysis-modal" role="dialog" aria-modal="true" aria-labelledby="shareAnalysisTitle" hidden>
@@ -357,7 +336,7 @@
         <div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية لفهم الأرقام واتخاذ قرارات أوضح.</p></div></div>
         <div class="footer-links">
           <a href="/">الرئيسية</a>
-          <a href="#ratioGuide">دليل النسب</a>
+          <a href="/services/financial-ratios/guide">دليل النسب</a>
           <a href="https://www.linkedin.com/in/omar-al-ghrman-1b5795382/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://x.com/omar_saeed3" target="_blank" rel="noopener noreferrer">X</a>
           <a href="tel:0533172872">0533172872</a>
@@ -369,7 +348,6 @@
     <!-- COMPANY_BOOTSTRAP -->
     <script src="/lib/advanced-ratios.js"></script>
     <script src="/lib/bank-ratios.js"></script>
-    <script src="/ratio-guide.js"></script>
     <script src="/script.js"></script>
     <script src="/assistant.js"></script>
   </body>

@@ -312,8 +312,9 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
 .future-services-note { margin-top: 21px; padding: 21px 24px; display: flex; align-items: center; gap: 16px; border: 1px dashed rgba(117,88,232,.2); border-radius: 18px; background: rgba(255,255,255,.5); }.future-services-note > span { width: 45px; height: 45px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 14px; background: rgba(117,88,232,.08); color: var(--accent-strong); font-size: 22px; }.future-services-note strong { font-size: 14px; }.future-services-note p { margin: 2px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .platform-ai-section { margin-block: 90px; padding: 38px 42px; display: flex; align-items: center; justify-content: space-between; gap: 38px; border: 1px solid rgba(117,88,232,.14); border-radius: 25px; background: linear-gradient(135deg, rgba(255,255,255,.82), rgba(117,88,232,.075), rgba(17,170,156,.07)); box-shadow: var(--glass-shadow); }.platform-ai-section h2 { margin: 6px 0; font-size: 30px; }.platform-ai-section p { max-width: 760px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.9; }.platform-ai-badge { min-width: 200px; padding: 19px; display: grid; grid-template-columns: auto 1fr; gap: 0 11px; border: 1px solid rgba(255,255,255,.86); border-radius: 18px; background: rgba(255,255,255,.65); }.platform-ai-badge > span { width: 42px; height: 42px; display: grid; place-items: center; grid-row: 1 / 3; border-radius: 13px; background: linear-gradient(145deg, var(--accent), var(--cyan)); color: #fff; }.platform-ai-badge b { font-size: 13px; }.platform-ai-badge small { color: var(--muted); font-size: 9px; }
 
-/* دليل النسب المدمج داخل الحاسبة */
+/* دليل النسب التابع لخدمة الحاسبة */
 .ratio-guide-service { padding-block: 96px; border-top: 1px solid var(--line-soft); background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(117,88,232,.045), rgba(255,255,255,.18)); }
+.ratio-guide-page-section { margin-top: 72px; }
 .guide-service-heading { margin-bottom: 48px; display: flex; align-items: end; justify-content: space-between; gap: 32px; }.guide-service-heading h2 { margin: 7px 0 9px; font-size: clamp(31px, 4vw, 46px); }.guide-service-heading p { max-width: 760px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
 .guide-mode-switch { padding: 5px; display: flex; gap: 5px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.58); }.guide-mode-switch button { min-height: 42px; padding: 8px 14px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 800; white-space: nowrap; }.guide-mode-switch button.is-active { background: linear-gradient(135deg, var(--accent), #4e84e5); box-shadow: 0 10px 23px rgba(102,77,205,.19); color: #fff; }
 .guide-service-groups { display: grid; gap: 62px; }.guide-service-group { padding: 0; }.guide-service-card { min-height: 285px; }.guide-service-card .ratio-definition { min-height: 72px; }.guide-service-note { margin-block: 70px 0; }
@@ -404,7 +405,7 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
 .ai-assistant {
   position: fixed;
   left: 22px;
-  bottom: 22px;
+  bottom: 88px;
   z-index: 120;
   pointer-events: none;
 }
@@ -681,16 +682,16 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
 .ai-disclaimer { margin: 8px 15px 11px; color: var(--muted-deep); font-size: 8px; text-align: center; }
 
 @media (max-width: 600px) {
-  .ai-assistant { left: 12px; bottom: 12px; }
+  .ai-assistant { left: 12px; bottom: 72px; }
   .ai-assistant-toggle { min-width: 166px; min-height: 56px; border-radius: 17px; }
   .ai-toggle-icon { width: 39px; height: 39px; border-radius: 13px; }
   .ai-assistant-panel {
     position: fixed;
     right: 12px;
     left: 12px;
-    bottom: 80px;
+    bottom: 140px;
     width: auto;
-    height: min(660px, calc(100dvh - 96px));
+    height: min(590px, calc(100dvh - 156px));
     border-radius: 24px;
     transform-origin: bottom center;
   }

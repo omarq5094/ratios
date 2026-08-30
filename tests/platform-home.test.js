@@ -15,27 +15,33 @@ test("الصفحة الرئيسية توجيهية وتعرض الوصول ال�
   assert.doesNotMatch(html, /id="financialForm"/);
 });
 
-test("الحاسبة ودليل النسب موجودان في صفحة خدمة واحدة", async () => {
-  const html = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
+test("الحاسبة ودليل النسب صفحتان مترابطتان ضمن الخدمة نفسها", async () => {
+  const calculator = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
+  const guide = await readFile(new URL("../financial-ratios-guide.html", import.meta.url), "utf8");
   const legacy = await readFile(new URL("../ratios.html", import.meta.url), "utf8");
   const guideScript = await readFile(new URL("../ratio-guide.js", import.meta.url), "utf8");
 
-  assert.match(html, /id="financialForm"/);
-  assert.match(html, /id="ratioGuide"/);
-  assert.match(html, /id="ratioGuideGroups"/);
-  assert.match(html, /data-guide-mode="operating"/);
-  assert.match(html, /data-guide-mode="bank"/);
-  assert.match(html, /<script src="\/ratio-guide\.js"><\/script>/);
-  assert.doesNotMatch(html, /href="\/ratios\.html"/);
-  assert.match(legacy, /window\.location\.replace\("\/services\/financial-ratios#ratioGuide"\)/);
+  assert.match(calculator, /id="financialForm"/);
+  assert.doesNotMatch(calculator, /id="ratioGuide"/);
+  assert.doesNotMatch(calculator, /<script src="\/ratio-guide\.js"><\/script>/);
+  assert.match(calculator, /href="\/services\/financial-ratios\/guide"/);
+  assert.doesNotMatch(guide, /id="financialForm"/);
+  assert.match(guide, /class="financial-ratios-guide-page"/);
+  assert.match(guide, /id="ratioGuide"/);
+  assert.match(guide, /id="ratioGuideGroups"/);
+  assert.match(guide, /data-guide-mode="operating"/);
+  assert.match(guide, /data-guide-mode="bank"/);
+  assert.match(guide, /<script src="\/ratio-guide\.js"><\/script>/);
+  assert.match(legacy, /window\.location\.replace\("\/services\/financial-ratios\/guide"\)/);
   assert.match(guideScript, /AdvancedFinancialRatios/);
   assert.match(guideScript, /BankFinancialRatios/);
 });
 
-test("خريطة الموقع تفهرس المنصة وخدمة الحاسبة دون صفحة دليل منفصلة", () => {
+test("خريطة الموقع تفهرس المنصة والحاسبة وصفحة الدليل المستقلة", () => {
   const sitemap = buildSitemap();
   assert.match(sitemap, /<loc>https:\/\/ratios-ashy\.vercel\.app\/<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/ratios-ashy\.vercel\.app\/services\/financial-ratios<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/ratios-ashy\.vercel\.app\/services\/financial-ratios\/guide<\/loc>/);
   assert.doesNotMatch(sitemap, /\/ratios\.html/);
 });
 
@@ -45,4 +51,8 @@ test("قالب صفحات الشركات يستخدم صفحة خدمة الحا
 
   assert.match(source, /financial-ratios\.html/);
   assert.equal(config.functions["api/company-page.js"].includeFiles, "financial-ratios.html");
+  assert.deepEqual(config.rewrites[3], {
+    source: "/services/financial-ratios/guide",
+    destination: "/financial-ratios-guide.html",
+  });
 });
