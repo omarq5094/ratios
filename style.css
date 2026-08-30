@@ -427,7 +427,7 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
   pointer-events: auto;
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
-  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  transition: opacity .2s ease, visibility .2s ease, transform .22s ease, box-shadow .22s ease, border-color .22s ease;
 }
 .ai-assistant-toggle:hover,
 .ai-assistant-toggle:focus-visible {
@@ -453,11 +453,13 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
 .ai-toggle-copy b { font-size: 14px; font-weight: 900; }
 .ai-toggle-copy small { margin-top: 3px; color: var(--muted); font-size: 10px; }
 .ai-assistant-panel {
-  position: absolute;
-  left: 0;
-  bottom: 76px;
+  position: fixed;
+  top: 16px;
+  left: 22px;
+  bottom: auto;
   width: min(420px, calc(100vw - 44px));
-  height: min(650px, calc(100dvh - 125px));
+  height: min(650px, calc(100vh - 32px));
+  height: min(650px, calc(100dvh - 32px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -482,6 +484,12 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0) scale(1);
+}
+.ai-assistant.is-open .ai-assistant-toggle {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
 }
 .ai-assistant-header {
   min-height: 82px;
@@ -686,12 +694,14 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
   .ai-assistant-toggle { min-width: 166px; min-height: 56px; border-radius: 17px; }
   .ai-toggle-icon { width: 39px; height: 39px; border-radius: 13px; }
   .ai-assistant-panel {
-    position: fixed;
+    top: 12px;
     right: 12px;
     left: 12px;
-    bottom: 140px;
+    bottom: auto;
     width: auto;
-    height: min(590px, calc(100dvh - 156px));
+    height: calc(100vh - 24px);
+    height: calc(100dvh - 24px);
+    max-height: none;
     border-radius: 24px;
     transform-origin: bottom center;
   }

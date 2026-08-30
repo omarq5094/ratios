@@ -33,6 +33,9 @@ test("الثيم يتضمن العرض المتجاوب للمساعد", async (
   assert.match(css, /\.ai-screen-context/);
   assert.match(css, /backdrop-filter: blur\(36px\)/);
   assert.match(css, /\.ai-assistant \{[\s\S]*?bottom: 88px;/);
+  assert.match(css, /\.ai-assistant-panel \{[\s\S]*?position: fixed;[\s\S]*?top: 16px;[\s\S]*?bottom: auto;/);
+  assert.match(css, /\.ai-assistant\.is-open \.ai-assistant-toggle \{[\s\S]*?visibility: hidden;/);
   assert.match(css, /@media \(max-width: 600px\)[\s\S]*?\.ai-assistant \{ left: 12px; bottom: 72px; \}/);
+  assert.match(css, /@media \(max-width: 600px\)[\s\S]*?top: 12px;[\s\S]*?height: calc\(100dvh - 24px\);/);
   assert.match(css, /@media \(max-width: 600px\)[\s\S]*\.ai-assistant-panel/);
 });
