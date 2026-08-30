@@ -67,7 +67,7 @@
       <section class="container features" id="features" aria-label="مزايا الأداة">
         <article class="feature-card"><span class="feature-icon">%</span><h2>نسب الربحية</h2><p>هامش مجمل الربح والتشغيل وصافي الربح.</p></article>
         <article class="feature-card"><span class="feature-icon">▤</span><h2>تعبئة تلقائية</h2><p>اكتب رمز الشركة لجلب أحدث قائمة مالية سنوية متاحة.</p></article>
-        <article class="feature-card"><span class="feature-icon">◎</span><h2>إدخال يدوي</h2><p>أدخل القيم بنفسك واحسب النسب دون اختيار قطاع أو فترة.</p></article>
+        <article class="feature-card"><span class="feature-icon">◎</span><h2>إدخال يدوي</h2><p>اختر شركة تشغيلية أو بنكًا، ثم أدخل البيانات المناسبة فقط.</p></article>
         <article class="feature-card"><span class="feature-icon">◫</span><h2>السيولة</h2><p>نسبة التداول والنسبة السريعة وقدرة المشروع على الوفاء بالتزاماته.</p></article>
         <article class="feature-card"><span class="feature-icon">◇</span><h2>المديونية والعائد</h2><p>الديون إلى حقوق الملكية والعائد على الأصول وحقوق الملاك.</p></article>
         <article class="feature-card"><span class="feature-icon">✓</span><h2>نتيجة مفهومة</h2><p>عرض واضح للنسب الأساسية مع وصف مختصر لكل مؤشر.</p></article>
@@ -125,9 +125,19 @@
             </div>
 
             <div class="form-block">
-              <div class="block-title"><span>1</span><div><h3>تعريف المشروع</h3><p>يمكنك إضافة اسم للمشروع أو الشركة لتمييز النتيجة.</p></div></div>
+              <div class="block-title"><span>1</span><div><h3>تعريف المنشأة</h3><p>حدد نوع المنشأة حتى لا تُطبَّق نسب الشركات التشغيلية على البنوك.</p></div></div>
               <div class="fields-grid project-field-grid">
                 <label class="field"><span>اسم المشروع <small>اختياري</small></span><input id="projectName" type="text" maxlength="100" placeholder="مثال: مزرعة الوادي" /></label>
+                <label class="field company-type-field">
+                  <span>نوع المنشأة <b>*</b></span>
+                  <select id="companyType" required>
+                    <option value="" selected disabled>اختر نوع المنشأة</option>
+                    <option value="operating">شركة تشغيلية</option>
+                    <option value="bank">بنك</option>
+                    <option value="unclassified">غير محدد</option>
+                  </select>
+                  <small id="companyTypeHelp">عند الجلب التلقائي يحدد الموقع نوع المنشأة، ويمكنك مراجعته.</small>
+                </label>
               </div>
             </div>
 
@@ -150,6 +160,23 @@
                 <label class="field"><span>إجمالي الأصول <b>*</b></span><div class="number-field"><input id="totalAssets" type="number" min="0.01" step="0.01" required /><small>ر.س</small></div></label>
                 <label class="field"><span>إجمالي الديون <b>*</b></span><div class="number-field"><input id="totalDebt" type="number" min="0" step="0.01" required /><small>ر.س</small></div></label>
                 <label class="field"><span>حقوق الملكية <b>*</b></span><div class="number-field"><input id="equity" type="number" step="0.01" required /><small>ر.س</small></div></label>
+              </div>
+            </div>
+
+            <div id="bankFieldsBlock" class="form-block bank-fields-block" hidden>
+              <div class="block-title"><span>4</span><div><h3>بيانات البنك</h3><p>أدخل المتوفر فقط؛ تظهر النسبة المصرفية عند اكتمال عناصرها.</p></div></div>
+              <div class="bank-mode-note">لا يستخدم وضع البنك نسبة التداول أو النسبة السريعة أو التدفق النقدي الحر؛ لأنها لا تعكس طبيعة النشاط المصرفي بصورة سليمة.</div>
+              <div class="fields-grid four-columns">
+                <label class="field"><span>صافي دخل العمولات الخاصة</span><div class="number-field"><input id="netInterestIncome" type="number" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>متوسط الأصول المدرة للدخل</span><div class="number-field"><input id="averageEarningAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>المصروفات التشغيلية</span><div class="number-field"><input id="operatingExpenses" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>الدخل التشغيلي</span><div class="number-field"><input id="operatingIncome" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>إجمالي القروض والسلف</span><div class="number-field"><input id="totalLoans" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>ودائع العملاء</span><div class="number-field"><input id="customerDeposits" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>القروض غير العاملة</span><div class="number-field"><input id="nonPerformingLoans" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>مخصصات خسائر الائتمان</span><div class="number-field"><input id="loanLossProvisions" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>رأس المال التنظيمي</span><div class="number-field"><input id="regulatoryCapital" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
+                <label class="field"><span>الأصول المرجحة بالمخاطر</span><div class="number-field"><input id="riskWeightedAssets" type="number" min="0" step="0.01" /><small>ر.س</small></div></label>
               </div>
             </div>
 
@@ -218,7 +245,7 @@
             </div>
           </section>
           <div id="ratioGrid" class="ratio-results-grid"></div>
-          <div class="additional-panel">
+          <div id="financialPositionPanel" class="additional-panel">
             <div class="panel-heading"><div><span>مؤشرات إضافية</span><h3>قراءة المركز المالي</h3></div></div>
             <div class="additional-grid">
               <article><span>نسبة التداول</span><strong id="currentRatioValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> الأصول المتداولة ÷ الالتزامات المتداولة</small><p><b>التفسير المبسط:</b> الأصول المتداولة مقابل الالتزامات المتداولة.</p></article>
@@ -227,12 +254,12 @@
               <article><span>تغطية التمويل</span><strong id="coverageValue">—</strong><small class="result-formula"><b>طريقة الحساب:</b> الربح التشغيلي ÷ مصروف التمويل</small><p><b>التفسير المبسط:</b> قدرة الربح التشغيلي على تغطية تكلفة التمويل.</p></article>
             </div>
           </div>
-          <div class="ratio-section-panel">
-            <div class="panel-heading"><div><span>بيانات السوق</span><h3>التقييم والتوزيعات</h3></div><small>وفق البيانات المتاحة</small></div>
+          <div id="valuationRatioPanel" class="ratio-section-panel">
+            <div class="panel-heading"><div><span>بيانات السوق</span><h3 id="valuationRatioTitle">التقييم والتوزيعات</h3></div><small>وفق البيانات المتاحة</small></div>
             <div id="valuationRatioGrid" class="expanded-ratio-grid"></div>
           </div>
-          <div class="ratio-section-panel">
-            <div class="panel-heading"><div><span>الكفاءة والتمويل</span><h3>مؤشرات تشغيلية متقدمة</h3></div><small>حسب البيانات المدخلة</small></div>
+          <div id="operationsRatioPanel" class="ratio-section-panel">
+            <div class="panel-heading"><div><span id="operationsRatioKicker">الكفاءة والتمويل</span><h3 id="operationsRatioTitle">مؤشرات تشغيلية متقدمة</h3></div><small>حسب البيانات المدخلة</small></div>
             <div id="operationsRatioGrid" class="expanded-ratio-grid"></div>
           </div>
           <section id="dividendHistoryPanel" class="dividend-history-panel" aria-labelledby="dividendHistoryTitle" hidden>
@@ -253,31 +280,6 @@
             </div>
             <p class="dividend-history-note">تعتمد القيم على توزيعات Yahoo Finance المسجلة حسب السنة الميلادية. السنة الحالية غير مكتملة، وقد تتغير بعد توزيعات لاحقة.</p>
           </section>
-          <section id="shareAnalysisPanel" class="share-analysis-panel" aria-labelledby="shareAnalysisTitle" hidden>
-            <div class="share-card-preview" aria-hidden="true">
-              <div class="share-card-brand"><span class="brand-mark">م</span><strong>محلل النسب المالية</strong></div>
-              <span id="sharePreviewSymbol" class="share-preview-symbol">—</span>
-              <h3 id="sharePreviewCompany">اسم الشركة</h3>
-              <p id="sharePreviewMeta">تحليل مالي مبسّط</p>
-              <div class="share-preview-line"></div>
-              <strong class="share-preview-url">ratios-ashy.vercel.app</strong>
-            </div>
-            <div class="share-analysis-copy">
-              <span class="section-kicker">جاهزة للنشر</span>
-              <h3 id="shareAnalysisTitle">شارك تحليل الشركة بصورة احترافية</h3>
-              <p>ينشئ الموقع صورة جذابة من النتائج الحالية، مع اسم الشركة وأبرز المؤشرات والتوزيعات ورابط الموقع.</p>
-              <div class="share-company-link">
-                <span>رابط التحليل الدائم</span>
-                <a id="companyPermalink" href="#" target="_blank" rel="noopener">—</a>
-              </div>
-              <div class="share-analysis-actions">
-                <button id="shareAnalysisButton" class="primary-button" type="button">مشاركة التحليل</button>
-                <button id="downloadAnalysisButton" class="secondary-button" type="button">تنزيل الصورة</button>
-                <button id="copyCompanyLinkButton" class="secondary-button compact-button" type="button">نسخ الرابط</button>
-              </div>
-              <p id="shareAnalysisFeedback" class="share-analysis-feedback" aria-live="polite"></p>
-            </div>
-          </section>
           <section id="missingDataPanel" class="missing-data-panel" hidden>
             <div class="missing-data-heading">
               <div><span>استكمال النتائج</span><h3>بعض البيانات المطلوبة غير متوفرة</h3></div>
@@ -287,9 +289,45 @@
             <button id="applyMissingFieldsButton" class="primary-button" type="button">احسب بعد إدخال الناقص</button>
           </section>
           <div class="result-note"><strong>قراءة سريعة</strong><p id="resultSummary"></p><small>هذه النتائج تعليمية وتحليلية وليست توصية استثمارية. تحقّق من القوائم والإعلانات الرسمية قبل اتخاذ أي قرار.</small></div>
+          <div id="shareAnalysisLauncher" class="share-analysis-launcher" hidden>
+            <button id="openShareAnalysisButton" class="primary-button" type="button">مشاركة التحليل</button>
+            <small>أنشئ صورة للنتائج أو انسخ رابط الشركة.</small>
+          </div>
         </div>
       </section>
     </main>
+
+    <div id="shareAnalysisModal" class="share-analysis-modal" role="dialog" aria-modal="true" aria-labelledby="shareAnalysisTitle" hidden>
+      <div class="share-analysis-backdrop" data-close-share-modal></div>
+      <div class="share-modal-dialog" tabindex="-1">
+        <button id="closeShareAnalysisButton" class="share-modal-close" type="button" aria-label="إغلاق نافذة المشاركة">×</button>
+        <section id="shareAnalysisPanel" class="share-analysis-panel">
+          <div class="share-card-preview" aria-hidden="true">
+            <div class="share-card-brand"><span class="brand-mark">م</span><strong>محلل النسب المالية</strong></div>
+            <span id="sharePreviewSymbol" class="share-preview-symbol">—</span>
+            <h3 id="sharePreviewCompany">اسم الشركة</h3>
+            <p id="sharePreviewMeta">تحليل مالي مبسّط</p>
+            <div class="share-preview-line"></div>
+            <strong class="share-preview-url">ratios-ashy.vercel.app</strong>
+          </div>
+          <div class="share-analysis-copy">
+            <span class="section-kicker">جاهزة للنشر</span>
+            <h3 id="shareAnalysisTitle">شارك تحليل الشركة بصورة احترافية</h3>
+            <p>ينشئ الموقع صورة من النتائج الحالية، مع اسم الشركة وأبرز المؤشرات والسنة المالية والمصدر ورابط الموقع.</p>
+            <div class="share-company-link">
+              <span id="companyPermalinkLabel">رابط التحليل الدائم</span>
+              <a id="companyPermalink" href="#" target="_blank" rel="noopener">—</a>
+            </div>
+            <div class="share-analysis-actions">
+              <button id="shareAnalysisButton" class="primary-button" type="button">مشاركة الصورة</button>
+              <button id="downloadAnalysisButton" class="secondary-button" type="button">تنزيل الصورة</button>
+              <button id="copyCompanyLinkButton" class="secondary-button compact-button" type="button">نسخ الرابط</button>
+            </div>
+            <p id="shareAnalysisFeedback" class="share-analysis-feedback" aria-live="polite"></p>
+          </div>
+        </section>
+      </div>
+    </div>
 
     <footer>
       <div class="container footer-content">
@@ -305,6 +343,7 @@
 
     <!-- COMPANY_BOOTSTRAP -->
     <script src="/lib/advanced-ratios.js"></script>
+    <script src="/lib/bank-ratios.js"></script>
     <script src="/script.js"></script>
     <script src="/assistant.js"></script>
   </body>

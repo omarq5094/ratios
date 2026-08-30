@@ -11,7 +11,9 @@ const FINANCIAL_INPUT_KEYS = [
   "currentLiabilities", "totalAssets", "totalDebt", "equity", "previousAssets", "previousEquity",
   "operatingCashFlow", "interestExpense", "marketCap", "freeCashFlow", "enterpriseValue", "ebitda",
   "cashAndEquivalents", "previousInventory", "annualDividendPerShare", "sharePrice", "totalDividends",
-  "earningsGrowthPercent",
+  "earningsGrowthPercent", "netInterestIncome", "averageEarningAssets", "operatingExpenses",
+  "operatingIncome", "totalLoans", "customerDeposits", "nonPerformingLoans", "loanLossProvisions",
+  "regulatoryCapital", "riskWeightedAssets",
 ];
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_REQUESTS = 8;
@@ -22,7 +24,7 @@ const SYSTEM_INSTRUCTIONS = `
 
 نطاقك:
 - شرح طريقة استخدام الموقع والتعبئة التلقائية من Yahoo Finance والإدخال اليدوي.
-- شرح النسب المالية ومعادلاتها وفائدتها العملية: الربحية، السيولة، المديونية، العائد، التقييم، التوزيعات، الكفاءة والتدفقات النقدية.
+- شرح النسب المالية ومعادلاتها وفائدتها العملية: الربحية، والسيولة، والمديونية، والعائد، والتقييم، والتوزيعات، والمؤشرات المصرفية.
 - توضيح البيانات الناقصة، والقيم السالبة، وحالة المقام صفرًا دون اختراع أرقام.
 - المقارنة التعليمية بين النسب، ومساعدة المستخدم على فهم نتيجة يذكرها بنفسه.
 
@@ -39,7 +41,8 @@ const SYSTEM_INSTRUCTIONS = `
 - إذا لم تكن المعلومة مؤكدة، صرّح بذلك بدلًا من التخمين.
 
 حقائق الموقع:
-- يحسب الموقع 26 مؤشرًا، ويعرض النتيجة وطريقة الحساب وتفسيرًا مبسطًا.
+- يحسب الموقع 26 مؤشرًا للشركات التشغيلية، ويستخدم مجموعة مستقلة ملائمة للبنوك.
+- في وضع البنوك لا تُستخدم نسبة التداول أو النسبة السريعة أو P/FCF، وتظهر بدلًا منها مؤشرات NIM وLDR وNPL والتغطية وكفاية رأس المال عند توفر بياناتها.
 - يمكن للمستخدم تعديل الأرقام التي جلبها Yahoo Finance قبل الحساب.
 - القسمة على صفر لا تنتج رقمًا، بينما القيم السالبة تُعرض كما حُسبت.
 - حساب النسب يتم داخل المتصفح. عند وجود نتائج حالية، تُرسل رسالة المستخدم ونسخة منظّمة من البيانات الظاهرة إلى خدمة الذكاء الاصطناعي عند الضغط على إرسال.
@@ -155,6 +158,9 @@ function normalizeAnalysisContext(value) {
   const context = {
     schemaVersion: 1,
     sourceType: value.sourceType === "yahoo" ? "yahoo" : "manual",
+    companyType: ["operating", "bank", "unclassified"].includes(value.companyType)
+      ? value.companyType
+      : "unclassified",
     company: {
       name: cleanText(value.company?.name, 140),
       symbol: cleanText(value.company?.symbol, 20),

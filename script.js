@@ -1,4 +1,5 @@
 const advancedRatioApi = window.AdvancedFinancialRatios;
+const bankRatioApi = window.BankFinancialRatios;
 
 const ratioMeta = {
   gross_margin: {
@@ -38,6 +39,23 @@ const ratioMeta = {
   },
 };
 
+const commonRatioMeta = {
+  roe: {
+    label: "العائد على حقوق الملكية",
+    type: "percent",
+    formula: "صافي الربح ÷ متوسط حقوق الملكية",
+    description: "كفاءة حقوق الملكية في توليد صافي الربح.",
+    negativeDescription: "النتيجة سالبة بسبب وجود قيمة سالبة في صافي الربح أو حقوق الملكية المستخدمة.",
+  },
+  roa: {
+    label: "العائد على الأصول",
+    type: "percent",
+    formula: "صافي الربح ÷ متوسط إجمالي الأصول",
+    description: "كفاءة الأصول في توليد صافي الربح.",
+    negativeDescription: "النتيجة سالبة لأن المنشأة سجلت صافي خسارة.",
+  },
+};
+
 const summaryRatioMeta = {
   current_ratio: { label: "نسبة التداول", type: "multiple" },
   quick_ratio: { label: "النسبة السريعة", type: "multiple" },
@@ -70,10 +88,20 @@ const dividendHistoryRows = document.querySelector("#dividendHistoryRows");
 const dividendTableWrap = document.querySelector("#dividendTableWrap");
 const dividendHistoryEmpty = document.querySelector("#dividendHistoryEmpty");
 const shareAnalysisPanel = document.querySelector("#shareAnalysisPanel");
+const shareAnalysisLauncher = document.querySelector("#shareAnalysisLauncher");
+const shareAnalysisModal = document.querySelector("#shareAnalysisModal");
+const openShareAnalysisButton = document.querySelector("#openShareAnalysisButton");
+const closeShareAnalysisButton = document.querySelector("#closeShareAnalysisButton");
 const shareAnalysisButton = document.querySelector("#shareAnalysisButton");
 const downloadAnalysisButton = document.querySelector("#downloadAnalysisButton");
 const copyCompanyLinkButton = document.querySelector("#copyCompanyLinkButton");
 const shareAnalysisFeedback = document.querySelector("#shareAnalysisFeedback");
+const companyTypeInput = document.querySelector("#companyType");
+const companyTypeHelp = document.querySelector("#companyTypeHelp");
+const bankFieldsBlock = document.querySelector("#bankFieldsBlock");
+const financialPositionPanel = document.querySelector("#financialPositionPanel");
+const valuationRatioPanel = document.querySelector("#valuationRatioPanel");
+const operationsRatioPanel = document.querySelector("#operationsRatioPanel");
 
 const importedFieldLabels = {
   revenue: "الإيرادات",
@@ -100,7 +128,70 @@ const importedFieldLabels = {
   sharePrice: "سعر السهم",
   totalDividends: "إجمالي توزيعات الأرباح",
   earningsGrowthPercent: "معدل نمو الأرباح",
+  netInterestIncome: "صافي دخل العمولات الخاصة",
+  averageEarningAssets: "متوسط الأصول المدرة للدخل",
+  operatingExpenses: "المصروفات التشغيلية",
+  operatingIncome: "الدخل التشغيلي",
+  totalLoans: "إجمالي القروض والسلف",
+  customerDeposits: "ودائع العملاء",
+  nonPerformingLoans: "القروض غير العاملة",
+  loanLossProvisions: "مخصصات خسائر الائتمان",
+  regulatoryCapital: "رأس المال التنظيمي",
+  riskWeightedAssets: "الأصول المرجحة بالمخاطر",
 };
+
+const OPERATING_ONLY_FIELDS = Object.freeze([
+  "revenue",
+  "costOfSales",
+  "operatingProfit",
+  "currentAssets",
+  "inventory",
+  "currentLiabilities",
+  "totalDebt",
+  "operatingCashFlow",
+  "interestExpense",
+  "freeCashFlow",
+  "enterpriseValue",
+  "ebitda",
+  "cashAndEquivalents",
+  "previousInventory",
+  "earningsGrowthPercent",
+]);
+
+const BANK_ONLY_FIELDS = Object.freeze([
+  "netInterestIncome",
+  "averageEarningAssets",
+  "operatingExpenses",
+  "operatingIncome",
+  "totalLoans",
+  "customerDeposits",
+  "nonPerformingLoans",
+  "loanLossProvisions",
+  "regulatoryCapital",
+  "riskWeightedAssets",
+]);
+
+const OPERATING_REQUIRED_FIELDS = Object.freeze([
+  "revenue",
+  "costOfSales",
+  "operatingProfit",
+  "netProfit",
+  "currentAssets",
+  "inventory",
+  "currentLiabilities",
+  "totalAssets",
+  "totalDebt",
+  "equity",
+]);
+
+const COMMON_REQUIRED_FIELDS = Object.freeze(["netProfit", "totalAssets", "equity"]);
+const UNCLASSIFIED_ADVANCED_CODES = new Set([
+  "market_cap",
+  "pe",
+  "pb",
+  "dividend_yield",
+  "dividend_payout",
+]);
 
 const numberFormatter = new Intl.NumberFormat("ar-SA", { maximumFractionDigits: 2 });
 const compactNumberFormatter = new Intl.NumberFormat("ar-SA", {
@@ -113,6 +204,7 @@ let nextFetchAt = readCooldownDeadline();
 let currencyUnit = "ر.س";
 let importedCompanyContext = null;
 let latestShareState = null;
+let shareModalReturnFocus = null;
 
 function valueOf(id) {
   const value = Number(document.querySelector(`#${id}`).value);
@@ -132,6 +224,83 @@ function textOf(id) {
 
 function setText(id, value) {
   document.querySelector(`#${id}`).textContent = value;
+}
+
+function normalizeCompanyType(value) {
+  return ["operating", "bank", "unclassified"].includes(value) ? value : "";
+}
+
+function currentCompanyType() {
+  return normalizeCompanyType(companyTypeInput?.value);
+}
+
+function requiredFieldsFor(companyType) {
+  return companyType === "operating" ? [...OPERATING_REQUIRED_FIELDS] : [...COMMON_REQUIRED_FIELDS];
+}
+
+function applicableFieldsFor(companyType) {
+  const allFields = Object.keys(importedFieldLabels);
+  if (companyType === "bank") return allFields.filter((key) => !OPERATING_ONLY_FIELDS.includes(key));
+  if (companyType === "unclassified") {
+    return allFields.filter((key) => !OPERATING_ONLY_FIELDS.includes(key) && !BANK_ONLY_FIELDS.includes(key));
+  }
+  return allFields.filter((key) => !BANK_ONLY_FIELDS.includes(key));
+}
+
+function ratioFieldApiFor(companyType) {
+  return companyType === "bank" ? bankRatioApi : advancedRatioApi;
+}
+
+function fieldLabelFor(fieldName, companyType = currentCompanyType()) {
+  return ratioFieldApiFor(companyType)?.fieldLabels?.[fieldName]
+    || importedFieldLabels[fieldName]
+    || fieldName;
+}
+
+function setFieldVisibility(fieldName, visible) {
+  const input = document.querySelector(`#${fieldName}`);
+  const field = input?.closest(".field");
+  if (!input || !field) return;
+  field.hidden = !visible;
+  input.disabled = !visible;
+}
+
+function setCompanyType(value, { hideResults = false } = {}) {
+  const companyType = normalizeCompanyType(value);
+  if (companyTypeInput) companyTypeInput.value = companyType;
+
+  OPERATING_ONLY_FIELDS.forEach((fieldName) => setFieldVisibility(fieldName, companyType === "operating"));
+  BANK_ONLY_FIELDS.forEach((fieldName) => setFieldVisibility(fieldName, companyType === "bank"));
+  if (bankFieldsBlock) bankFieldsBlock.hidden = companyType !== "bank";
+
+  Object.keys(importedFieldLabels).forEach((fieldName) => {
+    const input = document.querySelector(`#${fieldName}`);
+    if (input) input.required = false;
+  });
+  if (companyType) {
+    requiredFieldsFor(companyType).forEach((fieldName) => {
+      const input = document.querySelector(`#${fieldName}`);
+      if (input && !input.disabled) input.required = true;
+    });
+  }
+
+  if (companyTypeHelp) {
+    companyTypeHelp.textContent = companyType === "bank"
+      ? "وضع البنوك مفعّل: تظهر مؤشرات مصرفية وتُستبعد نسب السيولة التشغيلية."
+      : companyType === "operating"
+        ? "تظهر نسب الربحية والسيولة والمديونية والتشغيل."
+        : companyType === "unclassified"
+          ? "ستظهر المؤشرات المشتركة فقط حتى تختار نوعًا أدق."
+          : "عند الجلب التلقائي يحدد الموقع نوع المنشأة، ويمكنك مراجعته.";
+  }
+
+  if (importedCompanyContext && companyType) importedCompanyContext.companyType = companyType;
+  if (hideResults) {
+    resultsSection.hidden = true;
+    shareAnalysisLauncher.hidden = true;
+    closeShareModal();
+    publishAssistantContext(null);
+  }
 }
 
 function formatRatio(value, type) {
@@ -279,13 +448,14 @@ function resetImportPresentation() {
   importSummary.hidden = true;
   showFetchStatus("");
   Object.keys(importedFieldLabels).forEach((id) => {
-    document.querySelector(`#${id}`).closest(".field")?.classList.remove("auto-filled", "missing-field");
+    document.querySelector(`#${id}`)?.closest(".field")?.classList.remove("auto-filled", "missing-field");
   });
 }
 
 function clearFinancialFields() {
   Object.keys(importedFieldLabels).forEach((id) => {
-    document.querySelector(`#${id}`).value = "";
+    const input = document.querySelector(`#${id}`);
+    if (input) input.value = "";
   });
 }
 
@@ -301,6 +471,8 @@ function applyImportedData(data) {
   resetImportPresentation();
   clearFinancialFields();
 
+  const importedCompanyType = normalizeCompanyType(data.companyType) || "operating";
+
   importedCompanyContext = {
     symbol: data.symbol || "",
     companyName: data.companyName || data.symbol || "",
@@ -311,7 +483,10 @@ function applyImportedData(data) {
     periodEnd: data.periodEnd || "",
     missingFields: Array.isArray(data.missingFields) ? data.missingFields : [],
     source: data.source || {},
+    companyType: importedCompanyType,
   };
+
+  setCompanyType(importedCompanyType);
 
   resultsSection.hidden = true;
   publishAssistantContext(null);
@@ -319,8 +494,10 @@ function applyImportedData(data) {
   document.querySelector("#projectName").value = data.companyName || data.symbol;
   updateCurrencyUnits(data.currency);
 
+  const applicableKeys = applicableFieldsFor(importedCompanyType);
   Object.entries(importedFieldLabels).forEach(([id]) => {
     const input = document.querySelector(`#${id}`);
+    if (!input) return;
     const value = data.fields?.[id];
     const field = input.closest(".field");
     if (typeof value === "number" && Number.isFinite(value)) {
@@ -328,47 +505,36 @@ function applyImportedData(data) {
       field?.classList.add("auto-filled");
     } else {
       input.value = "";
-      field?.classList.add("missing-field");
+      if (applicableKeys.includes(id)) field?.classList.add("missing-field");
     }
   });
 
-  const importedKeys = Object.keys(importedFieldLabels);
-  const missingKeys = importedKeys.filter((key) => {
+  const missingKeys = applicableKeys.filter((key) => {
     const value = data.fields?.[key];
     return typeof value !== "number" || !Number.isFinite(value);
   });
   const missingLabels = missingKeys.map((key) => importedFieldLabels[key]);
-  const availableFieldCount = importedKeys.length - missingKeys.length;
+  const availableFieldCount = applicableKeys.length - missingKeys.length;
   document.querySelector("#importCompanyName").textContent = data.companyName || data.symbol;
-  document.querySelector("#importCompanyMeta").textContent = `الرمز: ${data.symbol || "غير محدد"}`;
+  const typeLabel = importedCompanyType === "bank" ? "بنك" : "شركة تشغيلية";
+  document.querySelector("#importCompanyMeta").textContent = `الرمز: ${data.symbol || "غير محدد"} · النوع: ${typeLabel}`;
   document.querySelector("#importSourceBadge").textContent = `المصدر: ${data.source?.provider || "غير محدد"}`;
   document.querySelector("#importPeriodBadge").textContent = `السنة المالية: ${data.period || "غير محددة"}`;
   document.querySelector("#importCurrencyBadge").textContent = `العملة: ${data.currency || "غير محددة"}`;
-  document.querySelector("#importCoverageBadge").textContent = `تم جلب ${availableFieldCount} من ${importedKeys.length} حقلًا`;
+  document.querySelector("#importCoverageBadge").textContent = `تم جلب ${availableFieldCount} من ${applicableKeys.length} حقلًا`;
   document.querySelector("#importSourceLink").href = data.source?.url || "#";
 
   const notes = [];
   if (missingLabels.length) {
     notes.push(`الحقول التي لم يوفرها Yahoo Finance: ${missingLabels.join("، ")}.`);
   } else {
-    notes.push("اكتملت جميع الحقول الأربعة والعشرون من Yahoo Finance.");
+    notes.push(`اكتملت جميع الحقول المناسبة لوضع ${typeLabel}.`);
   }
   notes.push("راجع الأرقام مع القوائم المنشورة قبل اعتماد النتيجة.");
   document.querySelector("#importMissingNote").textContent = notes.join(" ");
   importSummary.hidden = false;
 
-  const requiredMissing = [
-    "revenue",
-    "costOfSales",
-    "operatingProfit",
-    "netProfit",
-    "currentAssets",
-    "inventory",
-    "currentLiabilities",
-    "totalAssets",
-    "totalDebt",
-    "equity",
-  ].filter((key) => missingKeys.includes(key));
+  const requiredMissing = requiredFieldsFor(importedCompanyType).filter((key) => missingKeys.includes(key));
 
   if (requiredMissing.length) {
     showFetchStatus("تم جلب البيانات المتاحة. أكمل المراجعة والحقول المعلّمة قبل الحساب.", "warning");
@@ -434,28 +600,34 @@ function calculate(values) {
   const averageEquity = values.previousEquity !== null
     ? (values.equity + values.previousEquity) / 2
     : values.equity;
+  const operatingMode = values.companyType === "operating";
 
   return {
-    gross_margin: (values.revenue - values.costOfSales) / values.revenue,
-    operating_margin: values.operatingProfit / values.revenue,
-    net_margin: values.netProfit / values.revenue,
-    current_ratio: values.currentAssets / values.currentLiabilities,
-    quick_ratio: (values.currentAssets - values.inventory) / values.currentLiabilities,
-    debt_to_equity: values.totalDebt / values.equity,
-    roa: values.netProfit / averageAssets,
-    roe: values.netProfit / averageEquity,
-    interest_coverage: values.interestExpense > 0 ? values.operatingProfit / values.interestExpense : null,
+    gross_margin: operatingMode && values.revenue !== 0 ? (values.revenue - values.costOfSales) / values.revenue : null,
+    operating_margin: operatingMode && values.revenue !== 0 ? values.operatingProfit / values.revenue : null,
+    net_margin: operatingMode && values.revenue !== 0 ? values.netProfit / values.revenue : null,
+    current_ratio: operatingMode && values.currentLiabilities !== 0 ? values.currentAssets / values.currentLiabilities : null,
+    quick_ratio: operatingMode && values.currentLiabilities !== 0
+      ? (values.currentAssets - values.inventory) / values.currentLiabilities
+      : null,
+    debt_to_equity: operatingMode && values.equity !== 0 ? values.totalDebt / values.equity : null,
+    roa: averageAssets !== 0 ? values.netProfit / averageAssets : null,
+    roe: averageEquity !== 0 ? values.netProfit / averageEquity : null,
+    interest_coverage: operatingMode && values.interestExpense > 0
+      ? values.operatingProfit / values.interestExpense
+      : null,
     cash_quality:
-      values.operatingCashFlow !== null && values.netProfit !== 0
+      operatingMode && values.operatingCashFlow !== null && values.netProfit !== 0
         ? values.operatingCashFlow / values.netProfit
         : null,
   };
 }
 
-function renderPrimaryRatios(ratios) {
+function renderPrimaryRatios(ratios, companyType) {
   ratioGrid.replaceChildren();
 
-  Object.entries(ratioMeta).forEach(([code, meta]) => {
+  const definitions = companyType === "operating" ? ratioMeta : commonRatioMeta;
+  Object.entries(definitions).forEach(([code, meta]) => {
     const card = document.createElement("article");
     card.className = "ratio-result-card";
 
@@ -507,7 +679,7 @@ function renderAdvancedCard(item) {
   status.className = "ratio-data-status";
   if (item.status === "missing") {
     value.textContent = "بيانات ناقصة";
-    const labels = item.missingFields.map((key) => advancedRatioApi.fieldLabels[key] || key);
+    const labels = item.missingFields.map((key) => fieldLabelFor(key));
     status.textContent = `ينقص: ${labels.join("، ")}.`;
   } else {
     value.textContent = "غير قابل للحساب";
@@ -518,7 +690,12 @@ function renderAdvancedCard(item) {
 }
 
 function renderAdvancedRatios(values, ratios) {
-  const results = advancedRatioApi.calculate(values);
+  const companyType = values.companyType;
+  const results = companyType === "bank"
+    ? bankRatioApi.calculate(values)
+    : advancedRatioApi.calculate(values).filter((item) => (
+      companyType === "operating" || UNCLASSIFIED_ADVANCED_CODES.has(item.code)
+    ));
   valuationRatioGrid.replaceChildren();
   operationsRatioGrid.replaceChildren();
 
@@ -527,27 +704,35 @@ function renderAdvancedRatios(values, ratios) {
     target.append(renderAdvancedCard(item));
   });
 
+  financialPositionPanel.hidden = companyType !== "operating";
+  operationsRatioPanel.hidden = companyType === "unclassified";
+  valuationRatioPanel.hidden = false;
+  setText("valuationRatioTitle", companyType === "bank" ? "التقييم والتوزيعات للبنك" : "التقييم والتوزيعات");
+  setText("operationsRatioKicker", companyType === "bank" ? "الجودة والكفاءة ورأس المال" : "الكفاءة والتمويل");
+  setText("operationsRatioTitle", companyType === "bank" ? "مؤشرات مصرفية متقدمة" : "مؤشرات تشغيلية متقدمة");
+
   const missingResults = [...results];
-  if (ratios.interest_coverage === null && values.interestExpense === null) {
+  if (companyType === "operating" && ratios.interest_coverage === null && values.interestExpense === null) {
     missingResults.push({ status: "missing", missingFields: ["interestExpense"] });
   }
-  renderMissingFields(missingResults);
+  renderMissingFields(missingResults, companyType);
 }
 
-function unitLabelFor(fieldName) {
-  const unit = advancedRatioApi.inputMeta[fieldName]?.unit;
+function unitLabelFor(fieldName, companyType) {
+  const unit = ratioFieldApiFor(companyType)?.inputMeta?.[fieldName]?.unit;
   if (unit === "percent") return "٪";
   if (unit === "currency_per_share") return `${currencyUnit} للسهم`;
   return currencyUnit;
 }
 
-function renderMissingFields(results) {
+function renderMissingFields(results, companyType) {
+  const fieldApi = ratioFieldApiFor(companyType);
   const missingFields = [
     ...new Set(
       results
         .filter((item) => item.status === "missing")
         .flatMap((item) => item.missingFields)
-        .filter((fieldName) => advancedRatioApi.fieldLabels[fieldName]),
+        .filter((fieldName) => fieldApi?.fieldLabels?.[fieldName] || importedFieldLabels[fieldName]),
     ),
   ];
 
@@ -556,11 +741,11 @@ function renderMissingFields(results) {
   if (!missingFields.length) return;
 
   missingFields.forEach((fieldName) => {
-    const meta = advancedRatioApi.inputMeta[fieldName] || {};
+    const meta = fieldApi?.inputMeta?.[fieldName] || {};
     const label = document.createElement("label");
     label.className = "missing-input-card";
     const title = document.createElement("span");
-    title.textContent = advancedRatioApi.fieldLabels[fieldName];
+    title.textContent = fieldLabelFor(fieldName, companyType);
     const helper = document.createElement("small");
     helper.textContent = "أدخل القيمة من القوائم أو المصدر الرسمي.";
     const wrap = document.createElement("div");
@@ -569,12 +754,12 @@ function renderMissingFields(results) {
     input.type = "number";
     input.step = "any";
     input.dataset.field = fieldName;
-    input.setAttribute("aria-label", advancedRatioApi.fieldLabels[fieldName]);
+    input.setAttribute("aria-label", fieldLabelFor(fieldName, companyType));
     if (typeof meta.min === "number") input.min = String(meta.min);
     const savedValue = document.querySelector(`#${fieldName}`)?.value;
     if (savedValue) input.value = savedValue;
     const unit = document.createElement("b");
-    unit.textContent = unitLabelFor(fieldName);
+    unit.textContent = unitLabelFor(fieldName, companyType);
     wrap.append(input, unit);
     label.append(title, helper, wrap);
     missingFieldsGrid.append(label);
@@ -656,13 +841,35 @@ function renderDividendHistory() {
   });
 }
 
-function shareMetrics(ratios) {
-  return [
-    { label: "هامش صافي الربح", value: ratios.net_margin, type: "percent" },
-    { label: "العائد على حقوق الملكية", value: ratios.roe, type: "percent" },
-    { label: "الديون إلى حقوق الملكية", value: ratios.debt_to_equity, type: "multiple" },
-    { label: "نسبة التداول", value: ratios.current_ratio, type: "multiple" },
-  ].filter((item) => Number.isFinite(item.value)).slice(0, 3);
+function shareMetrics(values, ratios) {
+  if (values.companyType === "bank") {
+    const bankResults = Object.fromEntries(bankRatioApi.calculate(values).map((item) => [item.code, item]));
+    return [
+      { label: "هامش صافي العمولات", value: bankResults.nim?.value, type: "percent" },
+      { label: "القروض غير العاملة", value: bankResults.npl?.value, type: "percent" },
+      { label: "القروض إلى الودائع", value: bankResults.loan_deposit?.value, type: "percent" },
+      { label: "العائد على حقوق الملكية", value: ratios.roe, type: "percent" },
+      { label: "العائد على الأصول", value: ratios.roa, type: "percent" },
+      { label: "السعر إلى القيمة الدفترية", value: bankResults.pb?.value, type: "multiple" },
+    ].filter((item) => Number.isFinite(item.value)).slice(0, 3);
+  }
+
+  const commonMarketResults = Object.fromEntries(
+    advancedRatioApi.calculate(values).map((item) => [item.code, item]),
+  );
+  const candidates = values.companyType === "unclassified"
+    ? [
+      { label: "العائد على حقوق الملكية", value: ratios.roe, type: "percent" },
+      { label: "العائد على الأصول", value: ratios.roa, type: "percent" },
+      { label: "مضاعف الربحية", value: commonMarketResults.pe?.value, type: "multiple" },
+    ]
+    : [
+      { label: "هامش صافي الربح", value: ratios.net_margin, type: "percent" },
+      { label: "العائد على حقوق الملكية", value: ratios.roe, type: "percent" },
+      { label: "الديون إلى حقوق الملكية", value: ratios.debt_to_equity, type: "multiple" },
+      { label: "نسبة التداول", value: ratios.current_ratio, type: "multiple" },
+    ];
+  return candidates.filter((item) => Number.isFinite(item.value)).slice(0, 3);
 }
 
 function dividendShareSummary() {
@@ -677,25 +884,47 @@ function showShareFeedback(text, isError = false) {
   shareAnalysisFeedback.classList.toggle("is-error", isError);
 }
 
+function openShareModal() {
+  if (!latestShareState || !shareAnalysisModal) return;
+  shareModalReturnFocus = document.activeElement;
+  shareAnalysisModal.hidden = false;
+  document.body.classList.add("share-modal-open");
+  closeShareAnalysisButton?.focus();
+}
+
+function closeShareModal() {
+  if (!shareAnalysisModal || shareAnalysisModal.hidden) return;
+  shareAnalysisModal.hidden = true;
+  document.body.classList.remove("share-modal-open");
+  if (shareModalReturnFocus instanceof HTMLElement) shareModalReturnFocus.focus();
+  shareModalReturnFocus = null;
+}
+
 function renderSharePanel(values, ratios) {
-  if (!shareAnalysisPanel || !importedCompanyContext) {
-    if (shareAnalysisPanel) shareAnalysisPanel.hidden = true;
+  if (!shareAnalysisPanel) {
     latestShareState = null;
     return;
   }
 
-  const symbol = cleanCompanySymbol(importedCompanyContext.symbol);
-  const companyName = values.projectName || importedCompanyContext.companyName || symbol;
-  const permalink = companyUrlFor(symbol);
-  const period = importedCompanyContext.period || "أحدث سنة متاحة";
+  const imported = importedCompanyContext;
+  const symbol = cleanCompanySymbol(imported?.symbol);
+  const companyName = values.projectName || imported?.companyName || symbol || "تحليل مالي";
+  const permalink = symbol ? companyUrlFor(symbol) : SITE_URL;
+  const period = imported?.period || "غير محددة";
   const dividendSummary = dividendShareSummary();
+  const typeLabel = values.companyType === "bank"
+    ? "تحليل بنك"
+    : values.companyType === "operating"
+      ? "شركة تشغيلية"
+      : "تحليل مشترك";
 
-  setText("sharePreviewSymbol", symbol ? `تداول: ${symbol}` : "تداول");
+  setText("sharePreviewSymbol", symbol ? `تداول: ${symbol}` : typeLabel);
   setText("sharePreviewCompany", companyName);
   setText("sharePreviewMeta", `السنة المالية ${period} · ${dividendSummary}`);
   const permalinkElement = document.querySelector("#companyPermalink");
   permalinkElement.href = permalink;
   permalinkElement.textContent = permalink;
+  setText("companyPermalinkLabel", symbol ? "رابط التحليل الدائم" : "رابط الموقع");
 
   latestShareState = {
     companyName,
@@ -703,11 +932,14 @@ function renderSharePanel(values, ratios) {
     period,
     permalink,
     dividendSummary,
-    metrics: shareMetrics(ratios),
-    source: importedCompanyContext.source?.provider || "Yahoo Finance",
+    companyType: values.companyType,
+    typeLabel,
+    metrics: shareMetrics(values, ratios),
+    source: imported?.source?.provider || "إدخال يدوي",
   };
   showShareFeedback("");
-  shareAnalysisPanel.hidden = false;
+  closeShareModal();
+  shareAnalysisLauncher.hidden = false;
 }
 
 function roundedRectPath(context, x, y, width, height, radius) {
@@ -810,7 +1042,8 @@ async function createAnalysisImageBlob() {
   fillRoundedRect(context, 742, 220, 232, 57, 28, "rgba(255,255,255,.09)");
   context.fillStyle = "#d0c8ff";
   context.font = '800 23px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText(`تداول: ${latestShareState.symbol}`, 946, 257);
+  const shareBadge = latestShareState.symbol ? `تداول: ${latestShareState.symbol}` : latestShareState.typeLabel;
+  context.fillText(shareBadge, 946, 257);
 
   const titleSize = fitCanvasText(context, latestShareState.companyName, 870, 58, 34);
   context.fillStyle = "#ffffff";
@@ -827,7 +1060,7 @@ async function createAnalysisImageBlob() {
   context.fillText("أبرز المؤشرات", 974, 516);
 
   const metrics = latestShareState.metrics;
-  const cardWidth = 274;
+  const cardWidth = metrics.length === 1 ? 868 : metrics.length === 2 ? 422 : 274;
   const cardGap = 24;
   metrics.forEach((metric, index) => {
     const x = 106 + (metrics.length - 1 - index) * (cardWidth + cardGap);
@@ -948,11 +1181,19 @@ function assistantRatio(code, meta, value) {
 }
 
 function buildAssistantContext(values, ratios) {
+  const primaryDefinitions = values.companyType === "operating" ? ratioMeta : commonRatioMeta;
   const primaryRatios = [
-    ...Object.entries(ratioMeta).map(([code, meta]) => assistantRatio(code, meta, ratios[code])),
-    ...Object.entries(summaryRatioMeta).map(([code, meta]) => assistantRatio(code, meta, ratios[code])),
+    ...Object.entries(primaryDefinitions).map(([code, meta]) => assistantRatio(code, meta, ratios[code])),
+    ...(values.companyType === "operating"
+      ? Object.entries(summaryRatioMeta).map(([code, meta]) => assistantRatio(code, meta, ratios[code]))
+      : []),
   ];
-  const advancedRatios = advancedRatioApi.calculate(values).map((item) => ({
+  const calculatedAdvancedRatios = values.companyType === "bank"
+    ? bankRatioApi.calculate(values)
+    : advancedRatioApi.calculate(values).filter((item) => (
+      values.companyType === "operating" || UNCLASSIFIED_ADVANCED_CODES.has(item.code)
+    ));
+  const advancedRatios = calculatedAdvancedRatios.map((item) => ({
     code: item.code,
     label: item.label,
     type: item.type,
@@ -966,6 +1207,7 @@ function buildAssistantContext(values, ratios) {
   return {
     schemaVersion: 1,
     sourceType: imported ? "yahoo" : "manual",
+    companyType: values.companyType,
     company: {
       name: values.projectName || imported?.companyName || "النتائج الحالية",
       symbol: imported?.symbol || "",
@@ -998,10 +1240,14 @@ function renderResults(values, ratios, shouldScroll = true) {
   setText("coverageValue", formatRatio(ratios.interest_coverage, "multiple"));
   setText(
     "resultSummary",
-    "تم حساب المؤشرات من البيانات المتاحة والمدخلة. تعتمد مؤشرات التقييم السوقي على أحدث قيمة سوقية متاحة مع أحدث بيانات سنوية مكتملة؛ لذلك يجب مراجعة المصدر والقوائم الرسمية قبل تفسير النتائج.",
+    values.companyType === "bank"
+      ? "تم تطبيق وضع البنوك واستبعاد نسب الشركات التشغيلية غير المناسبة. تعتمد المؤشرات المصرفية على اكتمال بيانات القروض والودائع وجودة الائتمان ورأس المال، ويجب مراجعتها مع إفصاحات البنك الرسمية."
+      : values.companyType === "unclassified"
+        ? "تم عرض المؤشرات المشتركة فقط؛ اختر نوع المنشأة بدقة للحصول على مجموعة نسب أكثر ملاءمة."
+        : "تم حساب المؤشرات من البيانات المتاحة والمدخلة. تعتمد مؤشرات التقييم السوقي على أحدث قيمة سوقية متاحة مع أحدث بيانات سنوية مكتملة؛ لذلك يجب مراجعة المصدر والقوائم الرسمية قبل تفسير النتائج.",
   );
   renderCompanyInfo();
-  renderPrimaryRatios(ratios);
+  renderPrimaryRatios(ratios, values.companyType);
   renderAdvancedRatios(values, ratios);
   renderDividendHistory();
   renderSharePanel(values, ratios);
@@ -1013,6 +1259,7 @@ function renderResults(values, ratios, shouldScroll = true) {
 
 function collectValues() {
   return {
+    companyType: currentCompanyType(),
     projectName: textOf("projectName"),
     revenue: valueOf("revenue"),
     costOfSales: valueOf("costOfSales"),
@@ -1038,6 +1285,16 @@ function collectValues() {
     sharePrice: nullableValueOf("sharePrice"),
     totalDividends: nullableValueOf("totalDividends"),
     earningsGrowthPercent: nullableValueOf("earningsGrowthPercent"),
+    netInterestIncome: nullableValueOf("netInterestIncome"),
+    averageEarningAssets: nullableValueOf("averageEarningAssets"),
+    operatingExpenses: nullableValueOf("operatingExpenses"),
+    operatingIncome: nullableValueOf("operatingIncome"),
+    totalLoans: nullableValueOf("totalLoans"),
+    customerDeposits: nullableValueOf("customerDeposits"),
+    nonPerformingLoans: nullableValueOf("nonPerformingLoans"),
+    loanLossProvisions: nullableValueOf("loanLossProvisions"),
+    regulatoryCapital: nullableValueOf("regulatoryCapital"),
+    riskWeightedAssets: nullableValueOf("riskWeightedAssets"),
   };
 }
 
@@ -1047,11 +1304,11 @@ form.addEventListener("submit", (event) => {
   if (!form.reportValidity()) return;
 
   const values = collectValues();
-  if (values.inventory > values.currentAssets) {
+  if (values.companyType === "operating" && values.inventory > values.currentAssets) {
     showMessage("المخزون لا يمكن أن يكون أكبر من إجمالي الأصول المتداولة.", "error");
     return;
   }
-  if (values.totalDebt > values.totalAssets * 5) {
+  if (values.companyType === "operating" && values.totalDebt > values.totalAssets * 5) {
     showMessage("راجع إجمالي الديون؛ القيمة تبدو مرتفعة جدًا مقارنةً بالأصول.", "warning");
   }
 
@@ -1071,7 +1328,7 @@ applyMissingFieldsButton.addEventListener("click", () => {
     const minimum = input.min === "" ? null : Number(input.min);
     if (!Number.isFinite(value) || (minimum !== null && value < minimum)) {
       input.focus();
-      showMessage(`راجع قيمة ${advancedRatioApi.fieldLabels[input.dataset.field]}.`, "error");
+      showMessage(`راجع قيمة ${fieldLabelFor(input.dataset.field)}.`, "error");
       return;
     }
 
@@ -1101,12 +1358,14 @@ document.querySelector("#resetButton").addEventListener("click", () => {
   companyInfoPanel.hidden = true;
   dividendHistoryPanel.hidden = true;
   dividendHistoryRows.replaceChildren();
-  if (shareAnalysisPanel) shareAnalysisPanel.hidden = true;
+  if (shareAnalysisLauncher) shareAnalysisLauncher.hidden = true;
+  closeShareModal();
   latestShareState = null;
   showMessage("");
   resetImportPresentation();
   missingDataPanel.hidden = true;
   missingFieldsGrid.replaceChildren();
+  setCompanyType("");
   updateCurrencyUnits("SAR");
   updateFetchButton();
   if (window.history && typeof window.history.pushState === "function" && /^\/company\//.test(window.location.pathname || "")) {
@@ -1117,6 +1376,7 @@ document.querySelector("#resetButton").addEventListener("click", () => {
 });
 
 fetchCompanyButton.addEventListener("click", fetchCompanyData);
+companyTypeInput?.addEventListener("change", () => setCompanyType(companyTypeInput.value, { hideResults: true }));
 tickerInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -1127,6 +1387,14 @@ tickerInput.addEventListener("keydown", (event) => {
 shareAnalysisButton?.addEventListener("click", shareAnalysisImage);
 downloadAnalysisButton?.addEventListener("click", downloadAnalysisImage);
 copyCompanyLinkButton?.addEventListener("click", copyCompanyLink);
+openShareAnalysisButton?.addEventListener("click", openShareModal);
+closeShareAnalysisButton?.addEventListener("click", closeShareModal);
+shareAnalysisModal?.addEventListener("click", (event) => {
+  if (event.target instanceof Element && event.target.hasAttribute("data-close-share-modal")) closeShareModal();
+});
+document.addEventListener?.("keydown", (event) => {
+  if (event.key === "Escape" && !shareAnalysisModal?.hidden) closeShareModal();
+});
 
 function readCompanyBootstrap() {
   const element = document.querySelector("#companyBootstrap");
@@ -1146,18 +1414,7 @@ function initializeCompanyPage() {
   applyImportedData(payload);
   updateCompanyLocation(payload, false);
 
-  const requiredFields = [
-    "revenue",
-    "costOfSales",
-    "operatingProfit",
-    "netProfit",
-    "currentAssets",
-    "inventory",
-    "currentLiabilities",
-    "totalAssets",
-    "totalDebt",
-    "equity",
-  ];
+  const requiredFields = requiredFieldsFor(currentCompanyType());
   const canCalculate = requiredFields.every((key) => Number.isFinite(payload.fields?.[key]));
   if (canCalculate) {
     const values = collectValues();
@@ -1169,5 +1426,6 @@ function initializeCompanyPage() {
   }
 }
 
+setCompanyType("");
 updateFetchButton();
 initializeCompanyPage();

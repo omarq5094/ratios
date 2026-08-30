@@ -162,6 +162,20 @@ test("ينظف سياق بيانات الشاشة ويمنع الحقول غير
   assert.equal(context.ratios.length, 1);
 });
 
+test("يقبل نوع البنك ومدخلاته المصرفية فقط ضمن القائمة المعتمدة", () => {
+  const context = assistantInternals.normalizeAnalysisContext({
+    sourceType: "manual",
+    companyType: "bank",
+    company: { name: "بنك اختبار" },
+    financialInputs: { totalLoans: 600, customerDeposits: 720, secretField: 999 },
+    ratios: [{ code: "loan_deposit", label: "القروض إلى الودائع", type: "percent", status: "available", value: 0.8333 }],
+  });
+
+  assert.equal(context.companyType, "bank");
+  assert.deepEqual(context.financialInputs, { totalLoans: 600, customerDeposits: 720 });
+  assert.equal(context.financialInputs.secretField, undefined);
+});
+
 test("ينظف سجل المحادثة ويستبعد الأدوار غير المسموحة", () => {
   const history = assistantInternals.normalizeHistory([
     { role: "system", content: "غير مسموح" },
