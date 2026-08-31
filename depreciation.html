@@ -43,7 +43,7 @@
         </div>
         <div class="depreciation-hero-card" aria-hidden="true">
           <span>القيمة القابلة للإهلاك</span>
-          <strong>90,000 <small>ريال</small></strong>
+          <strong><span id="heroDepreciableValue">90,000</span> <small>ريال</small></strong>
           <div><i style="--h:100%"></i><i style="--h:78%"></i><i style="--h:58%"></i><i style="--h:41%"></i><i style="--h:22%"></i></div>
           <small>التكلفة − القيمة المتبقية</small>
         </div>
@@ -82,9 +82,9 @@
             <div class="form-block">
               <div class="block-title"><span>2</span><div><h3>بيانات الأصل</h3><p>الحقول المحاسبية قابلة للتعديل لتجهيز القيد المناسب.</p></div></div>
               <div class="fields-grid three-columns depreciation-fields">
-                <label class="field"><span>اسم الأصل <b>*</b></span><input id="assetName" type="text" maxlength="80" value="آلة إنتاج" required /></label>
-                <label class="field"><span>حساب الأصل <b>*</b></span><input id="assetAccount" type="text" maxlength="80" value="الآلات" required /></label>
-                <label class="field"><span>الحساب المقابل <b>*</b></span><select id="counterAccount"><option>النقدية</option><option>الدائنون</option><option>البنك</option></select></label>
+                <label class="field"><span>اسم الأصل <small>اختياري</small></span><input id="assetName" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: آلة إنتاج" /></label>
+                <label class="field"><span>حساب الأصل <small>اختياري</small></span><input id="assetAccount" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: الآلات" /></label>
+                <label class="field"><span>الحساب المقابل <small>اختياري</small></span><input id="counterAccount" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: النقدية" /></label>
                 <label class="field"><span>تكلفة الأصل <b>*</b></span><div class="number-field"><input id="assetCost" type="number" min="0.01" step="0.01" value="100000" required /><small>ريال</small></div></label>
                 <label class="field"><span>القيمة المتبقية <b>*</b></span><div class="number-field"><input id="residualValue" type="number" min="0" step="0.01" value="10000" required /><small>ريال</small></div></label>
                 <label class="field"><span>العمر الإنتاجي <b>*</b></span><div class="number-field"><input id="usefulLife" type="number" min="1" max="100" step="1" value="5" required /><small>سنة</small></div></label>
@@ -133,4 +133,3 @@
     <script src="/assistant.js"></script>
   </body>
 </html>
-

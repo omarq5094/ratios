@@ -5,6 +5,11 @@ const METHOD_LABELS = {
   double_declining: "الرصيد المتناقص المضاعف",
   units_of_production: "وحدات الإنتاج",
 };
+const DEFAULT_ASSET_DETAILS = Object.freeze({
+  assetName: "آلة إنتاج",
+  assetAccount: "الآلات",
+  counterAccount: "النقدية",
+});
 const CONTEXT_EVENT = "accounting-analysis-context";
 const form = document.querySelector("#depreciationForm");
 const methodInputs = [...document.querySelectorAll('input[name="depreciationMethod"]')];
@@ -27,6 +32,17 @@ function selectedMethod() {
 
 function formatMoney(value) {
   return new Intl.NumberFormat("ar-SA", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
+}
+
+function updateHeroPreview() {
+  const cost = Number(valueOf("assetCost"));
+  const residualValue = Number(valueOf("residualValue"));
+  const valid = Number.isFinite(cost)
+    && Number.isFinite(residualValue)
+    && cost > 0
+    && residualValue >= 0
+    && residualValue <= cost;
+  setText("heroDepreciableValue", valid ? formatMoney(cost - residualValue) : "—");
 }
 
 function setText(id, text) {
@@ -99,10 +115,15 @@ function journalText(debitAccount, creditAccount, amount) {
   return `${formatMoney(amount)} من حـ/ ${debitAccount}\n${formatMoney(amount)} إلى حـ/ ${creditAccount}`;
 }
 
-function currentAssetDetails() {
-  const assetName = String(valueOf("assetName") || "الأصل").trim().slice(0, 80);
-  const assetAccount = String(valueOf("assetAccount") || assetName).trim().slice(0, 80);
-  const counterAccount = String(valueOf("counterAccount") || "النقدية").trim().slice(0, 80);
+function currentAssetDetails(fillEmptyFields = false) {
+  const resolved = {};
+  for (const [field, fallback] of Object.entries(DEFAULT_ASSET_DETAILS)) {
+    const input = document.querySelector(`#${field}`);
+    const entered = String(input?.value || "").trim().slice(0, 80);
+    resolved[field] = entered || fallback;
+    if (fillEmptyFields && input && !entered) input.value = fallback;
+  }
+  const { assetName, assetAccount, counterAccount } = resolved;
   return { assetName, assetAccount, counterAccount };
 }
 
@@ -190,6 +211,7 @@ form.addEventListener("submit", (event) => {
   showError();
   if (!form.reportValidity()) return;
   try {
+    currentAssetDetails(true);
     latestCalculation = calculateDepreciation(collectInput());
     renderResult(latestCalculation);
   } catch (error) {
@@ -206,14 +228,17 @@ form.addEventListener("reset", () => {
     resultsSection.hidden = true;
     showError();
     updateMethodFields();
+    updateHeroPreview();
     publishAssistantContext();
   });
 });
 methodInputs.forEach((input) => input.addEventListener("change", updateMethodFields));
+document.querySelector("#assetCost").addEventListener("input", updateHeroPreview);
+document.querySelector("#residualValue").addEventListener("input", updateHeroPreview);
 periodSelect.addEventListener("change", () => renderJournal(Number(periodSelect.value)));
 document.querySelectorAll("[data-copy-entry]").forEach((button) => {
   button.addEventListener("click", () => copyEntry(button.dataset.copyEntry, button));
 });
 
 updateMethodFields();
-
+updateHeroPreview();

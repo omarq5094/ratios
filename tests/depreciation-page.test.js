@@ -13,11 +13,18 @@ test("صفحة الإهلاك مرتبطة بالحاسبة والمحلل ال�
   assert.match(html, /id="depreciationForm"/);
   assert.match(html, /id="depreciationScheduleBody"/);
   assert.match(html, /id="depreciationJournalEntry"/);
+  assert.match(html, /id="heroDepreciableValue"/);
+  assert.doesNotMatch(html, /id="assetName"[^>]*required/);
+  assert.doesNotMatch(html, /id="assetAccount"[^>]*required/);
+  assert.doesNotMatch(html, /id="counterAccount"[^>]*required/);
   assert.match(html, /src="\/depreciation\.js"/);
   assert.match(html, /src="\/assistant\.js"/);
   assert.match(script, /contextType:\s*"depreciation"/);
   assert.match(script, /accounting-analysis-context/);
+  assert.match(script, /assetName:\s*"آلة إنتاج"/);
+  assert.match(script, /assetAccount:\s*"الآلات"/);
+  assert.match(script, /counterAccount:\s*"النقدية"/);
+  assert.match(script, /updateHeroPreview/);
   assert.match(assistant, /depreciation-page/);
   assert.equal(JSON.parse(vercel).rewrites.some((item) => item.source === "/services/depreciation"), true);
 });
-
