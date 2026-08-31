@@ -169,6 +169,9 @@ a { color: inherit; }
 .data-provider { flex: 0 0 auto; padding: 7px 11px; border: 1px solid rgba(117,88,232,.14); border-radius: 99px; background: rgba(255,255,255,.7); color: var(--accent-strong); font-size: 11px; font-weight: 800; }
 .ticker-search { max-width: 760px; margin-top: 22px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; overflow: hidden; border: 1px solid rgba(77,94,130,.16); border-radius: 14px; background: rgba(255,255,255,.82); box-shadow: 0 13px 35px rgba(55,74,110,.09), inset 0 1px 0 rgba(255,255,255,.96); }
 .market-label { height: 54px; padding-inline: 17px; display: grid; place-items: center; border-left: 1px solid var(--line-soft); color: var(--muted); font-size: 12px; font-weight: 800; }
+.market-label[data-market="saudi"] { background: rgba(22,143,102,.07); color: var(--green); }
+.market-label[data-market="usa"] { background: rgba(50,120,232,.07); color: var(--blue); }
+.market-label[data-market="invalid"] { background: rgba(198,55,78,.06); color: var(--danger); }
 .ticker-search input { min-width: 0; height: 54px; padding: 10px 15px; border: 0; background: transparent; color: var(--text); font-size: 18px; font-weight: 800; outline: 0; direction: ltr; text-align: left; }
 .ticker-search:focus-within { border-color: rgba(117,88,232,.48); box-shadow: 0 0 0 4px rgba(117,88,232,.1), 0 13px 35px rgba(55,74,110,.09); }
 .fetch-button { min-width: 145px; height: 46px; margin-left: 4px; padding-inline: 18px; border: 0; border-radius: 11px; background: linear-gradient(135deg, var(--accent), #4e84e5); color: #fff; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px rgba(102,77,205,.2); }

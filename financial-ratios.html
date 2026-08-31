@@ -88,24 +88,26 @@
                 <div>
                   <span class="smart-import-kicker">تعبئة تلقائية</span>
                   <h3>اجلب القوائم المالية برمز الشركة</h3>
-                  <p>اكتب رمز الشركة في تداول فقط، مثل 2222 لأرامكو، وسنستخدم أحدث سنة مالية مكتملة متاحة.</p>
+                  <p>اكتب الرمز مرة واحدة، مثل 2222 لشركة سعودية أو AAPL لشركة أمريكية، وسنكتشف السوق تلقائيًا.</p>
                 </div>
                 <span class="data-provider">Yahoo Finance</span>
               </div>
               <div class="ticker-search">
-                <span class="market-label">تداول</span>
+                <span id="detectedMarketLabel" class="market-label" data-market="auto">تلقائي</span>
                 <input
                   id="tickerInput"
                   type="text"
-                  inputmode="numeric"
-                  maxlength="7"
+                  inputmode="text"
+                  maxlength="10"
                   autocomplete="off"
-                  aria-label="رمز الشركة في تداول"
-                  placeholder="مثال: 2222"
+                  autocapitalize="characters"
+                  spellcheck="false"
+                  aria-label="رمز الشركة السعودية أو الأمريكية"
+                  placeholder="2222 أو AAPL"
                 />
                 <button id="fetchCompanyButton" class="fetch-button" type="button">جلب البيانات</button>
               </div>
-              <p class="ticker-help">يمكنك تعديل أي رقم بعد الجلب. يتاح طلب جديد كل 15 ثانية، ويجب مراجعة العملة والحقول الناقصة.</p>
+              <p class="ticker-help">الأرقام الأربعة تُعامل كتداول، والحروف كسوق أمريكي. يمكنك تعديل البيانات بعد الجلب، ويتاح طلب جديد كل 15 ثانية.</p>
               <div id="dataFetchStatus" class="fetch-status" aria-live="polite" hidden></div>
               <div id="importSummary" class="import-summary" hidden>
                 <div class="import-summary-head">

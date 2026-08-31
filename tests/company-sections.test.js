@@ -28,3 +28,16 @@ test("تجلب الخدمة ملف الشركة وسجل التوزيعات من
   assert.match(script, /function renderCompanyInfo/);
   assert.match(script, /function renderDividendHistory/);
 });
+
+test("حقل الرمز الواحد يكتشف السوق السعودي والأمريكي تلقائيًا", async () => {
+  const html = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
+  const script = await readFile(new URL("../script.js", import.meta.url), "utf8");
+  const service = await readFile(new URL("../lib/company-service.js", import.meta.url), "utf8");
+
+  assert.match(html, /id="detectedMarketLabel"/);
+  assert.match(html, /placeholder="2222 أو AAPL"/);
+  assert.match(html, /inputmode="text"/);
+  assert.match(script, /function detectCompanyInput/);
+  assert.match(script, /السوق الأمريكي/);
+  assert.match(service, /normalizeCompanySymbol/);
+});

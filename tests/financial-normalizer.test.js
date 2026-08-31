@@ -3,6 +3,8 @@ import test from "node:test";
 import {
   buildCompanyPayload,
   buildDividendHistory,
+  detectCompanyMarket,
+  normalizeCompanySymbol,
   normalizeSaudiSymbol,
 } from "../lib/financial-normalizer.js";
 
@@ -11,6 +13,15 @@ test("يحوّل رمز تداول إلى صيغة Yahoo", () => {
   assert.equal(normalizeSaudiSymbol("٢٢٢٢"), "2222.SR");
   assert.equal(normalizeSaudiSymbol("2222.sr"), "2222.SR");
   assert.equal(normalizeSaudiSymbol("ARAMCO"), null);
+});
+
+test("يكتشف السوق الأمريكي والسعودي تلقائيًا من حقل واحد", () => {
+  assert.equal(normalizeCompanySymbol("٢٢٢٢"), "2222.SR");
+  assert.equal(normalizeCompanySymbol("aapl"), "AAPL");
+  assert.equal(normalizeCompanySymbol(" BRK.B "), "BRK-B");
+  assert.equal(normalizeCompanySymbol("123"), null);
+  assert.equal(detectCompanyMarket("2222").label, "تداول");
+  assert.equal(detectCompanyMarket("MSFT").label, "السوق الأمريكي");
 });
 
 test("يختار أحدث سنة مكتملة ويجلب أرقام السنة السابقة", () => {
@@ -85,6 +96,37 @@ test("يختار أحدث سنة مكتملة ويجلب أرقام السنة �
   assert.equal(result.companyInfo.industry, "Integrated Oil & Gas");
   assert.equal(result.companyInfo.website, "https://www.aramco.com/");
   assert.match(result.companyInfo.description, /قطاع الطاقة/);
+  assert.equal(result.market.id, "saudi");
+  assert.equal(result.market.label, "تداول");
+});
+
+test("يبني بيانات شركة أمريكية بالدولار وهوية السوق الصحيحة", () => {
+  const result = buildCompanyPayload(
+    "AAPL",
+    {
+      price: { longName: "Apple Inc.", currency: "USD", regularMarketPrice: 200, marketCap: 3_000 },
+      assetProfile: { sector: "Technology", industry: "Consumer Electronics" },
+    },
+    [{
+      date: new Date("2025-09-30"),
+      totalRevenue: 400,
+      costOfRevenue: 220,
+      operatingIncome: 120,
+      netIncome: 100,
+      currentAssets: 150,
+      inventory: 10,
+      currentLiabilities: 130,
+      totalAssets: 500,
+      totalDebt: 110,
+      stockholdersEquity: 80,
+    }],
+  );
+
+  assert.equal(result.symbol, "AAPL");
+  assert.equal(result.market.id, "usa");
+  assert.equal(result.market.label, "السوق الأمريكي");
+  assert.equal(result.currency, "USD");
+  assert.equal(result.companyName, "Apple Inc.");
 });
 
 test("يجمع توزيعات آخر خمس سنوات ويحسب انتظامها والتغير السنوي", () => {

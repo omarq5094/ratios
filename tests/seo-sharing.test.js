@@ -32,6 +32,21 @@ test("ينشئ صفحة شركة بعنوان ووصف ورابط مستقلين
   assert.doesNotMatch(html, /<!-- COMPANY_(?:SEO_CONTENT|BOOTSTRAP) -->/);
 });
 
+test("ينشئ رابطًا مستقلاً وصفحة صحيحة للشركة الأمريكية", async () => {
+  const template = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
+  const html = renderCompanyDocument(template, {
+    ...samplePayload,
+    symbol: "AAPL",
+    companyName: "Apple Inc.",
+    market: { id: "usa", label: "السوق الأمريكي" },
+    currency: "USD",
+  });
+
+  assert.match(html, /<title>تحليل Apple Inc\. \(AAPL\)/);
+  assert.match(html, /rel="canonical" href="https:\/\/ratios-ashy\.vercel\.app\/company\/AAPL"/);
+  assert.match(html, /السوق الأمريكي/);
+});
+
 test("يمنع كسر HTML عند وجود نص غير موثوق في بيانات الشركة", async () => {
   const template = await readFile(new URL("../financial-ratios.html", import.meta.url), "utf8");
   const html = renderCompanyDocument(template, {
@@ -70,6 +85,7 @@ test("تظهر المشاركة تحت سجل التوزيعات وتستخدم 
   assert.match(script, /canvas\.width = 1080/);
   assert.match(script, /navigator\.share/);
   assert.match(script, /https:\/\/ratios-ashy\.vercel\.app\//);
+  assert.match(script, /latestShareState\.marketLabel/);
   assert.doesNotMatch(`${html}\n${script}`, /(?:qr-code|qrcode|رمز الاستجابة)/i);
 });
 

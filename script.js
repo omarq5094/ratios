@@ -74,6 +74,7 @@ const message = document.querySelector("#formMessage");
 const resultsSection = document.querySelector("#results");
 const ratioGrid = document.querySelector("#ratioGrid");
 const tickerInput = document.querySelector("#tickerInput");
+const detectedMarketLabel = document.querySelector("#detectedMarketLabel");
 const fetchCompanyButton = document.querySelector("#fetchCompanyButton");
 const dataFetchStatus = document.querySelector("#dataFetchStatus");
 const importSummary = document.querySelector("#importSummary");
@@ -324,9 +325,64 @@ function safeHttpUrl(value) {
   }
 }
 
+function toLatinTickerDigits(value) {
+  const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+  const easternArabicDigits = "۰۱۲۳۴۵۶۷۸۹";
+  return String(value ?? "")
+    .replace(/[٠-٩]/g, (digit) => String(arabicDigits.indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String(easternArabicDigits.indexOf(digit)));
+}
+
+function detectCompanyInput(value) {
+  const normalized = toLatinTickerDigits(value).trim().toUpperCase().replace(/\s+/g, "");
+  const saudiMatch = normalized.match(/^(\d{4})(?:\.SR)?$/);
+  if (saudiMatch) {
+    return {
+      market: "saudi",
+      label: "تداول",
+      displaySymbol: saudiMatch[1],
+      yahooSymbol: `${saudiMatch[1]}.SR`,
+    };
+  }
+
+  if (/^[A-Z][A-Z0-9.-]{0,9}$/.test(normalized)) {
+    const yahooSymbol = normalized.replaceAll(".", "-");
+    if (/--|^-|-$/.test(yahooSymbol)) return null;
+    return {
+      market: "usa",
+      label: "السوق الأمريكي",
+      displaySymbol: yahooSymbol,
+      yahooSymbol,
+    };
+  }
+
+  return null;
+}
+
+function updateDetectedMarketLabel() {
+  if (!detectedMarketLabel) return;
+  const rawValue = tickerInput?.value || "";
+  const detected = detectCompanyInput(rawValue);
+  if (!rawValue.trim()) {
+    detectedMarketLabel.textContent = "تلقائي";
+    detectedMarketLabel.dataset.market = "auto";
+    return;
+  }
+  detectedMarketLabel.textContent = detected?.label || "تحقق";
+  detectedMarketLabel.dataset.market = detected?.market || "invalid";
+}
+
+function marketInfoForCompany(data = {}) {
+  const detected = detectCompanyInput(data.symbol);
+  return {
+    market: data.market?.id || detected?.market || "unknown",
+    label: data.market?.label || detected?.label || "سوق غير محدد",
+    displaySymbol: detected?.displaySymbol || "",
+  };
+}
+
 function cleanCompanySymbol(value) {
-  const match = String(value || "").match(/(\d{4})/);
-  return match ? match[1] : "";
+  return detectCompanyInput(value)?.displaySymbol || "";
 }
 
 function companyUrlFor(symbol) {
@@ -460,7 +516,7 @@ function clearFinancialFields() {
 }
 
 function updateCurrencyUnits(currency) {
-  const unit = currency === "SAR" ? "ر.س" : currency || "عملة التقرير";
+  const unit = currency === "SAR" ? "ر.س" : currency === "USD" ? "$" : currency || "عملة التقرير";
   currencyUnit = unit;
   document.querySelectorAll(".number-field small").forEach((element) => {
     element.textContent = unit;
@@ -475,10 +531,11 @@ function applyImportedData(data) {
 
   importedCompanyContext = {
     symbol: data.symbol || "",
+    market: data.market || null,
     companyName: data.companyName || data.symbol || "",
     companyInfo: data.companyInfo || {},
     dividendHistory: data.dividendHistory || null,
-    currency: data.currency || "SAR",
+    currency: data.currency || (data.market?.id === "usa" ? "USD" : "SAR"),
     period: data.period || "",
     periodEnd: data.periodEnd || "",
     missingFields: Array.isArray(data.missingFields) ? data.missingFields : [],
@@ -517,7 +574,8 @@ function applyImportedData(data) {
   const availableFieldCount = applicableKeys.length - missingKeys.length;
   document.querySelector("#importCompanyName").textContent = data.companyName || data.symbol;
   const typeLabel = importedCompanyType === "bank" ? "بنك" : "شركة تشغيلية";
-  document.querySelector("#importCompanyMeta").textContent = `الرمز: ${data.symbol || "غير محدد"} · النوع: ${typeLabel}`;
+  const marketInfo = marketInfoForCompany(data);
+  document.querySelector("#importCompanyMeta").textContent = `الرمز: ${marketInfo.displaySymbol || "غير محدد"} · السوق: ${marketInfo.label} · النوع: ${typeLabel}`;
   document.querySelector("#importSourceBadge").textContent = `المصدر: ${data.source?.provider || "غير محدد"}`;
   document.querySelector("#importPeriodBadge").textContent = `السنة المالية: ${data.period || "غير محددة"}`;
   document.querySelector("#importCurrencyBadge").textContent = `العملة: ${data.currency || "غير محددة"}`;
@@ -545,11 +603,16 @@ function applyImportedData(data) {
 
 async function fetchCompanyData() {
   const rawSymbol = tickerInput.value.trim();
-  if (!/^[0-9٠-٩۰-۹]{4}(?:\.sr)?$/i.test(rawSymbol)) {
-    showFetchStatus("أدخل رمز تداول مكوّنًا من أربعة أرقام، مثل 2222.", "error");
+  const symbolInfo = detectCompanyInput(rawSymbol);
+  if (!symbolInfo) {
+    showFetchStatus("أدخل رمزًا صحيحًا مثل 2222 لشركة سعودية أو AAPL لشركة أمريكية.", "error");
+    updateDetectedMarketLabel();
     tickerInput.focus();
     return;
   }
+
+  tickerInput.value = symbolInfo.displaySymbol;
+  updateDetectedMarketLabel();
 
   if (fetchInProgress) return;
 
@@ -569,7 +632,7 @@ async function fetchCompanyData() {
   const timeout = window.setTimeout(() => controller.abort(), 50_000);
 
   try {
-    const response = await fetch(`/api/company-data?symbol=${encodeURIComponent(rawSymbol)}`, {
+    const response = await fetch(`/api/company-data?symbol=${encodeURIComponent(symbolInfo.displaySymbol)}`, {
       headers: { Accept: "application/json" },
       signal: controller.signal,
     });
@@ -908,6 +971,7 @@ function renderSharePanel(values, ratios) {
 
   const imported = importedCompanyContext;
   const symbol = cleanCompanySymbol(imported?.symbol);
+  const marketInfo = marketInfoForCompany(imported || {});
   const companyName = values.projectName || imported?.companyName || symbol || "تحليل مالي";
   const permalink = symbol ? companyUrlFor(symbol) : `${SITE_URL}/services/financial-ratios`;
   const period = imported?.period || "غير محددة";
@@ -918,7 +982,7 @@ function renderSharePanel(values, ratios) {
       ? "شركة تشغيلية"
       : "تحليل مشترك";
 
-  setText("sharePreviewSymbol", symbol ? `تداول: ${symbol}` : typeLabel);
+  setText("sharePreviewSymbol", symbol ? `${marketInfo.label}: ${symbol}` : typeLabel);
   setText("sharePreviewCompany", companyName);
   setText("sharePreviewMeta", `السنة المالية ${period} · ${dividendSummary}`);
   const permalinkElement = document.querySelector("#companyPermalink");
@@ -929,6 +993,7 @@ function renderSharePanel(values, ratios) {
   latestShareState = {
     companyName,
     symbol,
+    marketLabel: marketInfo.label,
     period,
     permalink,
     dividendSummary,
@@ -1042,7 +1107,9 @@ async function createAnalysisImageBlob() {
   fillRoundedRect(context, 742, 220, 232, 57, 28, "rgba(255,255,255,.09)");
   context.fillStyle = "#d0c8ff";
   context.font = '800 23px "Segoe UI", Tahoma, Arial, sans-serif';
-  const shareBadge = latestShareState.symbol ? `تداول: ${latestShareState.symbol}` : latestShareState.typeLabel;
+  const shareBadge = latestShareState.symbol
+    ? `${latestShareState.marketLabel}: ${latestShareState.symbol}`
+    : latestShareState.typeLabel;
   context.fillText(shareBadge, 946, 257);
 
   const titleSize = fitCanvasText(context, latestShareState.companyName, 870, 58, 34);
@@ -1211,6 +1278,7 @@ function buildAssistantContext(values, ratios) {
     company: {
       name: values.projectName || imported?.companyName || "النتائج الحالية",
       symbol: imported?.symbol || "",
+      market: imported?.market || null,
       currency: imported?.currency || currencyUnit,
       period: imported?.period || "",
       periodEnd: imported?.periodEnd || "",
@@ -1367,6 +1435,7 @@ document.querySelector("#resetButton").addEventListener("click", () => {
   missingFieldsGrid.replaceChildren();
   setCompanyType("");
   updateCurrencyUnits("SAR");
+  updateDetectedMarketLabel();
   updateFetchButton();
   if (window.history && typeof window.history.pushState === "function" && /^\/company\//.test(window.location.pathname || "")) {
     window.history.pushState({}, "", "/services/financial-ratios");
@@ -1379,6 +1448,12 @@ document.querySelector("#resetButton").addEventListener("click", () => {
 
 fetchCompanyButton.addEventListener("click", fetchCompanyData);
 companyTypeInput?.addEventListener("change", () => setCompanyType(companyTypeInput.value, { hideResults: true }));
+tickerInput.addEventListener("input", updateDetectedMarketLabel);
+tickerInput.addEventListener("blur", () => {
+  const detected = detectCompanyInput(tickerInput.value);
+  if (detected) tickerInput.value = detected.displaySymbol;
+  updateDetectedMarketLabel();
+});
 tickerInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -1413,6 +1488,7 @@ function initializeCompanyPage() {
   if (!payload) return;
 
   tickerInput.value = cleanCompanySymbol(payload.symbol);
+  updateDetectedMarketLabel();
   applyImportedData(payload);
   updateCompanyLocation(payload, false);
 
@@ -1431,3 +1507,4 @@ function initializeCompanyPage() {
 setCompanyType("");
 updateFetchButton();
 initializeCompanyPage();
+updateDetectedMarketLabel();

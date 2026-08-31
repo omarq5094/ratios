@@ -148,6 +148,10 @@ test("يمنع طلب Yahoo جديدًا لمدة 15 ثانية ويستمر ب�
   context.window.AdvancedFinancialRatios = context.AdvancedFinancialRatios;
   vm.runInContext(source, context);
 
+  assert.equal(context.detectCompanyInput("AAPL").market, "usa");
+  assert.equal(context.detectCompanyInput("٢٢٢٢").market, "saudi");
+  assert.equal(context.detectCompanyInput("BRK.B").displaySymbol, "BRK-B");
+
   elements.tickerInput.value = "2222";
   await context.fetchCompanyData();
 
