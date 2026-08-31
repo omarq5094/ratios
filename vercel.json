@@ -25,6 +25,11 @@
       "source": "/financial-ratios-guide.html",
       "destination": "/services/financial-ratios/guide",
       "permanent": true
+    },
+    {
+      "source": "/depreciation.html",
+      "destination": "/services/depreciation",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -43,6 +48,10 @@
     {
       "source": "/services/financial-ratios/guide",
       "destination": "/financial-ratios-guide.html"
+    },
+    {
+      "source": "/services/depreciation",
+      "destination": "/depreciation.html"
     }
   ],
   "headers": [

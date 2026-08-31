@@ -187,3 +187,23 @@ test("ينظف سجل المحادثة ويستبعد الأدوار غير ال
     { role: "assistant", content: "إجابة" },
   ]);
 });
+
+test("ينظف سياق الإهلاك ويحتفظ بالجدول والقيد المعتمدين", () => {
+  const context = assistantInternals.normalizeAnalysisContext({
+    contextType: "depreciation",
+    method: "straight_line",
+    methodLabel: "القسط الثابت",
+    asset: { assetName: "آلة إنتاج", assetAccount: "الآلات", counterAccount: "النقدية" },
+    inputs: { cost: 100000, residualValue: 10000, usefulLife: 5, injected: 999 },
+    result: { depreciableAmount: 90000, annualDepreciation: 18000, selectedPeriod: "السنة 1" },
+    schedule: [{ period: 1, label: "السنة 1", openingBookValue: 100000, depreciation: 18000, accumulatedDepreciation: 18000, closingBookValue: 82000 }],
+    journalEntries: [{ title: "قيد الإهلاك", debitAccount: "مصروف إهلاك الآلات", creditAccount: "مجمع إهلاك الآلات", amount: 18000 }],
+    explanation: { formula: "(التكلفة − المتبقي) ÷ العمر", summary: "توزيع متساوٍ" },
+  });
+
+  assert.equal(context.contextType, "depreciation");
+  assert.equal(context.inputs.cost, 100000);
+  assert.equal(context.inputs.injected, undefined);
+  assert.equal(context.schedule[0].closingBookValue, 82000);
+  assert.equal(context.journalEntries[0].amount, 18000);
+});

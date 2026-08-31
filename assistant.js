@@ -1,4 +1,4 @@
-(function initializeFinancialAssistant() {
+(function initializeAccountingAssistant() {
   "use strict";
 
   const STORAGE_KEY = "financialRatioAssistantHistoryV1";
@@ -84,6 +84,8 @@
 
   const page = document.body.classList.contains("home-page")
     ? "home"
+    : document.body.classList.contains("depreciation-page")
+      ? "depreciation"
     : document.body.classList.contains("financial-ratios-guide-page")
       ? "guide"
     : document.body.classList.contains("financial-ratios-page")
@@ -91,6 +93,8 @@
       : "site";
   const basePromptLabels = page === "home"
     ? ["ما خدمات المنصة؟", "ما فائدة المحاسبة؟", "كيف أبدأ؟"]
+    : page === "depreciation"
+      ? ["اشرح طرق الإهلاك", "كيف يُسجل قيد الإهلاك؟", "ما القيمة الدفترية؟"]
     : page === "calculator"
       ? ["كيف أستخدم الحاسبة؟", "أين أجد دليل النسب؟", "ما الفرق بين نسب الشركات والبنوك؟"]
       : page === "guide"
@@ -98,6 +102,8 @@
       : ["ما الذي تقدمه المنصة؟", "كيف أصل إلى حاسبة النسب؟", "كيف يساعدني المحلل؟"];
   const welcomeMessage = page === "home"
     ? "مرحبًا، أنا المحلل الذكي. أشرح لك المنصة والمحاسبة، وأساعدك في اختيار الخدمة المناسبة."
+    : page === "depreciation"
+      ? "مرحبًا، أنا المحلل الذكي. أساعدك في حساب الإهلاك وفهم الجدول والقيود اليومية والفرق بين الطرق."
     : page === "guide"
       ? "مرحبًا، أنا المحلل الذكي. أساعدك في فهم معادلات النسب واختيار المؤشرات المناسبة لنوع المنشأة."
       : "مرحبًا، أنا المحلل الذكي. أساعدك في استخدام الحاسبة وفهم النسب والنتائج الحالية.";
@@ -135,8 +141,10 @@
 
   function renderQuickPrompts() {
     quickPrompts.replaceChildren();
-    const promptLabels = state.analysisContext
-      ? ["حلل النتائج الحالية", "ما أبرز نقاط القوة؟", "ما المخاطر الظاهرة؟"]
+    const promptLabels = state.analysisContext?.contextType === "depreciation"
+      ? ["اشرح النتيجة الحالية", "لماذا اختلف الإهلاك؟", "اشرح القيد اليومي"]
+      : state.analysisContext
+        ? ["حلل النتائج الحالية", "ما أبرز نقاط القوة؟", "ما المخاطر الظاهرة؟"]
       : basePromptLabels;
     promptLabels.forEach((label) => {
       const button = document.createElement("button");
@@ -148,6 +156,26 @@
   }
 
   function setAnalysisContext(context) {
+    if (context?.contextType === "depreciation") {
+      const validContext = context.asset && context.result && Array.isArray(context.schedule) && context.schedule.length > 0;
+      state.analysisContext = validContext ? context : null;
+      quickPrompts.hidden = false;
+
+      if (!state.analysisContext) {
+        screenContext.hidden = true;
+        screenContextLabel.textContent = "";
+        privacyNoteText.textContent = "تُرسل رسائل المحادثة فقط إلى خدمة الذكاء الاصطناعي.";
+      } else {
+        const assetName = String(context.asset.assetName || "الأصل الحالي").trim();
+        const methodLabel = String(context.methodLabel || "طريقة الإهلاك").trim();
+        screenContextLabel.textContent = `بيانات الإهلاك مرفقة: ${assetName} — ${methodLabel}`;
+        screenContext.hidden = false;
+        privacyNoteText.textContent = "عند الإرسال، تُرسل رسالتك وبيانات الإهلاك الظاهرة إلى خدمة الذكاء الاصطناعي.";
+      }
+      renderQuickPrompts();
+      return;
+    }
+
     const company = context?.company;
     const ratios = Array.isArray(context?.ratios) ? context.ratios : [];
     state.analysisContext = company && ratios.length ? context : null;
@@ -268,7 +296,8 @@
     if (event.key === "Escape" && root.classList.contains("is-open")) setOpen(false);
   });
   window.addEventListener("financial-analysis-context", (event) => setAnalysisContext(event.detail));
+  window.addEventListener("accounting-analysis-context", (event) => setAnalysisContext(event.detail));
 
   renderConversation();
-  setAnalysisContext(window.financialAnalysisContext || null);
+  setAnalysisContext(window.accountingAnalysisContext || window.financialAnalysisContext || null);
 })();

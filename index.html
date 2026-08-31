@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="منصة عربية تجمع أدوات محاسبية ومالية عملية، تبدأ بحاسبة النسب المالية للشركات والبنوك." />
+    <meta name="description" content="منصة عربية تجمع أدوات محاسبية ومالية عملية، تشمل حاسبة النسب المالية وحاسبة الإهلاك مع مساعد ذكي." />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="منصة الأدوات المحاسبية" />
     <meta property="og:description" content="أدوات محاسبية عملية تجعل الأرقام أوضح، وتساعدك على الفهم والتحليل." />
@@ -30,7 +30,7 @@
           <a href="#top">الرئيسية</a>
           <a href="#aboutAccounting">عن المحاسبة</a>
           <a href="#services">خدماتنا</a>
-          <a class="nav-cta" href="/services/financial-ratios">ابدأ الآن</a>
+          <a class="nav-cta" href="#services">ابدأ الآن</a>
         </nav>
       </div>
     </header>
@@ -61,7 +61,7 @@
             <div class="platform-mini-grid">
               <span><b>%</b><small>نسب مالية</small></span>
               <span><b>✦</b><small>مساعد ذكي</small></span>
-              <span><b>+</b><small>خدمات قادمة</small></span>
+              <span><b>−</b><small>إهلاك الأصول</small></span>
             </div>
           </article>
           <div class="platform-float-card float-analysis"><span>تحليل</span><strong>واضح</strong></div>
@@ -80,11 +80,11 @@
             <span><b>حاسبة النسب المالية</b><small>للشركات والبنوك</small></span>
             <i>متاحة الآن</i>
           </a>
-          <div class="quick-service-item is-upcoming" aria-label="خدمات جديدة قريبًا">
-            <span class="quick-service-icon">+</span>
-            <span><b>خدمات جديدة</b><small>تُضاف تدريجيًا</small></span>
-            <i>قريبًا</i>
-          </div>
+          <a class="quick-service-item is-available" href="/services/depreciation">
+            <span class="quick-service-icon">−</span>
+            <span><b>حاسبة الإهلاك</b><small>ثلاث طرق مع القيود</small></span>
+            <i>متاحة الآن</i>
+          </a>
         </div>
       </section>
 
@@ -105,7 +105,7 @@
       <section id="services" class="platform-services-section">
         <div class="container">
           <div class="platform-section-heading">
-            <div><span class="section-kicker">من خدماتنا</span><h2>ابدأ بالأداة المتاحة اليوم.</h2></div>
+            <div><span class="section-kicker">من خدماتنا</span><h2>اختر الأداة التي تحتاجها اليوم.</h2></div>
             <p>كل خدمة تحصل على صفحة مستقلة، بينما تبقى المنصة الرئيسية بوابة موحدة للوصول إلى جميع الأدوات الحالية والمستقبلية.</p>
           </div>
           <article class="featured-service-card">
@@ -127,6 +127,25 @@
               <a class="primary-button" href="/services/financial-ratios">استخدم حاسبة النسب</a>
             </div>
           </article>
+          <article class="featured-service-card depreciation-feature-card">
+            <div class="service-visual depreciation-service-visual" aria-hidden="true">
+              <span class="service-visual-icon">−</span>
+              <div class="service-depreciation-bars"><i></i><i></i><i></i><i></i><i></i></div>
+              <small>تكلفة موزعة عبر العمر الإنتاجي</small>
+            </div>
+            <div class="service-content">
+              <div class="service-status"><span>الخدمة الثانية</span><i>متاحة الآن</i></div>
+              <h3>حاسبة الإهلاك</h3>
+              <p>احسب إهلاك الأصل بالقسط الثابت أو الرصيد المتناقص أو وحدات الإنتاج، ثم راجع الجدول والقيود اليومية واسأل المحلل الذكي عن النتيجة.</p>
+              <ul>
+                <li>ثلاث طرق إهلاك</li>
+                <li>جدول كامل للقيمة الدفترية</li>
+                <li>قيود يومية قابلة للنسخ</li>
+                <li>سياق مباشر للمحلل الذكي</li>
+              </ul>
+              <a class="primary-button" href="/services/depreciation">استخدم حاسبة الإهلاك</a>
+            </div>
+          </article>
           <div class="future-services-note">
             <span>+</span>
             <div><strong>هذه بداية المنصة.</strong><p>عند إضافة أي خدمة محاسبية جديدة ستظهر هنا وفي شريط الوصول السريع دون ازدحام الصفحة الرئيسية.</p></div>
@@ -138,7 +157,7 @@
         <div>
           <span class="section-kicker">مساعد واحد في كل الصفحات</span>
           <h2>المحلل الذكي ينتقل معك.</h2>
-          <p>يشرح المنصة من الصفحة الرئيسية، ويفهم سياق الحاسبة ونتائج الشركات داخل الخدمة، وسيكون جاهزًا لفهم الخدمات الجديدة مستقبلًا.</p>
+          <p>يشرح المنصة، ويفهم نتائج النسب المالية وبيانات الإهلاك والجداول والقيود الظاهرة داخل كل خدمة.</p>
         </div>
         <div class="platform-ai-badge"><span>✦</span><b>اسأل المحلل</b><small>متاح في جميع الصفحات</small></div>
       </section>

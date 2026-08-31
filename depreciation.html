@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="حاسبة إهلاك عربية تحسب القسط الثابت والرصيد المتناقص ووحدات الإنتاج، مع جدول الإهلاك والقيود اليومية والمحلل الذكي." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="حاسبة الإهلاك | منصة الأدوات المحاسبية" />
+    <meta property="og:url" content="https://ratios-ashy.vercel.app/services/depreciation" />
+    <link rel="canonical" href="https://ratios-ashy.vercel.app/services/depreciation" />
+    <title>حاسبة الإهلاك | منصة الأدوات المحاسبية</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="depreciation-page">
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <header class="navbar">
+      <div class="container nav-content">
+        <a class="brand" href="/" aria-label="منصة الأدوات المحاسبية">
+          <span class="brand-mark">م</span>
+          <span class="brand-copy">الأدوات المحاسبية<small>ACCOUNTING TOOLS</small></span>
+        </a>
+        <nav aria-label="التنقل الرئيسي">
+          <a href="/">الرئيسية</a>
+          <a href="#methods">طرق الإهلاك</a>
+          <a href="/services/financial-ratios">النسب المالية</a>
+          <a class="nav-cta" href="#calculator">ابدأ الحساب</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="container depreciation-hero">
+        <div>
+          <span class="hero-kicker"><i></i> خدمة محاسبية عملية</span>
+          <h1>احسب الإهلاك.<br /><em>وافهم القيد.</em></h1>
+          <p>اختر الطريقة، أدخل بيانات الأصل، واحصل على جدول الإهلاك والقيود اليومية مع شرح يستطيع المحلل الذكي قراءته ومناقشته معك.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#calculator">احسب الآن</a>
+            <a class="secondary-button" href="#methods">افهم الطرق</a>
+          </div>
+        </div>
+        <div class="depreciation-hero-card" aria-hidden="true">
+          <span>القيمة القابلة للإهلاك</span>
+          <strong>90,000 <small>ريال</small></strong>
+          <div><i style="--h:100%"></i><i style="--h:78%"></i><i style="--h:58%"></i><i style="--h:41%"></i><i style="--h:22%"></i></div>
+          <small>التكلفة − القيمة المتبقية</small>
+        </div>
+      </section>
+
+      <section id="methods" class="container depreciation-methods" aria-labelledby="methodsTitle">
+        <div class="section-heading">
+          <span class="section-kicker">ثلاث طرق</span>
+          <h2 id="methodsTitle">اختر الطريقة التي تعبّر عن استهلاك الأصل.</h2>
+          <p>الاختلاف ليس في تكلفة الأصل، بل في توقيت توزيع المصروف.</p>
+        </div>
+        <div class="method-explain-grid">
+          <article><span>01</span><h3>القسط الثابت</h3><p>نفس مصروف الإهلاك كل سنة. مناسب عندما تكون الاستفادة من الأصل متقاربة عبر السنوات.</p><small>(التكلفة − المتبقي) ÷ العمر</small></article>
+          <article><span>02</span><h3>الرصيد المتناقص</h3><p>مصروف أعلى في البداية ثم ينخفض. مناسب للأصول التي تفقد منفعتها بسرعة.</p><small>القيمة الدفترية × المعدل المضاعف</small></article>
+          <article><span>03</span><h3>وحدات الإنتاج</h3><p>المصروف حسب الاستخدام الفعلي. مناسب للآلات التي يرتبط استهلاكها بحجم التشغيل.</p><small>الوحدات الفعلية × إهلاك الوحدة</small></article>
+        </div>
+      </section>
+
+      <section id="calculator" class="depreciation-calculator-section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="section-kicker">حاسبة الإهلاك</span>
+            <h2>أدخل بيانات الأصل.</h2>
+            <p>تتم الحسابات داخل متصفحك، ولا تُرسل النتائج إلا عندما تراسل المحلل الذكي.</p>
+          </div>
+          <form id="depreciationForm" class="form-card depreciation-form" novalidate>
+            <div class="form-block">
+              <div class="block-title"><span>1</span><div><h3>طريقة الإهلاك</h3><p>يمكنك تغيير الطريقة ومقارنة أثرها على السنوات.</p></div></div>
+              <div class="depreciation-method-selector">
+                <label class="is-selected"><input type="radio" name="depreciationMethod" value="straight_line" checked /><span><b>القسط الثابت</b><small>مصروف متساوٍ كل سنة</small></span></label>
+                <label><input type="radio" name="depreciationMethod" value="double_declining" /><span><b>الرصيد المتناقص</b><small>مصروف أكبر في البداية</small></span></label>
+                <label><input type="radio" name="depreciationMethod" value="units_of_production" /><span><b>وحدات الإنتاج</b><small>بحسب الاستخدام الفعلي</small></span></label>
+              </div>
+            </div>
+
+            <div class="form-block">
+              <div class="block-title"><span>2</span><div><h3>بيانات الأصل</h3><p>الحقول المحاسبية قابلة للتعديل لتجهيز القيد المناسب.</p></div></div>
+              <div class="fields-grid three-columns depreciation-fields">
+                <label class="field"><span>اسم الأصل <b>*</b></span><input id="assetName" type="text" maxlength="80" value="آلة إنتاج" required /></label>
+                <label class="field"><span>حساب الأصل <b>*</b></span><input id="assetAccount" type="text" maxlength="80" value="الآلات" required /></label>
+                <label class="field"><span>الحساب المقابل <b>*</b></span><select id="counterAccount"><option>النقدية</option><option>الدائنون</option><option>البنك</option></select></label>
+                <label class="field"><span>تكلفة الأصل <b>*</b></span><div class="number-field"><input id="assetCost" type="number" min="0.01" step="0.01" value="100000" required /><small>ريال</small></div></label>
+                <label class="field"><span>القيمة المتبقية <b>*</b></span><div class="number-field"><input id="residualValue" type="number" min="0" step="0.01" value="10000" required /><small>ريال</small></div></label>
+                <label class="field"><span>العمر الإنتاجي <b>*</b></span><div class="number-field"><input id="usefulLife" type="number" min="1" max="100" step="1" value="5" required /><small>سنة</small></div></label>
+              </div>
+              <div id="unitsFields" class="fields-grid two-columns units-fields" hidden>
+                <label class="field"><span>إجمالي الوحدات المتوقعة <b>*</b></span><input id="totalUnits" type="number" min="0.01" step="0.01" value="90000" /></label>
+                <label class="field"><span>وحدات الفترة الحالية <b>*</b></span><input id="producedUnits" type="number" min="0" step="0.01" value="20000" /></label>
+              </div>
+            </div>
+            <p id="depreciationError" class="depreciation-error" role="alert" hidden></p>
+            <div class="form-actions"><button class="primary-button" type="submit">احسب الإهلاك</button><button class="secondary-button" type="reset">إعادة ضبط</button></div>
+          </form>
+        </div>
+      </section>
+
+      <section id="depreciationResults" class="container depreciation-results" hidden>
+        <div class="result-header"><div><span class="section-kicker">نتيجة الحساب</span><h2 id="resultMethod">—</h2><p id="calculationSummary"></p></div><span class="result-status">محسوب محليًا</span></div>
+        <div class="depreciation-summary-grid">
+          <article><span>القيمة القابلة للإهلاك</span><strong id="depreciableAmount">—</strong><small>التكلفة ناقص القيمة المتبقية</small></article>
+          <article><span>إهلاك الفترة الأولى</span><strong id="firstPeriodDepreciation">—</strong><small id="secondaryResult">—</small></article>
+          <article><span>القيمة الدفترية بعد الفترة</span><strong id="closingBookValue">—</strong><small>بعد طرح الإهلاك المتراكم</small></article>
+        </div>
+        <div class="depreciation-formula-card"><span>طريقة الحساب</span><strong id="calculationFormula">—</strong></div>
+
+        <section class="depreciation-panel">
+          <div class="panel-heading"><div><span>تفصيل السنوات</span><h3>جدول الإهلاك</h3></div><small>بالريال السعودي</small></div>
+          <div class="depreciation-table-wrap"><table><thead><tr><th>الفترة</th><th>القيمة أول الفترة</th><th>مصروف الإهلاك</th><th>مجمع الإهلاك</th><th>القيمة الدفترية</th></tr></thead><tbody id="depreciationScheduleBody"></tbody></table></div>
+        </section>
+
+        <section class="depreciation-panel journal-panel">
+          <div class="panel-heading"><div><span>جاهزة للنسخ</span><h3>القيود اليومية</h3></div><label class="journal-period-label">قيد الفترة<select id="journalPeriod"></select></label></div>
+          <div class="journal-grid">
+            <article><div><span>عند شراء الأصل</span><button type="button" data-copy-entry="purchaseJournalEntry">نسخ القيد</button></div><pre id="purchaseJournalEntry"></pre></article>
+            <article><div><span>إثبات الإهلاك — <b id="selectedJournalLabel">—</b></span><button type="button" data-copy-entry="depreciationJournalEntry">نسخ القيد</button></div><pre id="depreciationJournalEntry"></pre></article>
+          </div>
+          <p class="journal-note">يظهر مصروف الإهلاك في قائمة الدخل، بينما يُطرح مجمع الإهلاك من تكلفة الأصل في قائمة المركز المالي.</p>
+        </section>
+
+        <div class="ai-context-notice"><span>✦</span><div><strong>المحلل الذكي مطّلع على هذه النتيجة.</strong><p>اسأله عن طريقة الحساب، اختلاف السنوات، أو القيد اليومي وسيستخدم البيانات الظاهرة في إجابته.</p></div></div>
+      </section>
+    </main>
+
+    <footer><div class="container footer-content"><div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية لفهم الأرقام واتخاذ قرارات أوضح.</p></div></div><div class="footer-links"><a href="/">الرئيسية</a><a href="/services/financial-ratios">حاسبة النسب</a><a href="mailto:wcoffeebusiness@gmail.com">البريد الإلكتروني</a></div></div></footer>
+    <script type="module" src="/depreciation.js"></script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script src="/assistant.js"></script>
+  </body>
+</html>
+

@@ -16,6 +16,7 @@ export function buildSitemap() {
     urlEntry("/", "1.0", "weekly"),
     urlEntry("/services/financial-ratios", "0.9", "weekly"),
     urlEntry("/services/financial-ratios/guide", "0.8", "monthly"),
+    urlEntry("/services/depreciation", "0.9", "monthly"),
     ...MAIN_MARKET_COMPANY_SYMBOLS.map((symbol) => urlEntry(`/company/${symbol}`, "0.8", "weekly")),
   ];
 
