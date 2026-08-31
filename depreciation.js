@@ -5,6 +5,12 @@ const METHOD_LABELS = {
   double_declining: "الرصيد المتناقص المضاعف",
   units_of_production: "وحدات الإنتاج",
 };
+const CHART_METRICS = Object.freeze({
+  openingBookValue: { label: "القيمة أول الفترة", title: "القيمة أول الفترة عبر الفترات" },
+  depreciation: { label: "مصروف الإهلاك", title: "مصروف الإهلاك عبر الفترات" },
+  accumulatedDepreciation: { label: "مجمع الإهلاك", title: "مجمع الإهلاك عبر الفترات" },
+  closingBookValue: { label: "القيمة آخر الفترة", title: "القيمة آخر الفترة عبر الفترات" },
+});
 const DEFAULT_ASSET_DETAILS = Object.freeze({
   assetName: "آلة إنتاج",
   assetAccount: "الآلات",
@@ -19,10 +25,15 @@ const errorBox = document.querySelector("#depreciationError");
 const scheduleBody = document.querySelector("#depreciationScheduleBody");
 const chart = document.querySelector("#depreciationChart");
 const chartNote = document.querySelector("#depreciationChartNote");
+const chartMetricButtons = [...document.querySelectorAll("[data-chart-metric]")];
+const shareChartButton = document.querySelector("#shareDepreciationChart");
+const downloadChartButton = document.querySelector("#downloadDepreciationChart");
+const shareFeedback = document.querySelector("#depreciationShareFeedback");
 const periodSelect = document.querySelector("#journalPeriod");
 const journalPurchase = document.querySelector("#purchaseJournalEntry");
 const journalDepreciation = document.querySelector("#depreciationJournalEntry");
 let latestCalculation = null;
+let activeChartMetric = "closingBookValue";
 
 function valueOf(id) {
   return document.querySelector(`#${id}`)?.value ?? "";
@@ -122,22 +133,39 @@ function sampledSchedule(schedule, maximumBars = 12) {
   return [...indexes].map((index) => schedule[index]);
 }
 
+function setChartMetric(metric) {
+  if (!Object.hasOwn(CHART_METRICS, metric)) return;
+  activeChartMetric = metric;
+  showShareFeedback();
+  chartMetricButtons.forEach((button) => {
+    const active = button.dataset.chartMetric === metric;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  if (latestCalculation) renderDepreciationChart(latestCalculation.schedule);
+}
+
 function renderDepreciationChart(schedule) {
   chart.replaceChildren();
+  const metric = CHART_METRICS[activeChartMetric];
   const displayedRows = sampledSchedule(schedule);
-  const maximumValue = Math.max(...displayedRows.map((row) => row.openingBookValue), 1);
+  const maximumValue = Math.max(...displayedRows.map((row) => row[activeChartMetric]), 1);
   chart.classList.toggle("is-single-period", displayedRows.length === 1);
+  setText("depreciationChartTitle", metric.title);
+  setText("depreciationChartLegend", metric.label);
+  chart.setAttribute("aria-label", `رسم بياني لـ${metric.label} عبر فترات الإهلاك`);
 
   displayedRows.forEach((row) => {
     const item = document.createElement("article");
     item.className = "depreciation-chart-item";
     const value = document.createElement("span");
-    value.textContent = formatMoney(row.closingBookValue);
+    const metricValue = row[activeChartMetric];
+    value.textContent = formatMoney(metricValue);
     const track = document.createElement("div");
     const bar = document.createElement("i");
-    const height = Math.max(6, (row.closingBookValue / maximumValue) * 100);
+    const height = Math.max(6, (metricValue / maximumValue) * 100);
     bar.style.setProperty("--bar-height", `${height}%`);
-    bar.title = `${row.label}: ${formatMoney(row.closingBookValue)} ريال`;
+    bar.title = `${row.label}: ${formatMoney(metricValue)} ريال`;
     track.append(bar);
     const label = document.createElement("small");
     label.textContent = row.label;
@@ -150,6 +178,180 @@ function renderDepreciationChart(schedule) {
   chartNote.textContent = sampled
     ? `عُرضت ${displayedRows.length} فترات موزعة من أصل ${schedule.length} للمحافظة على وضوح الرسم.`
     : "";
+}
+
+function roundedRectPath(context, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + width, y, x + width, y + height, r);
+  context.arcTo(x + width, y + height, x, y + height, r);
+  context.arcTo(x, y + height, x, y, r);
+  context.arcTo(x, y, x + width, y, r);
+  context.closePath();
+}
+
+function buildChartCanvas() {
+  if (!latestCalculation) throw new Error("احسب الإهلاك أولًا قبل مشاركة الرسم.");
+  const canvas = document.createElement("canvas");
+  canvas.width = 1200;
+  canvas.height = 800;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("المتصفح لا يدعم إنشاء صورة الرسم.");
+
+  const background = context.createLinearGradient(0, 0, 1200, 800);
+  background.addColorStop(0, "#183a49");
+  background.addColorStop(0.48, "#222b53");
+  background.addColorStop(1, "#3b3578");
+  context.fillStyle = background;
+  context.fillRect(0, 0, 1200, 800);
+
+  context.strokeStyle = "rgba(255,255,255,.09)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.arc(80, 40, 190, 0, Math.PI * 2);
+  context.stroke();
+
+  const metric = CHART_METRICS[activeChartMetric];
+  const asset = currentAssetDetails();
+  const rows = sampledSchedule(latestCalculation.schedule, 8);
+  const maximumValue = Math.max(...rows.map((row) => row[activeChartMetric]), 1);
+
+  context.direction = "rtl";
+  context.textAlign = "right";
+  context.fillStyle = "rgba(255,255,255,.56)";
+  context.font = '600 20px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("منصة الأدوات المحاسبية", 1120, 62);
+  context.fillStyle = "#ffffff";
+  context.font = '800 43px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText(metric.title, 1120, 125);
+  context.fillStyle = "rgba(255,255,255,.62)";
+  context.font = '600 20px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText(`${asset.assetName} · ${METHOD_LABELS[latestCalculation.input.method]}`, 1120, 165);
+
+  const chartLeft = 85;
+  const chartRight = 1115;
+  const chartTop = 245;
+  const chartBottom = 650;
+  const gap = 26;
+  const barWidth = Math.min(105, (chartRight - chartLeft - gap * (rows.length - 1)) / rows.length);
+  const totalWidth = barWidth * rows.length + gap * (rows.length - 1);
+  const startX = chartRight - ((chartRight - chartLeft - totalWidth) / 2) - barWidth;
+
+  context.strokeStyle = "rgba(255,255,255,.14)";
+  context.beginPath();
+  context.moveTo(chartLeft, chartBottom);
+  context.lineTo(chartRight, chartBottom);
+  context.stroke();
+
+  rows.forEach((row, index) => {
+    const metricValue = row[activeChartMetric];
+    const barHeight = Math.max(10, (metricValue / maximumValue) * (chartBottom - chartTop));
+    const x = startX - index * (barWidth + gap);
+    const y = chartBottom - barHeight;
+    const gradient = context.createLinearGradient(0, y, 0, chartBottom);
+    gradient.addColorStop(0, "#8f76f3");
+    gradient.addColorStop(1, "#50d5ca");
+    roundedRectPath(context, x, y, barWidth, barHeight, 13);
+    context.fillStyle = gradient;
+    context.fill();
+
+    context.textAlign = "center";
+    context.fillStyle = "rgba(255,255,255,.78)";
+    context.font = '700 17px "Segoe UI", Tahoma, Arial, sans-serif';
+    context.fillText(formatMoney(metricValue), x + barWidth / 2, Math.max(chartTop - 15, y - 15));
+    context.fillStyle = "rgba(255,255,255,.58)";
+    context.font = '600 16px "Segoe UI", Tahoma, Arial, sans-serif';
+    context.fillText(row.label, x + barWidth / 2, 687);
+  });
+
+  context.textAlign = "right";
+  context.fillStyle = "rgba(255,255,255,.46)";
+  context.font = '600 16px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("القيم بالريال السعودي · النتائج تعليمية ومحاسبية", 1120, 755);
+  context.direction = "ltr";
+  context.textAlign = "left";
+  context.fillStyle = "#ffffff";
+  context.font = '700 16px "Segoe UI", Tahoma, Arial, sans-serif';
+  context.fillText("ratios-ashy.vercel.app/services/depreciation", 80, 755);
+  return canvas;
+}
+
+function canvasBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("تعذر إنشاء صورة الرسم.")), "image/png", 1);
+  });
+}
+
+function chartFileName() {
+  const metric = activeChartMetric.replace(/([A-Z])/g, "-$1").toLowerCase();
+  return `depreciation-${metric}.png`;
+}
+
+async function createChartImage() {
+  return canvasBlob(buildChartCanvas());
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function showShareFeedback(message = "", type = "") {
+  shareFeedback.textContent = message;
+  shareFeedback.dataset.type = type;
+}
+
+async function downloadChartImage() {
+  try {
+    showShareFeedback("جارٍ إنشاء الصورة...");
+    const blob = await createChartImage();
+    downloadBlob(blob, chartFileName());
+    showShareFeedback("تم تنزيل صورة الرسم.", "success");
+  } catch (error) {
+    showShareFeedback(error instanceof Error ? error.message : "تعذر تنزيل الرسم.", "error");
+  }
+}
+
+async function shareChartImage() {
+  try {
+    showShareFeedback("جارٍ تجهيز الرسم للمشاركة...");
+    const blob = await createChartImage();
+    if (typeof File !== "function") {
+      downloadBlob(blob, chartFileName());
+      showShareFeedback("جهازك لا يدعم مشاركة الملفات مباشرة؛ تم تنزيل الصورة بدلًا من ذلك.", "success");
+      return;
+    }
+    const file = new File([blob], chartFileName(), { type: "image/png" });
+    const shareData = { files: [file], title: CHART_METRICS[activeChartMetric].title, text: "رسم إهلاك من منصة الأدوات المحاسبية" };
+    let canShareFiles = false;
+    if (typeof navigator.share === "function") {
+      try {
+        canShareFiles = typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] });
+      } catch {
+        canShareFiles = false;
+      }
+    }
+    if (canShareFiles) {
+      await navigator.share(shareData);
+      showShareFeedback("تم فتح خيارات المشاركة.", "success");
+      return;
+    }
+    downloadBlob(blob, chartFileName());
+    showShareFeedback("جهازك لا يدعم مشاركة الملفات مباشرة؛ تم تنزيل الصورة بدلًا من ذلك.", "success");
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      showShareFeedback();
+      return;
+    }
+    showShareFeedback(error instanceof Error ? error.message : "تعذرت مشاركة الرسم.", "error");
+  }
 }
 
 function journalText(debitAccount, creditAccount, amount) {
@@ -267,6 +469,7 @@ form.addEventListener("submit", (event) => {
 form.addEventListener("reset", () => {
   window.setTimeout(() => {
     latestCalculation = null;
+    setChartMetric("closingBookValue");
     resultsSection.hidden = true;
     showError();
     updateMethodFields();
@@ -275,6 +478,9 @@ form.addEventListener("reset", () => {
   });
 });
 methodInputs.forEach((input) => input.addEventListener("change", updateMethodFields));
+chartMetricButtons.forEach((button) => button.addEventListener("click", () => setChartMetric(button.dataset.chartMetric)));
+shareChartButton.addEventListener("click", shareChartImage);
+downloadChartButton.addEventListener("click", downloadChartImage);
 document.querySelector("#assetCost").addEventListener("input", updateHeroPreview);
 document.querySelector("#residualValue").addEventListener("input", updateHeroPreview);
 periodSelect.addEventListener("change", () => renderJournal(Number(periodSelect.value)));

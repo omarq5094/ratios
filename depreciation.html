@@ -110,9 +110,19 @@
         <div class="depreciation-formula-card"><span>طريقة الحساب</span><strong id="calculationFormula">—</strong></div>
 
         <section class="depreciation-chart-card" aria-labelledby="depreciationChartTitle">
-          <div class="depreciation-chart-heading"><div><span>من جدول الإهلاك</span><h3 id="depreciationChartTitle">القيمة الدفترية عبر الفترات</h3></div><div class="depreciation-chart-legend"><i></i><span>القيمة الدفترية آخر الفترة</span></div></div>
+          <div class="depreciation-chart-heading"><div><span>من جدول الإهلاك</span><h3 id="depreciationChartTitle">القيمة آخر الفترة عبر الفترات</h3></div><div class="depreciation-chart-legend"><i></i><span id="depreciationChartLegend">القيمة آخر الفترة</span></div></div>
+          <div class="depreciation-chart-toolbar">
+            <div class="chart-metric-switch" role="group" aria-label="اختر بيانات الرسم البياني">
+              <button type="button" data-chart-metric="openingBookValue" aria-pressed="false">القيمة أول الفترة</button>
+              <button type="button" data-chart-metric="depreciation" aria-pressed="false">مصروف الإهلاك</button>
+              <button type="button" data-chart-metric="accumulatedDepreciation" aria-pressed="false">مجمع الإهلاك</button>
+              <button class="is-active" type="button" data-chart-metric="closingBookValue" aria-pressed="true">القيمة آخر الفترة</button>
+            </div>
+            <div class="depreciation-chart-actions"><button id="shareDepreciationChart" type="button">مشاركة الرسم</button><button id="downloadDepreciationChart" type="button">تنزيل الصورة</button></div>
+          </div>
           <div id="depreciationChart" class="depreciation-chart" role="img" aria-label="رسم بياني للقيمة الدفترية عبر فترات الإهلاك"></div>
           <p id="depreciationChartNote" class="depreciation-chart-note" hidden></p>
+          <p id="depreciationShareFeedback" class="depreciation-share-feedback" aria-live="polite"></p>
         </section>
 
         <section class="depreciation-panel schedule-panel">

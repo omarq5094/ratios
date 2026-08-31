@@ -14,6 +14,12 @@ test("صفحة الإهلاك مرتبطة بالحاسبة والمحلل ال�
   assert.match(html, /id="depreciationScheduleBody"/);
   assert.match(html, /id="depreciationJournalEntry"/);
   assert.match(html, /id="depreciationChart"/);
+  assert.match(html, /data-chart-metric="openingBookValue"/);
+  assert.match(html, /data-chart-metric="depreciation"/);
+  assert.match(html, /data-chart-metric="accumulatedDepreciation"/);
+  assert.match(html, /data-chart-metric="closingBookValue"/);
+  assert.match(html, /id="shareDepreciationChart"/);
+  assert.match(html, /id="downloadDepreciationChart"/);
   assert.match(html, /id="heroDepreciableValue"/);
   assert.doesNotMatch(html, /id="assetName"[^>]*required/);
   assert.doesNotMatch(html, /id="assetAccount"[^>]*required/);
@@ -31,6 +37,9 @@ test("صفحة الإهلاك مرتبطة بالحاسبة والمحلل ال�
   assert.match(script, /counterAccount:\s*"النقدية"/);
   assert.match(script, /updateHeroPreview/);
   assert.match(script, /renderDepreciationChart/);
+  assert.match(script, /buildChartCanvas/);
+  assert.match(script, /navigator\.share/);
+  assert.match(script, /downloadBlob/);
   assert.match(assistant, /depreciation-page/);
   assert.equal(JSON.parse(vercel).rewrites.some((item) => item.source === "/services/depreciation"), true);
 });
