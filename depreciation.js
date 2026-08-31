@@ -17,6 +17,8 @@ const unitsFields = document.querySelector("#unitsFields");
 const resultsSection = document.querySelector("#depreciationResults");
 const errorBox = document.querySelector("#depreciationError");
 const scheduleBody = document.querySelector("#depreciationScheduleBody");
+const chart = document.querySelector("#depreciationChart");
+const chartNote = document.querySelector("#depreciationChartNote");
 const periodSelect = document.querySelector("#journalPeriod");
 const journalPurchase = document.querySelector("#purchaseJournalEntry");
 const journalDepreciation = document.querySelector("#depreciationJournalEntry");
@@ -111,6 +113,45 @@ function renderSchedule(schedule) {
   });
 }
 
+function sampledSchedule(schedule, maximumBars = 12) {
+  if (schedule.length <= maximumBars) return schedule;
+  const indexes = new Set();
+  for (let index = 0; index < maximumBars; index += 1) {
+    indexes.add(Math.round((index * (schedule.length - 1)) / (maximumBars - 1)));
+  }
+  return [...indexes].map((index) => schedule[index]);
+}
+
+function renderDepreciationChart(schedule) {
+  chart.replaceChildren();
+  const displayedRows = sampledSchedule(schedule);
+  const maximumValue = Math.max(...displayedRows.map((row) => row.openingBookValue), 1);
+  chart.classList.toggle("is-single-period", displayedRows.length === 1);
+
+  displayedRows.forEach((row) => {
+    const item = document.createElement("article");
+    item.className = "depreciation-chart-item";
+    const value = document.createElement("span");
+    value.textContent = formatMoney(row.closingBookValue);
+    const track = document.createElement("div");
+    const bar = document.createElement("i");
+    const height = Math.max(6, (row.closingBookValue / maximumValue) * 100);
+    bar.style.setProperty("--bar-height", `${height}%`);
+    bar.title = `${row.label}: ${formatMoney(row.closingBookValue)} ريال`;
+    track.append(bar);
+    const label = document.createElement("small");
+    label.textContent = row.label;
+    item.append(value, track, label);
+    chart.append(item);
+  });
+
+  const sampled = displayedRows.length < schedule.length;
+  chartNote.hidden = !sampled;
+  chartNote.textContent = sampled
+    ? `عُرضت ${displayedRows.length} فترات موزعة من أصل ${schedule.length} للمحافظة على وضوح الرسم.`
+    : "";
+}
+
 function journalText(debitAccount, creditAccount, amount) {
   return `${formatMoney(amount)} من حـ/ ${debitAccount}\n${formatMoney(amount)} إلى حـ/ ${creditAccount}`;
 }
@@ -154,6 +195,7 @@ function renderResult(calculation) {
       : `إهلاك الوحدة: ${formatMoney(calculation.depreciationPerUnit)} ريال`;
   setText("secondaryResult", secondaryLabel);
   renderSchedule(calculation.schedule);
+  renderDepreciationChart(calculation.schedule);
   renderJournal(0);
   resultsSection.hidden = false;
   resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });

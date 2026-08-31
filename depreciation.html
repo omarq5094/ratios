@@ -84,7 +84,7 @@
               <div class="fields-grid three-columns depreciation-fields">
                 <label class="field"><span>اسم الأصل <small>اختياري</small></span><input id="assetName" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: آلة إنتاج" /></label>
                 <label class="field"><span>حساب الأصل <small>اختياري</small></span><input id="assetAccount" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: الآلات" /></label>
-                <label class="field"><span>الحساب المقابل <small>اختياري</small></span><input id="counterAccount" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: النقدية" /></label>
+                <label class="field"><span>الحساب المقابل <small>اختياري</small></span><select id="counterAccount"><option value="">تلقائيًا: النقدية</option><option value="النقدية">النقدية</option><option value="الدائنون">الدائنون</option><option value="البنك">البنك</option></select></label>
                 <label class="field"><span>تكلفة الأصل <b>*</b></span><div class="number-field"><input id="assetCost" type="number" min="0.01" step="0.01" value="100000" required /><small>ريال</small></div></label>
                 <label class="field"><span>القيمة المتبقية <b>*</b></span><div class="number-field"><input id="residualValue" type="number" min="0" step="0.01" value="10000" required /><small>ريال</small></div></label>
                 <label class="field"><span>العمر الإنتاجي <b>*</b></span><div class="number-field"><input id="usefulLife" type="number" min="1" max="100" step="1" value="5" required /><small>سنة</small></div></label>
@@ -109,7 +109,13 @@
         </div>
         <div class="depreciation-formula-card"><span>طريقة الحساب</span><strong id="calculationFormula">—</strong></div>
 
-        <section class="depreciation-panel">
+        <section class="depreciation-chart-card" aria-labelledby="depreciationChartTitle">
+          <div class="depreciation-chart-heading"><div><span>من جدول الإهلاك</span><h3 id="depreciationChartTitle">القيمة الدفترية عبر الفترات</h3></div><div class="depreciation-chart-legend"><i></i><span>القيمة الدفترية آخر الفترة</span></div></div>
+          <div id="depreciationChart" class="depreciation-chart" role="img" aria-label="رسم بياني للقيمة الدفترية عبر فترات الإهلاك"></div>
+          <p id="depreciationChartNote" class="depreciation-chart-note" hidden></p>
+        </section>
+
+        <section class="depreciation-panel schedule-panel">
           <div class="panel-heading"><div><span>تفصيل السنوات</span><h3>جدول الإهلاك</h3></div><small>بالريال السعودي</small></div>
           <div class="depreciation-table-wrap"><table><thead><tr><th>الفترة</th><th>القيمة أول الفترة</th><th>مصروف الإهلاك</th><th>مجمع الإهلاك</th><th>القيمة الدفترية</th></tr></thead><tbody id="depreciationScheduleBody"></tbody></table></div>
         </section>
@@ -127,7 +133,7 @@
       </section>
     </main>
 
-    <footer><div class="container footer-content"><div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية لفهم الأرقام واتخاذ قرارات أوضح.</p></div></div><div class="footer-links"><a href="/">الرئيسية</a><a href="/services/financial-ratios">حاسبة النسب</a><a href="mailto:wcoffeebusiness@gmail.com">البريد الإلكتروني</a></div></div></footer>
+    <footer><div class="container footer-content"><div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية لفهم الأرقام واتخاذ قرارات أوضح.</p></div></div><div class="footer-links"><a href="/">الرئيسية</a><a href="/services/financial-ratios">حاسبة النسب</a><a href="https://www.linkedin.com/in/omar-al-ghrman-1b5795382/" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://x.com/omar_saeed3" target="_blank" rel="noopener noreferrer">X</a><a href="tel:0533172872">0533172872</a><a href="mailto:wcoffeebusiness@gmail.com">البريد الإلكتروني</a></div></div></footer>
     <script type="module" src="/depreciation.js"></script>
     <script defer src="/_vercel/insights/script.js"></script>
     <script src="/assistant.js"></script>
