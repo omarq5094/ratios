@@ -41,3 +41,13 @@ test("حقل الرمز الواحد يكتشف السوق السعودي وال
   assert.match(script, /السوق الأمريكي/);
   assert.match(service, /normalizeCompanySymbol/);
 });
+
+test("الإدخال اليدوي يبقى إلزاميًا والجلب التلقائي يسمح بنتائج جزئية", async () => {
+  const script = await readFile(new URL("../script.js", import.meta.url), "utf8");
+  const css = await readFile(new URL("../style.css", import.meta.url), "utf8");
+
+  assert.match(script, /companyType && !automaticImportMode/);
+  assert.match(script, /const coreValue = importedCompanyContext \? nullableValueOf : valueOf/);
+  assert.match(script, /تم حساب \$\{availableCount\} من \$\{totalCount\} مؤشرًا/);
+  assert.match(css, /\.form-card\.auto-import-mode \.field > span b \{ display: none; \}/);
+});

@@ -8,6 +8,7 @@ const ratioMeta = {
     formula: "(الإيرادات − تكلفة المبيعات) ÷ الإيرادات",
     description: "المتبقي من الإيرادات بعد تكلفة المبيعات.",
     negativeDescription: "النتيجة سالبة لأن تكلفة المبيعات تجاوزت الإيرادات.",
+    fields: ["revenue", "costOfSales"],
   },
   operating_margin: {
     label: "هامش التشغيل",
@@ -15,6 +16,7 @@ const ratioMeta = {
     formula: "الربح التشغيلي ÷ الإيرادات",
     description: "نتيجة النشاط التشغيلي مقارنة بالإيرادات.",
     negativeDescription: "النتيجة سالبة لأن النشاط سجل خسارة تشغيلية.",
+    fields: ["operatingProfit", "revenue"],
   },
   net_margin: {
     label: "هامش صافي الربح",
@@ -22,6 +24,7 @@ const ratioMeta = {
     formula: "صافي الربح ÷ الإيرادات",
     description: "صافي الربح المتحقق من إجمالي الإيرادات.",
     negativeDescription: "النتيجة سالبة لأن الشركة سجلت صافي خسارة.",
+    fields: ["netProfit", "revenue"],
   },
   roe: {
     label: "العائد على حقوق الملكية",
@@ -29,6 +32,7 @@ const ratioMeta = {
     formula: "صافي الربح ÷ متوسط حقوق الملكية",
     description: "كفاءة حقوق الملكية في توليد صافي الربح.",
     negativeDescription: "النتيجة سالبة بسبب وجود قيمة سالبة في صافي الربح أو حقوق الملكية المستخدمة.",
+    fields: ["netProfit", "equity"],
   },
   debt_to_equity: {
     label: "الديون إلى حقوق الملكية",
@@ -36,6 +40,7 @@ const ratioMeta = {
     formula: "إجمالي الديون ÷ حقوق الملكية",
     description: "حجم الديون مقارنة بحقوق الملكية.",
     negativeDescription: "النتيجة سالبة لأن حقوق الملكية المستخدمة في الحساب سالبة.",
+    fields: ["totalDebt", "equity"],
   },
 };
 
@@ -46,6 +51,7 @@ const commonRatioMeta = {
     formula: "صافي الربح ÷ متوسط حقوق الملكية",
     description: "كفاءة حقوق الملكية في توليد صافي الربح.",
     negativeDescription: "النتيجة سالبة بسبب وجود قيمة سالبة في صافي الربح أو حقوق الملكية المستخدمة.",
+    fields: ["netProfit", "equity"],
   },
   roa: {
     label: "العائد على الأصول",
@@ -53,14 +59,15 @@ const commonRatioMeta = {
     formula: "صافي الربح ÷ متوسط إجمالي الأصول",
     description: "كفاءة الأصول في توليد صافي الربح.",
     negativeDescription: "النتيجة سالبة لأن المنشأة سجلت صافي خسارة.",
+    fields: ["netProfit", "totalAssets"],
   },
 };
 
 const summaryRatioMeta = {
-  current_ratio: { label: "نسبة التداول", type: "multiple" },
-  quick_ratio: { label: "النسبة السريعة", type: "multiple" },
-  roa: { label: "العائد على الأصول", type: "percent" },
-  interest_coverage: { label: "تغطية التمويل", type: "multiple" },
+  current_ratio: { label: "نسبة التداول", type: "multiple", fields: ["currentAssets", "currentLiabilities"] },
+  quick_ratio: { label: "النسبة السريعة", type: "multiple", fields: ["currentAssets", "inventory", "currentLiabilities"] },
+  roa: { label: "العائد على الأصول", type: "percent", fields: ["netProfit", "totalAssets"] },
+  interest_coverage: { label: "تغطية التمويل", type: "multiple", fields: ["operatingProfit", "interestExpense"] },
 };
 
 const ASSISTANT_CONTEXT_EVENT = "financial-analysis-context";
@@ -269,6 +276,9 @@ function setFieldVisibility(fieldName, visible) {
 function setCompanyType(value, { hideResults = false } = {}) {
   const companyType = normalizeCompanyType(value);
   if (companyTypeInput) companyTypeInput.value = companyType;
+  const automaticImportMode = Boolean(importedCompanyContext);
+  if (automaticImportMode) form?.classList.add("auto-import-mode");
+  else form?.classList.remove("auto-import-mode");
 
   OPERATING_ONLY_FIELDS.forEach((fieldName) => setFieldVisibility(fieldName, companyType === "operating"));
   BANK_ONLY_FIELDS.forEach((fieldName) => setFieldVisibility(fieldName, companyType === "bank"));
@@ -278,7 +288,7 @@ function setCompanyType(value, { hideResults = false } = {}) {
     const input = document.querySelector(`#${fieldName}`);
     if (input) input.required = false;
   });
-  if (companyType) {
+  if (companyType && !automaticImportMode) {
     requiredFieldsFor(companyType).forEach((fieldName) => {
       const input = document.querySelector(`#${fieldName}`);
       if (input && !input.disabled) input.required = true;
@@ -595,7 +605,7 @@ function applyImportedData(data) {
   const requiredMissing = requiredFieldsFor(importedCompanyType).filter((key) => missingKeys.includes(key));
 
   if (requiredMissing.length) {
-    showFetchStatus("تم جلب البيانات المتاحة. أكمل المراجعة والحقول المعلّمة قبل الحساب.", "warning");
+    showFetchStatus("تم جلب البيانات المتاحة. يمكنك حساب المؤشرات المتوفرة الآن، وإكمال الحقول المعلّمة اختياريًا لإظهار نسب إضافية.", "warning");
   } else {
     showFetchStatus("تمت تعبئة أحدث القوائم المالية المتاحة. راجع الأرقام قبل الحساب.", "success");
   }
@@ -659,34 +669,46 @@ async function fetchCompanyData() {
 }
 
 function calculate(values) {
-  const averageAssets = values.previousAssets > 0 ? (values.totalAssets + values.previousAssets) / 2 : values.totalAssets;
-  const averageEquity = values.previousEquity !== null
-    ? (values.equity + values.previousEquity) / 2
-    : values.equity;
+  const isAvailable = (value) => typeof value === "number" && Number.isFinite(value);
+  const safeDivide = (numerator, denominator) => (
+    isAvailable(numerator) && isAvailable(denominator) && denominator !== 0
+      ? numerator / denominator
+      : null
+  );
+  const averageAssets = isAvailable(values.totalAssets)
+    ? isAvailable(values.previousAssets) && values.previousAssets > 0
+      ? (values.totalAssets + values.previousAssets) / 2
+      : values.totalAssets
+    : null;
+  const averageEquity = isAvailable(values.equity)
+    ? isAvailable(values.previousEquity)
+      ? (values.equity + values.previousEquity) / 2
+      : values.equity
+    : null;
   const operatingMode = values.companyType === "operating";
 
   return {
-    gross_margin: operatingMode && values.revenue !== 0 ? (values.revenue - values.costOfSales) / values.revenue : null,
-    operating_margin: operatingMode && values.revenue !== 0 ? values.operatingProfit / values.revenue : null,
-    net_margin: operatingMode && values.revenue !== 0 ? values.netProfit / values.revenue : null,
-    current_ratio: operatingMode && values.currentLiabilities !== 0 ? values.currentAssets / values.currentLiabilities : null,
-    quick_ratio: operatingMode && values.currentLiabilities !== 0
-      ? (values.currentAssets - values.inventory) / values.currentLiabilities
+    gross_margin: operatingMode && isAvailable(values.revenue) && isAvailable(values.costOfSales)
+      ? safeDivide(values.revenue - values.costOfSales, values.revenue)
       : null,
-    debt_to_equity: operatingMode && values.equity !== 0 ? values.totalDebt / values.equity : null,
-    roa: averageAssets !== 0 ? values.netProfit / averageAssets : null,
-    roe: averageEquity !== 0 ? values.netProfit / averageEquity : null,
-    interest_coverage: operatingMode && values.interestExpense > 0
-      ? values.operatingProfit / values.interestExpense
+    operating_margin: operatingMode ? safeDivide(values.operatingProfit, values.revenue) : null,
+    net_margin: operatingMode ? safeDivide(values.netProfit, values.revenue) : null,
+    current_ratio: operatingMode ? safeDivide(values.currentAssets, values.currentLiabilities) : null,
+    quick_ratio: operatingMode && isAvailable(values.currentAssets) && isAvailable(values.inventory)
+      ? safeDivide(values.currentAssets - values.inventory, values.currentLiabilities)
+      : null,
+    debt_to_equity: operatingMode ? safeDivide(values.totalDebt, values.equity) : null,
+    roa: safeDivide(values.netProfit, averageAssets),
+    roe: safeDivide(values.netProfit, averageEquity),
+    interest_coverage: operatingMode && isAvailable(values.interestExpense) && values.interestExpense > 0
+      ? safeDivide(values.operatingProfit, values.interestExpense)
       : null,
     cash_quality:
-      operatingMode && values.operatingCashFlow !== null && values.netProfit !== 0
-        ? values.operatingCashFlow / values.netProfit
-        : null,
+      operatingMode ? safeDivide(values.operatingCashFlow, values.netProfit) : null,
   };
 }
 
-function renderPrimaryRatios(ratios, companyType) {
+function renderPrimaryRatios(ratios, companyType, values) {
   ratioGrid.replaceChildren();
 
   const definitions = companyType === "operating" ? ratioMeta : commonRatioMeta;
@@ -703,9 +725,14 @@ function renderPrimaryRatios(ratios, companyType) {
     formula.textContent = `طريقة الحساب: ${meta.formula}`;
     const note = document.createElement("p");
     note.className = "ratio-result-note";
-    const interpretation = ratios[code] < 0 && meta.negativeDescription
-      ? meta.negativeDescription
-      : meta.description;
+    const missingFields = (meta.fields || []).filter((fieldName) => values[fieldName] === null);
+    const interpretation = missingFields.length
+      ? `لا يمكن حساب النسبة قبل توفر: ${missingFields.map((fieldName) => fieldLabelFor(fieldName, companyType)).join("، ")}.`
+      : ratios[code] === null
+        ? "لا يمكن حساب النسبة لأن أحد عناصر المعادلة يساوي صفرًا أو غير صالح للحساب."
+        : ratios[code] < 0 && meta.negativeDescription
+          ? meta.negativeDescription
+          : meta.description;
     note.textContent = `التفسير المبسط: ${interpretation}`;
 
     card.append(title, value, formula, note);
@@ -775,10 +802,20 @@ function renderAdvancedRatios(values, ratios) {
   setText("operationsRatioTitle", companyType === "bank" ? "مؤشرات مصرفية متقدمة" : "مؤشرات تشغيلية متقدمة");
 
   const missingResults = [...results];
+  const primaryDefinitions = companyType === "operating" ? ratioMeta : commonRatioMeta;
+  const primaryAndSummary = companyType === "operating"
+    ? { ...primaryDefinitions, ...summaryRatioMeta }
+    : primaryDefinitions;
+  Object.entries(primaryAndSummary).forEach(([code, meta]) => {
+    if (ratios[code] !== null) return;
+    const missingFields = (meta.fields || []).filter((fieldName) => values[fieldName] === null);
+    if (missingFields.length) missingResults.push({ status: "missing", missingFields });
+  });
   if (companyType === "operating" && ratios.interest_coverage === null && values.interestExpense === null) {
     missingResults.push({ status: "missing", missingFields: ["interestExpense"] });
   }
   renderMissingFields(missingResults, companyType);
+  return results;
 }
 
 function unitLabelFor(fieldName, companyType) {
@@ -1237,22 +1274,25 @@ async function copyCompanyLink() {
   }
 }
 
-function assistantRatio(code, meta, value) {
+function assistantRatio(code, meta, value, values) {
+  const missingFields = (meta.fields || []).filter((fieldName) => values[fieldName] === null);
+  const available = typeof value === "number" && Number.isFinite(value);
   return {
     code,
     label: meta.label,
     type: meta.type,
-    status: typeof value === "number" && Number.isFinite(value) ? "available" : "invalid",
-    value: typeof value === "number" && Number.isFinite(value) ? value : null,
+    status: available ? "available" : missingFields.length ? "missing" : "invalid",
+    value: available ? value : null,
+    missingFields,
   };
 }
 
 function buildAssistantContext(values, ratios) {
   const primaryDefinitions = values.companyType === "operating" ? ratioMeta : commonRatioMeta;
   const primaryRatios = [
-    ...Object.entries(primaryDefinitions).map(([code, meta]) => assistantRatio(code, meta, ratios[code])),
+    ...Object.entries(primaryDefinitions).map(([code, meta]) => assistantRatio(code, meta, ratios[code], values)),
     ...(values.companyType === "operating"
-      ? Object.entries(summaryRatioMeta).map(([code, meta]) => assistantRatio(code, meta, ratios[code]))
+      ? Object.entries(summaryRatioMeta).map(([code, meta]) => assistantRatio(code, meta, ratios[code], values))
       : []),
   ];
   const calculatedAdvancedRatios = values.companyType === "bank"
@@ -1306,17 +1346,29 @@ function renderResults(values, ratios, shouldScroll = true) {
   setText("quickRatioValue", formatRatio(ratios.quick_ratio, "multiple"));
   setText("roaValue", formatRatio(ratios.roa, "percent"));
   setText("coverageValue", formatRatio(ratios.interest_coverage, "multiple"));
-  setText(
-    "resultSummary",
-    values.companyType === "bank"
-      ? "تم تطبيق وضع البنوك واستبعاد نسب الشركات التشغيلية غير المناسبة. تعتمد المؤشرات المصرفية على اكتمال بيانات القروض والودائع وجودة الائتمان ورأس المال، ويجب مراجعتها مع إفصاحات البنك الرسمية."
-      : values.companyType === "unclassified"
-        ? "تم عرض المؤشرات المشتركة فقط؛ اختر نوع المنشأة بدقة للحصول على مجموعة نسب أكثر ملاءمة."
-        : "تم حساب المؤشرات من البيانات المتاحة والمدخلة. تعتمد مؤشرات التقييم السوقي على أحدث قيمة سوقية متاحة مع أحدث بيانات سنوية مكتملة؛ لذلك يجب مراجعة المصدر والقوائم الرسمية قبل تفسير النتائج.",
-  );
   renderCompanyInfo();
-  renderPrimaryRatios(ratios, values.companyType);
-  renderAdvancedRatios(values, ratios);
+  renderPrimaryRatios(ratios, values.companyType, values);
+  const advancedResults = renderAdvancedRatios(values, ratios);
+  const primaryDefinitions = values.companyType === "operating"
+    ? { ...ratioMeta, ...summaryRatioMeta }
+    : commonRatioMeta;
+  const primaryAvailableCount = Object.keys(primaryDefinitions)
+    .filter((code) => typeof ratios[code] === "number" && Number.isFinite(ratios[code])).length;
+  const availableCount = primaryAvailableCount
+    + advancedResults.filter((item) => item.status === "available").length;
+  const totalCount = Object.keys(primaryDefinitions).length + advancedResults.length;
+  const unavailableCount = totalCount - availableCount;
+  const availabilitySummary = importedCompanyContext
+    ? unavailableCount > 0
+      ? `تم حساب ${availableCount} من ${totalCount} مؤشرًا، وتعذر حساب ${unavailableCount} لعدم اكتمال بياناتها. الحقول الناقصة اختيارية ويمكن إضافتها لإظهار نتائج أخرى.`
+      : `تم حساب جميع المؤشرات المتاحة وعددها ${totalCount} مؤشرًا.`
+    : "تم حساب المؤشرات من البيانات التي أدخلتها.";
+  const interpretationSummary = values.companyType === "bank"
+    ? "تم تطبيق وضع البنوك واستبعاد نسب الشركات التشغيلية غير المناسبة، ويجب مراجعة النتائج مع إفصاحات البنك الرسمية."
+    : values.companyType === "unclassified"
+      ? "تم عرض المؤشرات المشتركة فقط؛ اختر نوع المنشأة بدقة للحصول على مجموعة نسب أكثر ملاءمة."
+      : "تعتمد مؤشرات التقييم السوقي على أحدث قيمة سوقية متاحة مع أحدث بيانات سنوية مكتملة؛ لذلك يجب مراجعة المصدر والقوائم الرسمية قبل تفسير النتائج.";
+  setText("resultSummary", `${availabilitySummary} ${interpretationSummary}`);
   renderDividendHistory();
   renderSharePanel(values, ratios);
 
@@ -1326,19 +1378,20 @@ function renderResults(values, ratios, shouldScroll = true) {
 }
 
 function collectValues() {
+  const coreValue = importedCompanyContext ? nullableValueOf : valueOf;
   return {
     companyType: currentCompanyType(),
     projectName: textOf("projectName"),
-    revenue: valueOf("revenue"),
-    costOfSales: valueOf("costOfSales"),
-    operatingProfit: valueOf("operatingProfit"),
-    netProfit: valueOf("netProfit"),
-    currentAssets: valueOf("currentAssets"),
-    inventory: valueOf("inventory"),
-    currentLiabilities: valueOf("currentLiabilities"),
-    totalAssets: valueOf("totalAssets"),
-    totalDebt: valueOf("totalDebt"),
-    equity: valueOf("equity"),
+    revenue: coreValue("revenue"),
+    costOfSales: coreValue("costOfSales"),
+    operatingProfit: coreValue("operatingProfit"),
+    netProfit: coreValue("netProfit"),
+    currentAssets: coreValue("currentAssets"),
+    inventory: coreValue("inventory"),
+    currentLiabilities: coreValue("currentLiabilities"),
+    totalAssets: coreValue("totalAssets"),
+    totalDebt: coreValue("totalDebt"),
+    equity: coreValue("equity"),
     previousAssets: nullableValueOf("previousAssets"),
     previousEquity: nullableValueOf("previousEquity"),
     operatingCashFlow: nullableValueOf("operatingCashFlow"),
@@ -1372,11 +1425,21 @@ form.addEventListener("submit", (event) => {
   if (!form.reportValidity()) return;
 
   const values = collectValues();
-  if (values.companyType === "operating" && values.inventory > values.currentAssets) {
+  if (
+    values.companyType === "operating"
+    && Number.isFinite(values.inventory)
+    && Number.isFinite(values.currentAssets)
+    && values.inventory > values.currentAssets
+  ) {
     showMessage("المخزون لا يمكن أن يكون أكبر من إجمالي الأصول المتداولة.", "error");
     return;
   }
-  if (values.companyType === "operating" && values.totalDebt > values.totalAssets * 5) {
+  if (
+    values.companyType === "operating"
+    && Number.isFinite(values.totalDebt)
+    && Number.isFinite(values.totalAssets)
+    && values.totalDebt > values.totalAssets * 5
+  ) {
     showMessage("راجع إجمالي الديون؛ القيمة تبدو مرتفعة جدًا مقارنةً بالأصول.", "warning");
   }
 
@@ -1492,15 +1555,11 @@ function initializeCompanyPage() {
   applyImportedData(payload);
   updateCompanyLocation(payload, false);
 
-  const requiredFields = requiredFieldsFor(currentCompanyType());
-  const canCalculate = requiredFields.every((key) => Number.isFinite(payload.fields?.[key]));
-  if (canCalculate) {
-    const values = collectValues();
-    renderResults(values, calculate(values), false);
-    showFetchStatus("تم تحميل صفحة الشركة ونتائجها من الرابط الدائم.", "success");
-    if (window.location.hash === "#results") {
-      window.setTimeout(() => resultsSection.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
-    }
+  const values = collectValues();
+  renderResults(values, calculate(values), false);
+  showFetchStatus("تم تحميل صفحة الشركة وحساب المؤشرات التي توفرت بياناتها.", "success");
+  if (window.location.hash === "#results") {
+    window.setTimeout(() => resultsSection.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 }
 

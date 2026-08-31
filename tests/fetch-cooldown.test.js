@@ -84,6 +84,16 @@ function createBrowserContext(nowRef) {
     "sharePrice",
     "totalDividends",
     "earningsGrowthPercent",
+    "netInterestIncome",
+    "averageEarningAssets",
+    "operatingExpenses",
+    "operatingIncome",
+    "totalLoans",
+    "customerDeposits",
+    "nonPerformingLoans",
+    "loanLossProvisions",
+    "regulatoryCapital",
+    "riskWeightedAssets",
   ];
   const elements = Object.fromEntries(ids.map((id) => [id, new FakeElement()]));
   const storage = new Map();
@@ -135,13 +145,14 @@ function createBrowserContext(nowRef) {
       window,
     }),
     elements,
+    payload,
     storage,
   };
 }
 
 test("يمنع طلب Yahoo جديدًا لمدة 15 ثانية ويستمر بعد الطلب", async () => {
   const nowRef = { value: 1_000 };
-  const { context, elements, storage } = createBrowserContext(nowRef);
+  const { context, elements, payload, storage } = createBrowserContext(nowRef);
   const advancedSource = await readFile(new URL("../lib/advanced-ratios.js", import.meta.url), "utf8");
   const source = await readFile(new URL("../script.js", import.meta.url), "utf8");
   vm.runInContext(advancedSource, context);
@@ -151,6 +162,10 @@ test("يمنع طلب Yahoo جديدًا لمدة 15 ثانية ويستمر ب�
   assert.equal(context.detectCompanyInput("AAPL").market, "usa");
   assert.equal(context.detectCompanyInput("٢٢٢٢").market, "saudi");
   assert.equal(context.detectCompanyInput("BRK.B").displaySymbol, "BRK-B");
+
+  context.setCompanyType("operating");
+  assert.equal(elements.revenue.required, true);
+  assert.equal(elements.costOfSales.required, true);
 
   elements.tickerInput.value = "2222";
   await context.fetchCompanyData();
@@ -162,7 +177,25 @@ test("يمنع طلب Yahoo جديدًا لمدة 15 ثانية ويستمر ب�
   assert.equal(elements.importSourceBadge.textContent, "المصدر: Yahoo Finance");
   assert.equal(elements.importPeriodBadge.textContent, "السنة المالية: 2025");
   assert.equal(elements.importCurrencyBadge.textContent, "العملة: SAR");
+  assert.equal(elements.revenue.required, false);
+  assert.equal(elements.costOfSales.required, false);
   assert.equal(storage.get("financialBenchmarkYahooNextFetchAt"), "16000");
+
+  elements.costOfSales.value = "";
+  const partialValues = context.collectValues();
+  assert.equal(partialValues.costOfSales, null);
+  assert.equal(context.calculate(partialValues).gross_margin, null);
+  elements.currentAssets.value = "";
+  elements.currentLiabilities.value = "";
+  const liquidityMissingValues = context.collectValues();
+  assert.equal(context.calculate(liquidityMissingValues).current_ratio, null);
+
+  context.applyImportedData({
+    ...payload,
+    fields: { ...payload.fields, costOfSales: null, inventory: null },
+  });
+  assert.match(elements.dataFetchStatus.textContent, /يمكنك حساب المؤشرات المتوفرة الآن/);
+  assert.equal(elements.costOfSales.required, false);
 
   nowRef.value = 16_000;
   context.updateFetchButton();
