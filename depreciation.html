@@ -10,7 +10,8 @@
     <link rel="canonical" href="https://ratios-ashy.vercel.app/services/depreciation" />
     <title>حاسبة الإهلاك | منصة الأدوات المحاسبية</title>
     <link rel="stylesheet" href="/style.css" />
-  </head>
+    <script defer src="/saudi-riyal.js"></script>
+</head>
   <body class="depreciation-page">
     <div class="ambient ambient-one" aria-hidden="true"></div>
     <div class="ambient ambient-two" aria-hidden="true"></div>
@@ -43,7 +44,7 @@
         </div>
         <div class="depreciation-hero-card" aria-hidden="true">
           <span>القيمة القابلة للإهلاك</span>
-          <strong><span id="heroDepreciableValue">90,000</span> <small>ريال</small></strong>
+          <strong><span id="heroDepreciableValue">90,000</span> <small>ر.س</small></strong>
           <div><i style="--h:100%"></i><i style="--h:78%"></i><i style="--h:58%"></i><i style="--h:41%"></i><i style="--h:22%"></i></div>
           <small>التكلفة − القيمة المتبقية</small>
         </div>
@@ -85,8 +86,8 @@
                 <label class="field"><span>اسم الأصل <small>اختياري</small></span><input id="assetName" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: آلة إنتاج" /></label>
                 <label class="field"><span>حساب الأصل <small>اختياري</small></span><input id="assetAccount" type="text" maxlength="80" placeholder="يُملأ تلقائيًا: الآلات" /></label>
                 <label class="field"><span>الحساب المقابل <small>اختياري</small></span><select id="counterAccount"><option value="">تلقائيًا: النقدية</option><option value="النقدية">النقدية</option><option value="الدائنون">الدائنون</option><option value="البنك">البنك</option></select></label>
-                <label class="field"><span>تكلفة الأصل <b>*</b></span><div class="number-field"><input id="assetCost" type="number" min="0.01" step="0.01" value="100000" required /><small>ريال</small></div></label>
-                <label class="field"><span>القيمة المتبقية <b>*</b></span><div class="number-field"><input id="residualValue" type="number" min="0" step="0.01" value="10000" required /><small>ريال</small></div></label>
+                <label class="field"><span>تكلفة الأصل <b>*</b></span><div class="number-field"><input id="assetCost" type="number" min="0.01" step="0.01" value="100000" required /><small>ر.س</small></div></label>
+                <label class="field"><span>القيمة المتبقية <b>*</b></span><div class="number-field"><input id="residualValue" type="number" min="0" step="0.01" value="10000" required /><small>ر.س</small></div></label>
                 <label class="field"><span>العمر الإنتاجي <b>*</b></span><div class="number-field"><input id="usefulLife" type="number" min="1" max="100" step="1" value="5" required /><small>سنة</small></div></label>
               </div>
               <div id="unitsFields" class="fields-grid two-columns units-fields" hidden>
@@ -126,7 +127,7 @@
         </section>
 
         <section class="depreciation-panel schedule-panel">
-          <div class="panel-heading"><div><span>تفصيل السنوات</span><h3>جدول الإهلاك</h3></div><small>بالريال السعودي</small></div>
+          <div class="panel-heading"><div><span>تفصيل السنوات</span><h3>جدول الإهلاك</h3></div><small>بوحدة ر.س</small></div>
           <div class="depreciation-table-wrap"><table><thead><tr><th>الفترة</th><th>القيمة أول الفترة</th><th>مصروف الإهلاك</th><th>مجمع الإهلاك</th><th>القيمة الدفترية</th></tr></thead><tbody id="depreciationScheduleBody"></tbody></table></div>
         </section>
 

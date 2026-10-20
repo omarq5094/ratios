@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="احسب نقطة التعادل وهامش المساهمة والربح التشغيلي المستهدف لمنتج واحد، مع رسم للإيرادات والتكاليف." />
+  <link rel="canonical" href="https://ratios-ashy.vercel.app/services/break-even-profit" />
+  <meta property="og:title" content="تحليل نقطة التعادل والربح | منصة الأدوات المحاسبية" />
+  <meta property="og:url" content="https://ratios-ashy.vercel.app/services/break-even-profit" />
+  <title>تحليل نقطة التعادل والربح | منصة الأدوات المحاسبية</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/cvp.css" />
+  <script defer src="/saudi-riyal.js"></script>
+</head>
+<body class="cvp-page">
+  <div class="ambient ambient-one" aria-hidden="true"></div><div class="ambient ambient-two" aria-hidden="true"></div>
+  <a class="cvp-skip" href="#calculator">انتقل إلى الحاسبة</a>
+  <header class="navbar"><div class="container nav-content">
+    <a class="brand" href="/" aria-label="منصة الأدوات المحاسبية"><span class="brand-mark">م</span><span class="brand-copy">الأدوات المحاسبية<small>ACCOUNTING TOOLS</small></span></a>
+    <nav aria-label="التنقل الرئيسي"><a href="/">الرئيسية</a><a href="#howItWorks">كيف تقرأ النتيجة؟</a><a class="nav-cta" href="#calculator">ابدأ التحليل</a></nav>
+  </div></header>
+  <main>
+    <section class="container depreciation-hero cvp-hero">
+      <div><span class="hero-kicker"><i></i> تحليل التكلفة والحجم والربح · CVP</span>
+        <h1>متى تغطّي تكاليفك؟<br /><em>ومتى يبدأ الربح؟</em></h1>
+        <p>اربط سعر البيع وتكاليفك بحجم المبيعات. احسب نقطة التعادل، ثم اعرف أثر المبيعات المتوقعة وما تحتاجه لتحقيق ربحك المستهدف.</p>
+        <div class="hero-actions"><a class="primary-button" href="#calculator">احسب نقطة التعادل</a><a class="secondary-button" href="#howItWorks">افهم الفكرة</a></div>
+        <p class="cvp-hero-note">منتج واحد · الربح التشغيلي قبل الضريبة</p>
+      </div>
+      <aside class="depreciation-hero-card cvp-preview" aria-label="فكرة نقطة التعادل">
+        <span>عند نقطة التعادل</span><strong>لا ربح <small>ولا خسارة</small></strong>
+        <svg viewBox="0 0 360 170" role="img" aria-label="تتقاطع الإيرادات مع التكاليف عند نقطة التعادل">
+          <path d="M20 145H340 M20 145V15" fill="none" stroke="#7686aa" />
+          <path d="M20 145L330 20" fill="none" stroke="#65dcd0" stroke-width="4" />
+          <path d="M20 105L330 45" fill="none" stroke="#b09aff" stroke-width="4" stroke-dasharray="9 5" />
+          <circle cx="211" cy="68" r="7" fill="#fff" stroke="#65dcd0" stroke-width="3" />
+        </svg>
+        <small>الإيرادات = إجمالي التكاليف</small>
+      </aside>
+    </section>
+    <section id="calculator" class="depreciation-calculator-section cvp-calculator">
+      <div class="container">
+        <div class="section-heading"><span class="section-kicker">من الرقم إلى القرار</span><h2>أدخل بيانات منتجك.</h2><p>استخدم الفترة نفسها لكل القيم. تتم الحسابات داخل متصفحك.</p></div>
+        <form id="cvpForm" class="form-card depreciation-form" novalidate>
+          <div class="form-block"><div class="block-title"><span>1</span><div><h3>السعر والتكاليف</h3><p>التكلفة المتغيرة لكل وحدة، والتكاليف الثابتة لكامل الفترة.</p></div></div>
+            <div class="fields-grid cvp-fields">
+              <label class="field" for="price"><span>سعر بيع الوحدة <b>*</b></span><div class="number-field"><input id="price" name="price" type="text" inputmode="decimal" value="70" required aria-describedby="inputHelp" /><small>ر.س</small></div></label>
+              <label class="field" for="variableCost"><span>التكلفة المتغيرة للوحدة <b>*</b></span><div class="number-field"><input id="variableCost" name="variableCost" type="text" inputmode="decimal" value="42" required aria-describedby="inputHelp" /><small>ر.س</small></div></label>
+              <label class="field" for="fixedCosts"><span>إجمالي التكاليف الثابتة <b>*</b></span><div class="number-field"><input id="fixedCosts" name="fixedCosts" type="text" inputmode="decimal" value="84000" required aria-describedby="inputHelp" /><small>ر.س</small></div></label>
+            </div>
+          </div>
+          <div class="form-block"><div class="block-title"><span>2</span><div><h3>المبيعات والهدف</h3><p>اترك الربح المستهدف فارغًا إذا كنت تريد تحليل التعادل فقط.</p></div></div>
+            <div class="fields-grid cvp-fields cvp-two-fields">
+              <label class="field" for="quantity"><span>كمية المبيعات المتوقعة <b>*</b></span><div class="number-field"><input id="quantity" name="quantity" type="text" inputmode="numeric" value="2500" required /><small>وحدة</small></div></label>
+              <label class="field" for="targetProfit"><span>ربح تشغيلي مستهدف <small>اختياري</small></span><div class="number-field"><input id="targetProfit" name="targetProfit" type="text" inputmode="decimal" placeholder="مثال: 14000" aria-describedby="inputHelp" /><small>ر.س</small></div></label>
+            </div>
+            <p id="inputHelp" class="cvp-help">تُقبل الأرقام العربية والإنجليزية والفواصل مثل 84,000، حتى 6 منازل عشرية. كمية المبيعات عدد وحدات صحيح. العملة: ر.س.</p>
+          </div>
+          <p id="cvpError" class="depreciation-error" role="alert" hidden></p>
+          <div class="form-actions cvp-actions"><button class="primary-button" type="submit">احسب التعادل والربح</button><button class="secondary-button" type="button" id="loadExample">تعبئة المثال الدراسي</button><button class="secondary-button" type="reset">مسح البيانات</button></div>
+          <p id="cvpStatus" class="cvp-help cvp-form-status" role="status">القيم المعبأة مثال دراسي يمكنك تغييره، ثم الضغط على الحساب.</p>
+        </form>
+        <noscript><p class="depreciation-error">فعّل JavaScript لتشغيل الحاسبة والرسم البياني.</p></noscript>
+      </div>
+    </section>
+    <section id="cvpResults" class="container depreciation-results cvp-results" hidden aria-labelledby="resultsTitle">
+      <div class="result-header"><div><span class="section-kicker">قراءة الأرقام</span><h2 id="resultsTitle" tabindex="-1">نتيجة تحليلك.</h2><p>جميع النتائج تخص الربح التشغيلي قبل الضريبة.</p></div><span class="result-status" id="profitStatus"></span></div>
+      <div class="cvp-summary-grid">
+        <article><h3>هامش المساهمة للوحدة</h3><strong id="contributionValue"></strong><p>سعر البيع − التكلفة المتغيرة للوحدة</p></article>
+        <article><h3>نسبة هامش المساهمة</h3><strong id="ratioValue"></strong><p>هامش المساهمة ÷ سعر البيع × 100</p></article>
+        <article class="cvp-highlight"><h3>نقطة التعادل بالوحدات</h3><strong id="breakEvenUnitsValue"></strong><p>التكاليف الثابتة ÷ هامش الوحدة، مقربًا للأعلى</p></article>
+        <article><h3>مبيعات نقطة التعادل بالقيمة</h3><strong id="breakEvenSalesValue"></strong><p>التكاليف الثابتة ÷ نسبة هامش المساهمة</p></article>
+        <article id="profitCard"><h3 id="profitTitle">الربح أو الخسارة التشغيلية</h3><strong id="operatingProfitValue"></strong><p>(هامش الوحدة × المبيعات المتوقعة) − الثابتة</p></article>
+        <article><h3>وحدات الربح المستهدف</h3><strong id="targetUnitsValue"></strong><p id="targetFormula">(التكاليف الثابتة + الربح المستهدف) ÷ هامش الوحدة</p></article>
+      </div>
+      <div class="depreciation-formula-card cvp-reading"><span>ماذا تعني النتيجة؟</span><p id="resultExplanation"></p></div>
+      <section class="depreciation-chart-card cvp-chart-card" aria-labelledby="chartTitle">
+        <div class="depreciation-chart-heading"><div><span>الإيرادات والتكاليف · ر.س</span><h3 id="chartTitle">أين تلتقي الإيرادات والتكاليف؟</h3></div></div>
+        <div class="cvp-legend"><span><i class="revenue-key"></i>الإيرادات</span><span><i class="cost-key"></i>إجمالي التكاليف</span><span><i class="break-even-key"></i>نقطة التعادل</span></div>
+        <div id="cvpChart" class="cvp-chart"></div>
+        <p id="chartDescription" class="cvp-chart-description"></p>
+      </section>
+      <section class="depreciation-panel cvp-income" aria-labelledby="incomeTitle"><div class="panel-heading"><div><span>عند كمية المبيعات المتوقعة</span><h3 id="incomeTitle">كيف وصلنا إلى الربح؟</h3></div><small>ر.س</small></div><dl><div><dt>إجمالي الإيرادات</dt><dd id="revenueValue"></dd></div><div><dt>ناقص: إجمالي التكاليف المتغيرة</dt><dd id="variableTotalValue"></dd></div><div><dt>ناقص: إجمالي التكاليف الثابتة</dt><dd id="fixedTotalValue"></dd></div><div><dt>النتيجة التشغيلية قبل الضريبة</dt><dd id="profitTotalValue"></dd></div></dl></section>
+    </section>
+    <section id="howItWorks" class="container depreciation-methods cvp-methods" aria-labelledby="meaningTitle">
+      <div class="section-heading"><span class="section-kicker">تحليل التكلفة والحجم والربح</span><h2 id="meaningTitle">افهم نقطة التحوّل.</h2><p>كل وحدة مباعة تساهم أولًا في تغطية الثابتة، ثم في تكوين الربح.</p></div>
+      <div class="method-explain-grid"><article><span>01</span><h3>هامش المساهمة</h3><p>ما يبقى من سعر الوحدة بعد تكلفتها المتغيرة. يُستخدم لتغطية التكاليف الثابتة؛ وبعد تغطيتها يصبح ربحًا تشغيليًا.</p><small>ليس هامش صافي الربح</small></article><article><span>02</span><h3>نقطة التعادل</h3><p>المستوى الذي تتساوى عنده الإيرادات وإجمالي التكاليف: لا ربح ولا خسارة. أسفله خسارة وأعلاه ربح، وفق الافتراضات.</p><small>الإيرادات = التكاليف</small></article><article><span>03</span><h3>الربح المستهدف</h3><p>غطِّ التكاليف الثابتة وأضف الربح الذي تريد تحقيقه، ثم اقسم الإجمالي على مساهمة كل وحدة لتعرف حجم المبيعات اللازم.</p><small>وحدات المبيعات تُقرّب للأعلى</small></article></div>
+      <aside class="cvp-assumptions"><h3>افتراضات التحليل</h3><ul><li>التحليل لمنتج أو خدمة واحدة، وجميع المدخلات للفترة نفسها وبالعملة نفسها.</li><li>سعر بيع الوحدة والتكلفة المتغيرة للوحدة وإجمالي التكاليف الثابتة ثابتة ضمن نطاق النشاط المدروس.</li><li>العلاقة بين الحجم والإيرادات والتكاليف خطية، والوحدات المنتجة تُباع دون تغيّر في المخزون.</li><li>النتيجة ربح تشغيلي قبل الضريبة، ولا تشمل التمويل أو البنود غير التشغيلية أو القيمة الزمنية للنقود.</li></ul><p>الرسم يوضح التقاطع النظري. عند وجود جزء من وحدة، تُقرّب الوحدات للأعلى؛ وقد ينشأ ربح بسيط عند بيع هذا العدد الصحيح. قيمة مبيعات التعادل تبقى محسوبة دون تقريب الوحدات.</p><small>مبني على مفاهيم الفصل الثامن: علاقات التكلفة والحجم والربح، ومثال سعر 70 وتكلفة متغيرة 42 وثابتة 84,000.</small></aside>
+    </section>
+  </main>
+  <footer><div class="container footer-content"><div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية تجعل الأرقام أوضح.</p></div></div><div class="footer-links"><a href="/">الرئيسية</a><a href="/services/financial-ratios">حاسبة النسب</a><a href="/services/depreciation">حاسبة الإهلاك</a><a href="mailto:wcoffeebusiness@gmail.com">البريد الإلكتروني</a></div></div></footer>
+  <script type="module" src="/cvp.js"></script>
+</body>
+</html>

@@ -30,6 +30,11 @@
       "source": "/depreciation.html",
       "destination": "/services/depreciation",
       "permanent": true
+    },
+    {
+      "source": "/10v.html",
+      "destination": "/services/break-even-profit",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -52,6 +57,10 @@
     {
       "source": "/services/depreciation",
       "destination": "/depreciation.html"
+    },
+    {
+      "source": "/services/break-even-profit",
+      "destination": "/10v.html"
     }
   ],
   "headers": [

@@ -176,7 +176,7 @@ test("يمنع طلب Yahoo جديدًا لمدة 15 ثانية ويستمر ب�
   assert.equal(elements.importCoverageBadge.textContent, "تم جلب 24 من 24 حقلًا");
   assert.equal(elements.importSourceBadge.textContent, "المصدر: Yahoo Finance");
   assert.equal(elements.importPeriodBadge.textContent, "السنة المالية: 2025");
-  assert.equal(elements.importCurrencyBadge.textContent, "العملة: SAR");
+  assert.equal(elements.importCurrencyBadge.textContent, "العملة: ر.س");
   assert.equal(elements.revenue.required, false);
   assert.equal(elements.costOfSales.required, false);
   assert.equal(storage.get("financialBenchmarkYahooNextFetchAt"), "16000");

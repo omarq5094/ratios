@@ -1,0 +1,36 @@
+/* Uses the platform's existing colors, typography, glass cards and layout. */
+.cvp-skip { position: fixed; top: -100px; right: 16px; z-index: 100; padding: 12px 20px; background: white; border-radius: 10px; }
+.cvp-skip:focus { top: 10px; }
+.cvp-page .cvp-hero { gap: 50px; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
+.cvp-hero h1 { font-size: clamp(40px, 4.4vw, 66px); letter-spacing: -1.5px; }
+.cvp-page .cvp-hero-note { margin-top: 22px; font-size: 12px; color: var(--muted); }
+.cvp-preview { min-width: 0; min-height: 340px; padding: 32px; }
+.cvp-preview > strong { font-size: 40px; letter-spacing: 0; }
+.cvp-preview svg { display: block; width: 100%; margin-block: 20px 10px; }
+.cvp-calculator, .cvp-results, #howItWorks { scroll-margin-top: 100px; }
+.cvp-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cvp-two-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cvp-fields input { min-width: 0; direction: ltr; text-align: right; }
+.cvp-help { color: var(--muted); font-size: 12px; line-height: 1.9; margin-bottom: 0; }
+.cvp-form-status { margin: 0; padding: 0 34px 25px; }
+.cvp-actions { flex-wrap: wrap; gap: 12px; }
+.cvp-actions button { min-height: 48px; }
+.cvp-fields input[aria-invalid="true"] { outline: 2px solid var(--red); outline-offset: -2px; }
+.cvp-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 30px; }
+.cvp-summary-grid article { padding: 25px; border: 1px solid rgba(255,255,255,.88); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: var(--glass-shadow); min-width: 0; }
+.cvp-summary-grid h3 { margin: 0 0 14px; color: var(--muted); font-size: 14px; font-weight: 600; }
+.cvp-summary-grid strong { display: block; font-size: clamp(25px, 2.6vw, 36px); line-height: 1.5; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.cvp-summary-grid p { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+.cvp-summary-grid .cvp-highlight { border-color: rgba(117,88,232,.3); background: linear-gradient(135deg,rgba(117,88,232,.09),rgba(17,170,156,.08)); }
+.cvp-summary-grid .is-loss strong { color: var(--red); }.cvp-summary-grid .is-profit strong { color: var(--green); }
+.cvp-page .result-status.is-loss { background: rgba(200,61,88,.07); color: var(--red); border-color: rgba(200,61,88,.15); }
+.cvp-reading { align-items: flex-start; }.cvp-reading span { flex-shrink: 0; }.cvp-reading p { margin: 0; font-size: 15px; color: #3f4c64; line-height: 1.95; }
+.cvp-legend { display: flex; flex-wrap: wrap; gap: 22px; margin-block: 22px 8px; font-size: 13px; }.cvp-legend span { display: inline-flex; align-items: center; gap: 8px; }.cvp-legend i { width: 25px; border-top: 3px solid #65dcd0; }.cvp-legend .cost-key { border-color: #bba5ff; border-top-style: dashed; }.cvp-legend .break-even-key { width: 9px; height: 9px; border: 2px solid #fff; border-radius: 50%; }
+.cvp-chart-card { overflow: visible; }.cvp-chart { direction: ltr; width: 100%; }.cvp-chart svg { display: block; width: 100%; height: auto; overflow: visible; }.cvp-chart text { fill: #e0e6f5; font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-size: 13px; }
+.cvp-chart-description { font-size: 12px; line-height: 1.9; color: #d4ddef; margin: 10px 0 0; }
+.cvp-income dl { margin-bottom: 0; }.cvp-income dl > div { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--line-soft); font-size: 15px; }.cvp-income dd { margin: 0; direction: ltr; font-weight: 700; overflow-wrap: anywhere; }.cvp-income dt { min-width: 0; }.cvp-income dl > div:last-child { font-weight: 800; color: var(--accent-strong); }
+.cvp-assumptions { padding: 30px; border: 1px solid var(--line); border-radius: 20px; background: rgba(255,255,255,.55); margin-top: 24px; }.cvp-assumptions h3 { margin-top: 0; }.cvp-assumptions ul { padding-inline-start: 22px; }.cvp-assumptions li { color: #526078; font-size: 15px; margin-block: 10px; }.cvp-assumptions p { color: #526078; font-size: 14px; }.cvp-assumptions small { color: var(--muted); }
+.cvp-page :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 1000px) { .cvp-page .cvp-hero { grid-template-columns: 1fr; }.cvp-preview { width: min(100%, 540px); margin-inline: auto; }.cvp-summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }.cvp-fields { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .cvp-page .navbar nav a:not(.nav-cta) { display: none; }.cvp-hero h1 { font-size: 40px; }.cvp-hero { padding-top: 52px; }.cvp-actions { flex-direction: column; padding-inline: 18px; }.cvp-actions button { width: 100%; }.cvp-form-status { padding-inline: 18px; }.cvp-summary-grid { grid-template-columns: 1fr; }.cvp-summary-grid article { padding: 22px; }.cvp-reading { flex-direction: column; gap: 8px; }.cvp-chart-card { padding: 24px 14px; overflow: hidden; }.cvp-legend { gap: 12px; font-size: 11px; }.cvp-chart text { font-size: 13px; }.cvp-income dl > div { font-size: 13px; }.cvp-assumptions { padding: 22px; }.cvp-preview > strong { font-size: 36px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

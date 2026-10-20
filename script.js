@@ -1,3 +1,8 @@
+function drawCanvasText(context, ...args) {
+  if (window.SaudiRiyal) window.SaudiRiyal.drawText(context, ...args);
+  else context.fillText(...args);
+}
+
 const advancedRatioApi = window.AdvancedFinancialRatios;
 const bankRatioApi = window.BankFinancialRatios;
 
@@ -588,7 +593,7 @@ function applyImportedData(data) {
   document.querySelector("#importCompanyMeta").textContent = `الرمز: ${marketInfo.displaySymbol || "غير محدد"} · السوق: ${marketInfo.label} · النوع: ${typeLabel}`;
   document.querySelector("#importSourceBadge").textContent = `المصدر: ${data.source?.provider || "غير محدد"}`;
   document.querySelector("#importPeriodBadge").textContent = `السنة المالية: ${data.period || "غير محددة"}`;
-  document.querySelector("#importCurrencyBadge").textContent = `العملة: ${data.currency || "غير محددة"}`;
+  document.querySelector("#importCurrencyBadge").textContent = `العملة: ${data.currency === "SAR" ? "ر.س" : data.currency || "غير محددة"}`;
   document.querySelector("#importCoverageBadge").textContent = `تم جلب ${availableFieldCount} من ${applicableKeys.length} حقلًا`;
   document.querySelector("#importSourceLink").href = data.source?.url || "#";
 
@@ -1082,18 +1087,19 @@ function drawMetricCard(context, metric, x, y, width) {
   context.textAlign = "right";
   context.fillStyle = "rgba(255,255,255,.65)";
   context.font = '600 25px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText(metric.label, x + width - 24, y + 58);
+  drawCanvasText(context, metric.label, x + width - 24, y + 58);
   context.fillStyle = "#ffffff";
   context.font = '800 39px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText(formatRatio(metric.value, metric.type), x + width - 24, y + 126);
+  drawCanvasText(context, formatRatio(metric.value, metric.type), x + width - 24, y + 126);
   context.fillStyle = "#5de0d0";
   context.font = '700 20px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("من النتائج الحالية", x + width - 24, y + 172);
+  drawCanvasText(context, "من النتائج الحالية", x + width - 24, y + 172);
 }
 
 async function createAnalysisImageBlob() {
   if (!latestShareState) throw new Error("احسب نتائج الشركة أولًا قبل إنشاء الصورة.");
   if (document.fonts?.ready) await document.fonts.ready;
+  await window.SaudiRiyal?.ready;
 
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
@@ -1133,13 +1139,13 @@ async function createAnalysisImageBlob() {
   context.textAlign = "center";
   context.fillStyle = "#ffffff";
   context.font = '900 39px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("م", 937, 157);
+  drawCanvasText(context, "م", 937, 157);
   context.textAlign = "right";
   context.font = '800 30px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("محلل النسب المالية", 878, 137);
+  drawCanvasText(context, "محلل النسب المالية", 878, 137);
   context.fillStyle = "rgba(255,255,255,.54)";
   context.font = '600 18px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("تحليل مالي مبسّط وقابل للمشاركة", 878, 169);
+  drawCanvasText(context, "تحليل مالي مبسّط وقابل للمشاركة", 878, 169);
 
   fillRoundedRect(context, 742, 220, 232, 57, 28, "rgba(255,255,255,.09)");
   context.fillStyle = "#d0c8ff";
@@ -1147,21 +1153,21 @@ async function createAnalysisImageBlob() {
   const shareBadge = latestShareState.symbol
     ? `${latestShareState.marketLabel}: ${latestShareState.symbol}`
     : latestShareState.typeLabel;
-  context.fillText(shareBadge, 946, 257);
+  drawCanvasText(context, shareBadge, 946, 257);
 
   const titleSize = fitCanvasText(context, latestShareState.companyName, 870, 58, 34);
   context.fillStyle = "#ffffff";
   context.font = `800 ${titleSize}px "Segoe UI", Tahoma, Arial, sans-serif`;
-  context.fillText(latestShareState.companyName, 974, 357);
+  drawCanvasText(context, latestShareState.companyName, 974, 357);
   context.fillStyle = "rgba(255,255,255,.62)";
   context.font = '600 24px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText(`نتائج السنة المالية ${latestShareState.period} · المصدر: ${latestShareState.source}`, 974, 407);
+  drawCanvasText(context, `نتائج السنة المالية ${latestShareState.period} · المصدر: ${latestShareState.source}`, 974, 407);
 
   context.fillStyle = "rgba(255,255,255,.13)";
   context.fillRect(106, 461, 868, 2);
   context.fillStyle = "#65e2d3";
   context.font = '800 25px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("أبرز المؤشرات", 974, 516);
+  drawCanvasText(context, "أبرز المؤشرات", 974, 516);
 
   const metrics = latestShareState.metrics;
   const cardWidth = metrics.length === 1 ? 868 : metrics.length === 2 ? 422 : 274;
@@ -1174,31 +1180,31 @@ async function createAnalysisImageBlob() {
   fillRoundedRect(context, 106, 810, 868, 145, 28, "rgba(255,255,255,.075)");
   context.fillStyle = "rgba(255,255,255,.58)";
   context.font = '700 23px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("سجل التوزيعات", 936, 859);
+  drawCanvasText(context, "سجل التوزيعات", 936, 859);
   context.fillStyle = "#ffffff";
   context.font = '800 35px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText(latestShareState.dividendSummary, 936, 914);
+  drawCanvasText(context, latestShareState.dividendSummary, 936, 914);
 
   fillRoundedRect(context, 106, 995, 868, 108, 25, "rgba(87,221,207,.1)");
   context.fillStyle = "#72e6d9";
   context.font = '800 25px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("اقرأ النسب في سياقها، وليس كأرقام منفردة.", 936, 1058);
+  drawCanvasText(context, "اقرأ النسب في سياقها، وليس كأرقام منفردة.", 936, 1058);
 
   context.fillStyle = "rgba(255,255,255,.5)";
   context.font = '600 20px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("هذه النتائج تعليمية وتحليلية وليست توصية استثمارية.", 974, 1162);
+  drawCanvasText(context, "هذه النتائج تعليمية وتحليلية وليست توصية استثمارية.", 974, 1162);
   context.fillStyle = "rgba(255,255,255,.15)";
   context.fillRect(106, 1197, 868, 2);
   context.direction = "ltr";
   context.textAlign = "left";
   context.fillStyle = "#ffffff";
   context.font = '800 27px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("https://ratios-ashy.vercel.app/", 106, 1250);
+  drawCanvasText(context, "https://ratios-ashy.vercel.app/", 106, 1250);
   context.textAlign = "right";
   context.fillStyle = "rgba(255,255,255,.46)";
   context.font = '600 19px "Segoe UI", Tahoma, Arial, sans-serif';
   const today = new Intl.DateTimeFormat("ar-SA", { dateStyle: "long" }).format(new Date());
-  context.fillText(today, 974, 1248);
+  drawCanvasText(context, today, 974, 1248);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
@@ -1443,6 +1449,7 @@ form.addEventListener("submit", (event) => {
     showMessage("راجع إجمالي الديون؛ القيمة تبدو مرتفعة جدًا مقارنةً بالأصول.", "warning");
   }
 
+
   const ratios = calculate(values);
   renderResults(values, ratios);
   showMessage("تم الحساب محليًا داخل جهازك، ولم تُحفظ بياناتك المالية.", "success");
@@ -1474,6 +1481,7 @@ applyMissingFieldsButton.addEventListener("click", () => {
     showMessage("أدخل قيمة واحدة على الأقل من البيانات الناقصة.", "warning");
     return;
   }
+
 
   const values = collectValues();
   const ratios = calculate(values);

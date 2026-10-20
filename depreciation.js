@@ -1,3 +1,8 @@
+function drawCanvasText(context, ...args) {
+  if (window.SaudiRiyal) window.SaudiRiyal.drawText(context, ...args);
+  else context.fillText(...args);
+}
+
 import { calculateDepreciation } from "./lib/depreciation-calculator.js";
 
 const METHOD_LABELS = {
@@ -165,7 +170,7 @@ function renderDepreciationChart(schedule) {
     const bar = document.createElement("i");
     const height = Math.max(6, (metricValue / maximumValue) * 100);
     bar.style.setProperty("--bar-height", `${height}%`);
-    bar.title = `${row.label}: ${formatMoney(metricValue)} ريال`;
+    bar.title = `${row.label}: ${formatMoney(metricValue)} ر.س`;
     track.append(bar);
     const label = document.createElement("small");
     label.textContent = row.label;
@@ -221,13 +226,13 @@ function buildChartCanvas() {
   context.textAlign = "right";
   context.fillStyle = "rgba(255,255,255,.56)";
   context.font = '600 20px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("منصة الأدوات المحاسبية", 1120, 62);
+  drawCanvasText(context, "منصة الأدوات المحاسبية", 1120, 62);
   context.fillStyle = "#ffffff";
   context.font = '800 43px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText(metric.title, 1120, 125);
+  drawCanvasText(context, metric.title, 1120, 125);
   context.fillStyle = "rgba(255,255,255,.62)";
   context.font = '600 20px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText(`${asset.assetName} · ${METHOD_LABELS[latestCalculation.input.method]}`, 1120, 165);
+  drawCanvasText(context, `${asset.assetName} · ${METHOD_LABELS[latestCalculation.input.method]}`, 1120, 165);
 
   const chartLeft = 85;
   const chartRight = 1115;
@@ -259,21 +264,21 @@ function buildChartCanvas() {
     context.textAlign = "center";
     context.fillStyle = "rgba(255,255,255,.78)";
     context.font = '700 17px "Segoe UI", Tahoma, Arial, sans-serif';
-    context.fillText(formatMoney(metricValue), x + barWidth / 2, Math.max(chartTop - 15, y - 15));
+    drawCanvasText(context, formatMoney(metricValue), x + barWidth / 2, Math.max(chartTop - 15, y - 15));
     context.fillStyle = "rgba(255,255,255,.58)";
     context.font = '600 16px "Segoe UI", Tahoma, Arial, sans-serif';
-    context.fillText(row.label, x + barWidth / 2, 687);
+    drawCanvasText(context, row.label, x + barWidth / 2, 687);
   });
 
   context.textAlign = "right";
   context.fillStyle = "rgba(255,255,255,.46)";
   context.font = '600 16px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("القيم بالريال السعودي · النتائج تعليمية ومحاسبية", 1120, 755);
+  drawCanvasText(context, "القيم بوحدة ر.س · النتائج تعليمية ومحاسبية", 1120, 755);
   context.direction = "ltr";
   context.textAlign = "left";
   context.fillStyle = "#ffffff";
   context.font = '700 16px "Segoe UI", Tahoma, Arial, sans-serif';
-  context.fillText("ratios-ashy.vercel.app/services/depreciation", 80, 755);
+  drawCanvasText(context, "ratios-ashy.vercel.app/services/depreciation", 80, 755);
   return canvas;
 }
 
@@ -289,6 +294,7 @@ function chartFileName() {
 }
 
 async function createChartImage() {
+  await window.SaudiRiyal?.ready;
   return canvasBlob(buildChartCanvas());
 }
 
@@ -384,17 +390,17 @@ function renderResult(calculation) {
   const firstRow = calculation.schedule[0];
   const methodLabel = METHOD_LABELS[calculation.input.method];
   setText("resultMethod", methodLabel);
-  setText("depreciableAmount", `${formatMoney(calculation.depreciableAmount)} ريال`);
-  setText("firstPeriodDepreciation", `${formatMoney(firstRow.depreciation)} ريال`);
-  setText("closingBookValue", `${formatMoney(firstRow.closingBookValue)} ريال`);
+  setText("depreciableAmount", `${formatMoney(calculation.depreciableAmount)} ر.س`);
+  setText("firstPeriodDepreciation", `${formatMoney(firstRow.depreciation)} ر.س`);
+  setText("closingBookValue", `${formatMoney(firstRow.closingBookValue)} ر.س`);
   setText("calculationFormula", calculation.formula);
   setText("calculationSummary", calculation.summary);
 
   const secondaryLabel = calculation.input.method === "straight_line"
-    ? `الإهلاك الشهري: ${formatMoney(calculation.monthlyDepreciation)} ريال`
+    ? `الإهلاك الشهري: ${formatMoney(calculation.monthlyDepreciation)} ر.س`
     : calculation.input.method === "double_declining"
       ? `معدل الإهلاك: ${formatMoney(calculation.decliningRate * 100)}%`
-      : `إهلاك الوحدة: ${formatMoney(calculation.depreciationPerUnit)} ريال`;
+      : `إهلاك الوحدة: ${formatMoney(calculation.depreciationPerUnit)} ر.س`;
   setText("secondaryResult", secondaryLabel);
   renderSchedule(calculation.schedule);
   renderDepreciationChart(calculation.schedule);
