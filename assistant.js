@@ -180,7 +180,7 @@
       quickPrompts.hidden = false;
       screenContext.hidden = !valid;
       screenContextLabel.textContent = valid
-        ? context.status === "ready" ? `عمليات المخزون مرفقة: ${context.operations.length} عملية — ${context.result.methodLabel}` : "لا توجد عمليات مخزون بعد؛ أضف عمليات للحصول على تحليل رقمي."
+        ? context.status === "ready" ? `${context.teachingExample ? "مثال تعليمي مرفق" : "عمليات المخزون مرفقة"}: ${context.operations.length} عملية — ${context.result.methodLabel}` : "لا توجد عمليات مخزون بعد؛ أضف عمليات للحصول على تحليل رقمي."
         : "";
       privacyNoteText.textContent = valid && context.status === "ready"
         ? "عند الإرسال، تُرسل رسالتك وعمليات المخزون ونتائج التكلفة الحالية إلى خدمة الذكاء الاصطناعي."
