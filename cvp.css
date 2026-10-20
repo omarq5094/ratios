@@ -34,3 +34,15 @@
 @media (max-width: 1000px) { .cvp-page .cvp-hero { grid-template-columns: 1fr; }.cvp-preview { width: min(100%, 540px); margin-inline: auto; }.cvp-summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }.cvp-fields { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .cvp-page .navbar nav a:not(.nav-cta) { display: none; }.cvp-hero h1 { font-size: 40px; }.cvp-hero { padding-top: 52px; }.cvp-actions { flex-direction: column; padding-inline: 18px; }.cvp-actions button { width: 100%; }.cvp-form-status { padding-inline: 18px; }.cvp-summary-grid { grid-template-columns: 1fr; }.cvp-summary-grid article { padding: 22px; }.cvp-reading { flex-direction: column; gap: 8px; }.cvp-chart-card { padding: 24px 14px; overflow: hidden; }.cvp-legend { gap: 12px; font-size: 11px; }.cvp-chart text { font-size: 13px; }.cvp-income dl > div { font-size: 13px; }.cvp-assumptions { padding: 22px; }.cvp-preview > strong { font-size: 36px; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.cvp-chart-hit { cursor: crosshair; touch-action: pan-y; }
+.cvp-chart-controls { margin-top: 16px; }
+.cvp-chart-controls label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; color: #e0e6f5; font-size: 13px; }
+.cvp-chart-controls input { display: block; width: 100%; min-height: 36px; direction: ltr; accent-color: #65dcd0; cursor: pointer; }
+.cvp-chart-shortcuts { display: flex; flex-wrap: wrap; gap: 10px; margin-block: 8px 16px; }
+.cvp-chart-shortcuts button { padding: 10px 14px; min-height: 44px; color: #fff; background: #ffffff12; border: 1px solid #ffffff38; border-radius: 12px; font: inherit; font-size: 12px; cursor: pointer; }
+.cvp-chart-shortcuts button:hover { background: #ffffff25; }
+.cvp-chart-readout { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; padding: 18px; border: 1px solid #ffffff25; border-radius: 16px; background: #ffffff0d; color: #fff; }
+.cvp-chart-readout span { display: block; color: #d4ddef; font-size: 12px; margin-bottom: 9px; }
+.cvp-chart-readout strong { display: block; font-size: 17px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.cvp-chart-readout #inspectProfit { color: #65dcd0; }.cvp-chart-readout.is-loss #inspectProfit { color: #ffadb8; }
+@media (max-width: 600px) { .cvp-chart-readout { grid-template-columns: repeat(2, minmax(0,1fr)); padding: 14px; }.cvp-chart-readout strong { font-size: 15px; } }

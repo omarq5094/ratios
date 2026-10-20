@@ -5,14 +5,16 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 
 test("واجهة المساعد محملة في صفحات الموقع الأساسية", async () => {
-  const [indexHtml, ratiosHtml, guideHtml] = await Promise.all([
+  const [indexHtml, ratiosHtml, guideHtml, cvpHtml] = await Promise.all([
     readFile(new URL("index.html", root), "utf8"),
     readFile(new URL("financial-ratios.html", root), "utf8"),
     readFile(new URL("financial-ratios-guide.html", root), "utf8"),
+    readFile(new URL("10v.html", root), "utf8"),
   ]);
   assert.match(indexHtml, /<script src="\/assistant\.js"><\/script>/);
   assert.match(ratiosHtml, /<script src="\/assistant\.js"><\/script>/);
   assert.match(guideHtml, /<script src="\/assistant\.js"><\/script>/);
+  assert.match(cvpHtml, /<script src="\/assistant\.js"><\/script>/);
 });
 
 test("واجهة المساعد تتضمن عناصر الوصول والخصوصية", async () => {

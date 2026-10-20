@@ -86,6 +86,8 @@
     ? "home"
     : document.body.classList.contains("depreciation-page")
       ? "depreciation"
+    : document.body.classList.contains("cvp-page")
+      ? "cvp"
     : document.body.classList.contains("financial-ratios-guide-page")
       ? "guide"
     : document.body.classList.contains("financial-ratios-page")
@@ -95,6 +97,8 @@
     ? ["ما خدمات المنصة؟", "ما فائدة المحاسبة؟", "كيف أبدأ؟"]
     : page === "depreciation"
       ? ["اشرح طرق الإهلاك", "كيف يُسجل قيد الإهلاك؟", "ما القيمة الدفترية؟"]
+    : page === "cvp"
+      ? ["كيف أستخدم تحليل التعادل؟", "ما هامش المساهمة؟", "كيف أستكشف الرسم؟"]
     : page === "calculator"
       ? ["كيف أستخدم الحاسبة؟", "أين أجد دليل النسب؟", "ما الفرق بين نسب الشركات والبنوك؟"]
       : page === "guide"
@@ -104,6 +108,8 @@
     ? "مرحبًا، أنا المحلل الذكي. أشرح لك المنصة والمحاسبة، وأساعدك في اختيار الخدمة المناسبة."
     : page === "depreciation"
       ? "مرحبًا، أنا المحلل الذكي. أساعدك في حساب الإهلاك وفهم الجدول والقيود اليومية والفرق بين الطرق."
+    : page === "cvp"
+      ? "مرحبًا، أنا المحلل الذكي. أشرح لك نقطة التعادل والربح التشغيلي والرسم التفاعلي، وأحلل مدخلاتك ونتائجك الحالية عند إرسال سؤالك."
     : page === "guide"
       ? "مرحبًا، أنا المحلل الذكي. أساعدك في فهم معادلات النسب واختيار المؤشرات المناسبة لنوع المنشأة."
       : "مرحبًا، أنا المحلل الذكي. أساعدك في استخدام الحاسبة وفهم النسب والنتائج الحالية.";
@@ -143,6 +149,8 @@
     quickPrompts.replaceChildren();
     const promptLabels = state.analysisContext?.contextType === "depreciation"
       ? ["اشرح النتيجة الحالية", "لماذا اختلف الإهلاك؟", "اشرح القيد اليومي"]
+      : state.analysisContext?.contextType === "cvp"
+        ? ["اشرح بيانات التعادل الحالية", "كيف أحقق الربح المستهدف؟", "كيف يؤثر تغيير السعر والتكلفة؟"]
       : state.analysisContext
         ? ["حلل النتائج الحالية", "ما أبرز نقاط القوة؟", "ما المخاطر الظاهرة؟"]
       : basePromptLabels;
@@ -156,6 +164,19 @@
   }
 
   function setAnalysisContext(context) {
+    if (context?.contextType === "cvp") {
+      state.analysisContext = context.inputs && context.result ? context : null;
+      quickPrompts.hidden = false;
+      screenContext.hidden = !state.analysisContext;
+      screenContextLabel.textContent = state.analysisContext
+        ? `${context.resultsVisible ? "نتائج" : "مدخلات"} التعادل الحالية مرفقة — ${context.inputs.quantity.toLocaleString("en-US")} وحدة`
+        : "";
+      privacyNoteText.textContent = state.analysisContext
+        ? "عند الإرسال، تُرسل رسالتك ومدخلات التعادل ونتائجها الحالية إلى خدمة الذكاء الاصطناعي."
+        : "تُرسل رسائل المحادثة فقط إلى خدمة الذكاء الاصطناعي.";
+      renderQuickPrompts();
+      return;
+    }
     if (context?.contextType === "depreciation") {
       const validContext = context.asset && context.result && Array.isArray(context.schedule) && context.schedule.length > 0;
       state.analysisContext = validContext ? context : null;

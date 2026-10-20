@@ -78,6 +78,15 @@
         <div class="depreciation-chart-heading"><div><span>الإيرادات والتكاليف · ر.س</span><h3 id="chartTitle">أين تلتقي الإيرادات والتكاليف؟</h3></div></div>
         <div class="cvp-legend"><span><i class="revenue-key"></i>الإيرادات</span><span><i class="cost-key"></i>إجمالي التكاليف</span><span><i class="break-even-key"></i>نقطة التعادل</span></div>
         <div id="cvpChart" class="cvp-chart"></div>
+        <div class="cvp-chart-controls">
+          <label for="chartQuantity">استكشف كمية المبيعات <output id="chartQuantityLabel" for="chartQuantity"></output></label>
+          <input id="chartQuantity" type="range" min="0" max="1000" step="1" value="0" aria-describedby="chartInteractionHelp" />
+          <div class="cvp-chart-shortcuts"><button id="inspectBreakEven" type="button">عرض نقطة التعادل</button><button id="inspectExpected" type="button">عرض المبيعات المتوقعة</button></div>
+        </div>
+        <div id="chartReadout" class="cvp-chart-readout" aria-label="قيم نقطة الاستكشاف">
+          <div><span>كمية الاستكشاف</span><strong id="inspectQuantity"></strong></div><div><span>الإيرادات</span><strong id="inspectRevenue"></strong></div><div><span>إجمالي التكاليف</span><strong id="inspectCosts"></strong></div><div><span id="inspectProfitLabel">النتيجة التشغيلية</span><strong id="inspectProfit"></strong></div>
+        </div>
+        <p id="chartInteractionHelp" class="cvp-chart-description">حرّك الماوس أو المس الرسم لاستكشاف القيم، أو استخدم شريط الكمية بمفاتيح الأسهم. الاستكشاف لا يغيّر مدخلاتك. بعد أول حساب، تتحدث النتائج والرسم تلقائيًا مع الأرقام الصالحة.</p>
         <p id="chartDescription" class="cvp-chart-description"></p>
       </section>
       <section class="depreciation-panel cvp-income" aria-labelledby="incomeTitle"><div class="panel-heading"><div><span>عند كمية المبيعات المتوقعة</span><h3 id="incomeTitle">كيف وصلنا إلى الربح؟</h3></div><small>ر.س</small></div><dl><div><dt>إجمالي الإيرادات</dt><dd id="revenueValue"></dd></div><div><dt>ناقص: إجمالي التكاليف المتغيرة</dt><dd id="variableTotalValue"></dd></div><div><dt>ناقص: إجمالي التكاليف الثابتة</dt><dd id="fixedTotalValue"></dd></div><div><dt>النتيجة التشغيلية قبل الضريبة</dt><dd id="profitTotalValue"></dd></div></dl></section>
@@ -89,6 +98,7 @@
     </section>
   </main>
   <footer><div class="container footer-content"><div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية تجعل الأرقام أوضح.</p></div></div><div class="footer-links"><a href="/">الرئيسية</a><a href="/services/financial-ratios">حاسبة النسب</a><a href="/services/depreciation">حاسبة الإهلاك</a><a href="mailto:wcoffeebusiness@gmail.com">البريد الإلكتروني</a></div></div></footer>
+  <script src="/assistant.js"></script>
   <script type="module" src="/cvp.js"></script>
 </body>
 </html>

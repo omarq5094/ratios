@@ -188,6 +188,35 @@ test("ينظف سجل المحادثة ويستبعد الأدوار غير ال
   ]);
 });
 
+test("يرسل سياق CVP المحسوب وتعليمات الصفحة إلى المساعد", async () => {
+  const previousKey = process.env.OPENAI_API_KEY, previousFetch = global.fetch;
+  process.env.OPENAI_API_KEY = "test-key";
+  let sent;
+  global.fetch = async (url, options) => {
+    sent = JSON.parse(options.body);
+    return { ok: true, json: async () => ({ output: [{ content: [{ type: "output_text", text: "نقطة التعادل 3000 وحدة والخسارة 14000 ريال." }] }] }) };
+  };
+  try {
+    const response = mockResponse();
+    await handler(mockRequest({ body: {
+      message: "اشرح بياناتي", page: "cvp", history: [], analysisContext: {
+        contextType: "cvp", resultsVisible: true,
+        inputs: { price: 70, variableCost: 42, fixedCosts: 84000, quantity: 2500, targetProfit: 14000 },
+        result: { operatingProfit: 999999 },
+      },
+    } }), response);
+    assert.equal(response.statusCode, 200); assert.equal(response.body.contextAccepted, true);
+    const data = JSON.parse(sent.input.at(-1).content).currentScreenData;
+    assert.equal(data.contextType, "cvp"); assert.equal(data.result.operatingProfit, -14000);
+    assert.equal(data.result.targetUnits, 3500); assert.equal(data.resultsVisible, true);
+    assert.match(sent.instructions, /صفحة تحليل نقطة التعادل والربح/);
+    assert.match(sent.instructions, /الأولوية على أي أرقام قديمة/);
+  } finally {
+    global.fetch = previousFetch;
+    if (previousKey) process.env.OPENAI_API_KEY = previousKey; else delete process.env.OPENAI_API_KEY;
+  }
+});
+
 test("ينظف سياق الإهلاك ويحتفظ بالجدول والقيد المعتمدين", () => {
   const context = assistantInternals.normalizeAnalysisContext({
     contextType: "depreciation",
