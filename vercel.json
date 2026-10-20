@@ -36,6 +36,11 @@
       "source": "/10v.html",
       "destination": "/services/break-even-profit",
       "permanent": true
+    },
+    {
+      "source": "/11v.html",
+      "destination": "/services/inventory-cost",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -62,6 +67,10 @@
     {
       "source": "/services/break-even-profit",
       "destination": "/10v.html"
+    },
+    {
+      "source": "/services/inventory-cost",
+      "destination": "/11v.html"
     }
   ],
   "headers": [

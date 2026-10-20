@@ -301,6 +301,7 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
 .quick-services-label { min-width: 175px; padding-inline: 5px 22px; border-left: 1px solid var(--line-soft); }.quick-services-label span { color: var(--accent-strong); font-size: 10px; font-weight: 800; }.quick-services-label h2 { margin: 2px 0 0; font-size: 18px; }
 .quick-services-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .quick-services-list > a:nth-child(3) { grid-column: 1 / -1; }
+.quick-services-list > a:nth-child(4) { grid-column: 1 / -1; }
 .cvp-feature-card { margin-top: 24px; }
 .quick-service-item { min-width: 0; padding: 12px 14px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; border: 1px solid var(--line-soft); border-radius: 15px; background: rgba(255,255,255,.58); text-decoration: none; transition: transform .2s ease, border-color .2s ease, background .2s ease; }
 .quick-service-item.is-available:hover { transform: translateY(-2px); border-color: rgba(117,88,232,.25); background: #fff; }.quick-service-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; background: linear-gradient(145deg, var(--accent), #43b7ae); color: #fff; font-size: 20px; font-weight: 900; }.quick-service-item > span:nth-child(2) { min-width: 0; display: grid; }.quick-service-item b { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }.quick-service-item small { color: var(--muted); font-size: 9px; }.quick-service-item i { padding: 5px 8px; border-radius: 99px; background: rgba(22,143,102,.08); color: var(--green); font-size: 9px; font-style: normal; font-weight: 800; white-space: nowrap; }.quick-service-item.is-upcoming { opacity: .66; }.quick-service-item.is-upcoming .quick-service-icon { background: linear-gradient(145deg, #9aa4b7, #7b879d); }.quick-service-item.is-upcoming i { background: rgba(101,114,138,.08); color: var(--muted); }
@@ -861,3 +862,14 @@ footer { padding-block: 42px; border-top: 1px solid var(--line-soft); background
   .accounting-definition { width: min(100% - 24px, 1220px); padding: 31px 20px; border-radius: 22px; }.accounting-definition-copy h2 { font-size: 32px; }.platform-services-section { padding-block: 68px; }.platform-section-heading h2 { font-size: 32px; }.featured-service-card { padding: 18px; gap: 25px; border-radius: 22px; }.service-visual { min-height: 285px; padding: 25px; }.service-content ul { grid-template-columns: 1fr; }.service-content .primary-button { width: 100%; }.future-services-note { align-items: flex-start; }
   .platform-ai-section { margin-block: 68px; padding: 28px 20px; }.platform-ai-section h2 { font-size: 27px; }.ratio-guide-service { padding-block: 70px; }.guide-mode-switch { flex-direction: column; }.guide-mode-switch button { width: 100%; }.guide-service-groups { gap: 48px; }.guide-service-note { margin-top: 52px; }
 }
+
+/* Shared tools menu: preserves the existing navigation order on every page. */
+.navbar nav { flex-wrap: wrap; }
+.site-services-menu { position: relative; color: var(--accent-strong); font-size: 14px; }
+.site-services-menu > summary { cursor: pointer; padding: 10px; border-radius: 10px; }
+.site-services-menu[open] > summary { background: rgba(117,88,232,.09); }
+.site-services-links { position: absolute; inset-inline-end: 0; top: calc(100% + 10px); width: 295px; max-width: calc(100vw - 24px); padding: 10px; border: 1px solid var(--line); border-radius: 16px; background: #fafaff; box-shadow: var(--glass-shadow); z-index: 120; }
+.navbar .nav-content nav .site-services-menu a.site-service-link { display: block; padding: 12px; line-height: 1.7; white-space: normal; border-radius: 8px; }
+.navbar .nav-content nav .site-services-menu a.site-service-link:hover { background: rgba(117,88,232,.07); }
+@media (max-width: 900px) { .navbar .nav-content { flex-wrap: wrap; gap: 12px; padding-block: 10px; }.navbar nav { gap: 12px; } }
+@media (max-width: 600px) { .site-services-menu { font-size: 12px; }.site-services-links { position: fixed; inset-inline: 12px; top: 78px; width: auto; max-width: none; }.navbar .nav-content nav .site-services-menu a.site-service-link { font-size: 14px; } }

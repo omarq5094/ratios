@@ -84,6 +84,8 @@
 
   const page = document.body.classList.contains("home-page")
     ? "home"
+    : document.body.classList.contains("inventory-page")
+      ? "inventory"
     : document.body.classList.contains("depreciation-page")
       ? "depreciation"
     : document.body.classList.contains("cvp-page")
@@ -95,6 +97,8 @@
       : "site";
   const basePromptLabels = page === "home"
     ? ["ما خدمات المنصة؟", "ما فائدة المحاسبة؟", "كيف أبدأ؟"]
+    : page === "inventory"
+      ? ["كيف أدخل عمليات المخزون؟", "ما الفرق بين طرق التكلفة؟", "لماذا LIFO للتعليم فقط؟"]
     : page === "depreciation"
       ? ["اشرح طرق الإهلاك", "كيف يُسجل قيد الإهلاك؟", "ما القيمة الدفترية؟"]
     : page === "cvp"
@@ -106,6 +110,8 @@
       : ["ما الذي تقدمه المنصة؟", "كيف أصل إلى حاسبة النسب؟", "كيف يساعدني المحلل؟"];
   const welcomeMessage = page === "home"
     ? "مرحبًا، أنا المحلل الذكي. أشرح لك المنصة والمحاسبة، وأساعدك في اختيار الخدمة المناسبة."
+    : page === "inventory"
+      ? "مرحبًا، أنا المحلل الذكي. أشرح تكلفة البضاعة المباعة والمخزون المتبقي، وأقارن الطرق من عملياتك المحفوظة فعلًا عند إرسال سؤالك. أدخل عمليات أولًا للحصول على تحليل رقمي؛ وLIFO للتعليم فقط ولا يُسمح به في تقارير IFRS."
     : page === "depreciation"
       ? "مرحبًا، أنا المحلل الذكي. أساعدك في حساب الإهلاك وفهم الجدول والقيود اليومية والفرق بين الطرق."
     : page === "cvp"
@@ -149,6 +155,10 @@
     quickPrompts.replaceChildren();
     const promptLabels = state.analysisContext?.contextType === "depreciation"
       ? ["اشرح النتيجة الحالية", "لماذا اختلف الإهلاك؟", "اشرح القيد اليومي"]
+      : state.analysisContext?.contextType === "inventory" && state.analysisContext.status === "ready"
+        ? ["اشرح تكلفة المبيعات والمخزون الحالي", "قارن طرق التكلفة من عملياتي", "كيف وصلت الأداة إلى النتيجة؟"]
+      : state.analysisContext?.contextType === "inventory"
+        ? basePromptLabels
       : state.analysisContext?.contextType === "cvp"
         ? ["اشرح بيانات التعادل الحالية", "كيف أحقق الربح المستهدف؟", "كيف يؤثر تغيير السعر والتكلفة؟"]
       : state.analysisContext
@@ -164,6 +174,20 @@
   }
 
   function setAnalysisContext(context) {
+    if (context?.contextType === "inventory") {
+      const valid = Array.isArray(context.operations) && ["ready", "empty"].includes(context.status);
+      state.analysisContext = valid ? context : null;
+      quickPrompts.hidden = false;
+      screenContext.hidden = !valid;
+      screenContextLabel.textContent = valid
+        ? context.status === "ready" ? `عمليات المخزون مرفقة: ${context.operations.length} عملية — ${context.result.methodLabel}` : "لا توجد عمليات مخزون بعد؛ أضف عمليات للحصول على تحليل رقمي."
+        : "";
+      privacyNoteText.textContent = valid && context.status === "ready"
+        ? "عند الإرسال، تُرسل رسالتك وعمليات المخزون ونتائج التكلفة الحالية إلى خدمة الذكاء الاصطناعي."
+        : "تُرسل رسالتك وحالة الصفحة دون تحليل رقمي عندما لا توجد عمليات كافية.";
+      renderQuickPrompts();
+      return;
+    }
     if (context?.contextType === "cvp") {
       state.analysisContext = context.inputs && context.result ? context : null;
       quickPrompts.hidden = false;

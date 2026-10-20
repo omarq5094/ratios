@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>حاسبة تكلفة المخزون والبضاعة المباعة | الأدوات المحاسبية</title>
+  <meta name="description" content="احسب تكلفة المبيعات والمخزون المتبقي بالجرد المستمر باستخدام FIFO ومتوسط التكلفة المتحرك، مع مقارنة LIFO التعليمية ومحلل ذكي." />
+  <link rel="canonical" href="https://ratios-ashy.vercel.app/services/inventory-cost" />
+  <meta property="og:title" content="حاسبة تكلفة المخزون والبضاعة المباعة" />
+  <meta property="og:url" content="https://ratios-ashy.vercel.app/services/inventory-cost" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/cvp.css" />
+  <link rel="stylesheet" href="/inventory.css" />
+  <script defer src="/saudi-riyal.js"></script>
+</head>
+<body class="cvp-page inventory-page">
+  <div class="ambient ambient-one" aria-hidden="true"></div><div class="ambient ambient-two" aria-hidden="true"></div>
+  <a class="cvp-skip" href="#operations">انتقل إلى العمليات</a>
+  <header class="navbar"><div class="container nav-content">
+    <a class="brand" href="/" aria-label="منصة الأدوات المحاسبية"><span class="brand-mark">م</span><span class="brand-copy">الأدوات المحاسبية<small>ACCOUNTING TOOLS</small></span></a>
+    <nav aria-label="التنقل الرئيسي"><a href="/">الرئيسية</a><a href="#howItWorks">طرق التكلفة</a><details class="site-services-menu"><summary>الأدوات</summary><div class="site-services-links" aria-label="الأدوات المحاسبية"><a class="site-service-link" href="/services/financial-ratios">حاسبة النسب المالية</a><a class="site-service-link" href="/services/depreciation">حاسبة الإهلاك</a><a class="site-service-link" href="/services/break-even-profit">تحليل نقطة التعادل والربح</a><a class="site-service-link" href="/services/inventory-cost">حاسبة تكلفة المخزون والبضاعة المباعة</a></div></details><a class="nav-cta" href="#operations">أدخل العمليات</a></nav>
+  </div></header>
+  <main>
+    <section class="container depreciation-hero cvp-hero">
+      <div><span class="hero-kicker"><i></i> المخزون · الجرد المستمر</span>
+        <h1>تكلفة ما بعت،<br /><em>وقيمة ما تبقّى.</em></h1>
+        <p>حاسبة تكلفة المخزون والبضاعة المباعة. أدخل مشترياتك ومبيعاتك بالتسلسل، ثم قارن طرق التكلفة وافهم أثرها على رصيدك.</p>
+        <div class="hero-actions"><a class="primary-button" href="#operations">ابدأ بعملية شراء</a><a class="secondary-button" href="#howItWorks">افهم طرق الحساب</a></div>
+        <p class="cvp-hero-note">منتج واحد · العملة ريال سعودي · الحساب داخل متصفحك</p>
+      </div>
+      <aside class="depreciation-hero-card cvp-preview" aria-label="معادلة حركة تكلفة المخزون">
+        <span>كل تكلفة لها وجهة</span><strong>مبيعات <small>أو مخزون</small></strong>
+        <svg viewBox="0 0 360 150" role="img" aria-label="تتوزع تكلفة المشتريات بين تكلفة المبيعات وقيمة المخزون المتبقي"><path d="M180 20V65H70V125M180 65H290V125" fill="none" stroke="#bba5ff" stroke-width="3"/><rect x="138" y="5" width="84" height="43" rx="10" fill="#65dcd033" stroke="#65dcd0"/><rect x="28" y="100" width="84" height="43" rx="10" fill="#65dcd033" stroke="#65dcd0"/><rect x="248" y="100" width="84" height="43" rx="10" fill="#bba5ff33" stroke="#bba5ff"/></svg>
+        <small>تكلفة المشتريات = تكلفة المبيعات + قيمة المخزون المتبقي</small>
+      </aside>
+    </section>
+    <section id="operations" class="container inventory-section" aria-labelledby="operationsTitle">
+      <div class="section-heading"><span class="section-kicker">سجّل الحركة</span><h2 id="operationsTitle">عملياتك بالترتيب.</h2><p>ابدأ بالشراء. أدخل المخزون الافتتاحي كأول شراء بتكلفته. عند تساوي التاريخ، يُعتمد ترتيب الصفوف.</p></div>
+      <div class="inventory-toolbar">
+        <label class="field" for="inventoryMethod"><span>طريقة حساب التكلفة</span><select id="inventoryMethod"><option value="fifo">FIFO — الوارد أولًا صادر أولًا</option><option value="average">متوسط التكلفة المتحرك</option><option value="lifo">LIFO — للمقارنة التعليمية فقط</option></select></label>
+        <p id="methodExplanation" class="cvp-help"></p>
+      </div>
+      <p id="lifoWarning" class="inventory-warning" role="note" hidden>LIFO للمقارنة التعليمية فقط؛ غير مسموح به في التقارير المعدّة وفق IFRS (IAS 2).</p>
+      <form id="inventoryForm" class="form-card inventory-form" novalidate>
+        <div class="form-block"><div class="block-title"><span>+</span><div><h3 id="entryTitle">إضافة عملية</h3><p>الكمية حتى منزلتين عشريتين، وسعر الشراء حتى 6 منازل. البيع لا يحتاج سعر بيع؛ الحساب للتكلفة فقط.</p></div></div>
+          <div class="fields-grid inventory-fields">
+            <label class="field" for="operationType"><span>نوع العملية</span><select id="operationType"><option value="purchase">شراء</option><option value="sale">بيع</option></select></label>
+            <label class="field" for="operationDate"><span>التاريخ</span><input id="operationDate" type="date" min="1900-01-01" max="9999-12-31" required /></label>
+            <label class="field" for="operationQuantity"><span>الكمية</span><input id="operationQuantity" type="text" inputmode="decimal" placeholder="مثال: 100" required /></label>
+            <label class="field" for="operationCost"><span>سعر شراء الوحدة · ر.س</span><input id="operationCost" type="text" inputmode="decimal" placeholder="مثال: 12.50" required /><small id="costHelp">لا يُطلب في عملية البيع.</small></label>
+          </div>
+        </div>
+        <p id="inventoryError" class="depreciation-error" role="alert" hidden></p>
+        <div class="form-actions cvp-actions"><button id="saveOperation" class="primary-button" type="submit">إضافة العملية</button><button id="cancelEdit" class="secondary-button" type="button" hidden>إلغاء التعديل</button></div>
+        <p id="inventoryStatus" class="cvp-help cvp-form-status" role="status">لا توجد عمليات بعد. أضف شراءً لبدء الحساب.</p>
+      </form>
+      <div class="inventory-section inventory-table-panel">
+        <div class="panel-heading"><div><span>الجرد المستمر</span><h3>سجل العمليات</h3></div><span id="operationsCount">0 / 150 عملية</span></div>
+        <p class="cvp-help">يمكنك تعديل أو حذف أي صف. تُعاد الحسابات تلقائيًا بعد حفظ العملية أو حذفها أو تغيير الطريقة. البيانات تبقى في هذه الصفحة حتى إعادة تحميلها.</p>
+        <div class="inventory-table-scroll" role="region" aria-label="سجل عمليات المخزون، قابل للتمرير أفقيًا" tabindex="0"><table class="inventory-table"><caption class="sr-only">عمليات المخزون المدخلة بالترتيب</caption><thead><tr><th scope="col">#</th><th scope="col">التاريخ</th><th scope="col">العملية</th><th scope="col">الكمية</th><th scope="col">سعر الشراء · ر.س</th><th scope="col">إجراءات</th></tr></thead><tbody id="operationsBody"></tbody></table></div>
+      </div>
+    </section>
+    <section id="inventoryResults" class="container inventory-section" hidden aria-labelledby="inventoryResultsTitle">
+      <div class="result-header"><div><span class="section-kicker">قراءة المخزون</span><h2 id="inventoryResultsTitle">نتيجة تكلفتك.</h2><p id="selectedMethodLabel"></p></div><span class="result-status">تتحدث تلقائيًا</span></div>
+      <div class="cvp-summary-grid"><article><h3>الكمية المتبقية</h3><strong id="remainingQuantity"></strong><p>إجمالي الكميات المشتراة ناقص الكميات المباعة</p></article><article><h3>تكلفة البضاعة المباعة</h3><strong id="totalCOGS"></strong><p>تكلفة الوحدات المباعة، وليست إيرادات البيع</p></article><article class="cvp-highlight"><h3>قيمة المخزون المتبقي</h3><strong id="endingInventory"></strong><p>التكلفة التي ما زالت ضمن المخزون</p></article></div>
+      <div class="depreciation-formula-card cvp-reading"><span>كيف نقرأ النتيجة؟</span><p id="inventoryExplanation"></p></div>
+      <section class="depreciation-chart-card inventory-section" aria-labelledby="inventoryChartTitle">
+        <div class="depreciation-chart-heading"><div><span>مقارنة طرق التكلفة · ر.س</span><h3 id="inventoryChartTitle">التكلفة تتوزع، والكمية واحدة.</h3></div></div>
+        <div class="cvp-legend"><span><i class="revenue-key"></i>تكلفة المبيعات</span><span><i class="cost-key inventory-solid-key"></i>المخزون المتبقي</span></div>
+        <p class="cvp-chart-description">مرّر الماوس أو المس أي عمود لعرض قيمته، أو انتقل بين الأعمدة بمفتاح Tab. الإطار يميّز طريقة الحساب المختارة.</p>
+        <div id="inventoryChart" class="inventory-chart" role="group" aria-label="مقارنة تكلفة المبيعات والمخزون لكل طريقة"></div>
+        <div id="inventoryChartDetail" class="inventory-chart-detail" role="status"></div>
+        <p class="cvp-chart-description">LIFO في هذه المقارنة للتعليم فقط، وغير مسموح به في التقارير المعدّة وفق IFRS.</p>
+      </section>
+      <section class="inventory-table-panel inventory-section" aria-labelledby="comparisonTitle"><div class="panel-heading"><h3 id="comparisonTitle">القيم المقارنة، في جدول</h3><span>ر.س</span></div><div class="inventory-table-scroll" role="region" aria-label="جدول مقارنة طرق التكلفة" tabindex="0"><table class="inventory-table"><caption class="sr-only">بديل نصي للرسم البياني</caption><thead><tr><th scope="col">الطريقة</th><th scope="col">تكلفة المبيعات</th><th scope="col">المخزون المتبقي</th><th scope="col">الكمية المتبقية</th></tr></thead><tbody id="comparisonBody"></tbody></table></div></section>
+      <section class="inventory-table-panel inventory-section" aria-labelledby="ledgerTitle"><div class="panel-heading"><div><span>خطوة بخطوة</span><h3 id="ledgerTitle">كيف وصلنا إلى النتيجة؟</h3></div></div><p class="cvp-help">افتح تفاصيل كل بيع لمعرفة الدفعات أو المتوسط المستخدم. المبالغ المعروضة مقربة إلى منزلتين؛ الحساب الداخلي لا يقرب المتوسطات ولا تكاليف العمليات المتراكمة، وقد تختلف مجاميع القيم المعروضة قليلًا بسبب تقريب العرض.</p><div class="inventory-table-scroll" role="region" aria-label="تفصيل تكلفة كل عملية، قابل للتمرير أفقيًا" tabindex="0"><table class="inventory-table inventory-ledger"><caption class="sr-only">حركة الكمية والتكلفة وفق الطريقة المختارة</caption><thead><tr><th scope="col">العملية</th><th scope="col">تكلفة الشراء</th><th scope="col">تكلفة البيع</th><th scope="col">الكمية المتبقية</th><th scope="col">قيمة المخزون</th><th scope="col">متوسط الوحدة</th><th scope="col">تفاصيل البيع</th></tr></thead><tbody id="ledgerBody"></tbody></table></div></section>
+    </section>
+    <section id="howItWorks" class="container inventory-section depreciation-methods">
+      <div class="section-heading"><span class="section-kicker">افهم الاختلاف</span><h2>نفس العمليات، وطرق تكلفة مختلفة.</h2><p>عندما تختلف أسعار الشراء، يختلف توزيع التكلفة بين المبيعات والمخزون باختلاف الطريقة.</p></div>
+      <div class="method-explain-grid"><article><span>01</span><h3>FIFO</h3><p>نبيع محاسبيًا من أقدم تكلفة متاحة أولًا. يتبقى المخزون من الدفعات الأحدث بعد استهلاك الأقدم.</p></article><article><span>02</span><h3>المتوسط المتحرك</h3><p>نمزج تكلفة المخزون المتبقي مع تكلفة كل شراء جديد. لا تخلطه بالمتوسط الدوري؛ ترتيب الشراء والبيع يؤثر في النتيجة.</p></article><article><span>03</span><h3>LIFO · تعليم فقط</h3><p>نبيع محاسبيًا من أحدث تكلفة متاحة أولًا. غير مسموح به في التقارير المعدّة وفق IFRS.</p></article></div>
+      <aside class="cvp-assumptions"><h3>نطاق الحاسبة</h3><ul><li>منتج واحد، ورصيد أولي صفر؛ لإضافة مخزون افتتاحي سجّله كأول شراء بتكلفته.</li><li>تُعالج العمليات بالتسلسل الزمني، والصف الأسبق أولًا عند تساوي التاريخ. لا يجوز البيع قبل توفر الكمية.</li><li>حتى 150 عملية؛ الكمية حتى منزلتين عشريتين وسعر الوحدة حتى 6، وبحد أقصى مليار لكل مدخل.</li><li>هذه تكلفة المخزون والمبيعات؛ لا تحسب إيرادات أو أرباحًا أو ضرائب أو مرتجعات. أدرج التكاليف الإضافية الملائمة في سعر الوحدة بنفسك.</li><li>النتيجة تكلفة قبل أي تخفيض لصافي القيمة القابلة للتحقق، ولا تمثل تقييمًا كاملًا للمخزون وفق IAS 2.</li></ul><p><a href="https://www.ifrs.org/issued-standards/list-of-standards/ias-2-inventories/" target="_blank" rel="noopener noreferrer">المصدر: معيار IAS 2 — المخزون</a></p></aside>
+    </section>
+    <noscript><p class="container depreciation-error">فعّل JavaScript لتشغيل الحاسبة والرسم والمحلل الذكي.</p></noscript>
+  </main>
+  <footer><div class="container footer-content"><div class="footer-brand"><span class="brand-mark">م</span><div><strong>منصة الأدوات المحاسبية</strong><p>أدوات عملية تجعل الأرقام أوضح.</p></div></div><div class="footer-links"><a href="/">الرئيسية</a><a href="/services/financial-ratios">حاسبة النسب</a><a href="/services/depreciation">حاسبة الإهلاك</a><a href="/services/break-even-profit">التعادل والربح</a></div></div></footer>
+  <script src="/assistant.js"></script>
+  <script type="module" src="/inventory.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

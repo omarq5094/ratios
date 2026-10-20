@@ -1,0 +1,26 @@
+.inventory-section { margin-top: 42px; scroll-margin-top: 110px; }
+.inventory-toolbar { display: grid; grid-template-columns: minmax(240px, .75fr) minmax(0,1.25fr); align-items: center; gap: 24px; margin-bottom: 20px; }
+.inventory-form { overflow: hidden; }.inventory-fields { grid-template-columns: repeat(4,minmax(0,1fr)); }.inventory-fields input,.inventory-fields select { min-width: 0; width: 100%; }.inventory-fields input:not([type="date"]) { direction: ltr; text-align: right; }
+.inventory-warning { padding: 18px 22px; border: 1px solid #a05f1f66; border-radius: 16px; background: #fff1d8; color: #78410d; line-height: 1.9; font-size: 14px; }
+.inventory-form input[aria-invalid="true"] { outline: 2px solid var(--red); }
+.inventory-table-panel { padding: 26px; border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,.65); min-width: 0; }
+.inventory-table-scroll { max-width: 100%; overflow-x: auto; border-radius: 12px; }
+.inventory-table { border-collapse: collapse; width: 100%; min-width: 650px; font-size: 13px; text-align: right; }
+.inventory-table th,.inventory-table td { padding: 16px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+.inventory-table th { background: #eeeafa; color: #526078; white-space: nowrap; }.inventory-table .inventory-selected { background: #eeeafa80; }
+.inventory-table button { font: inherit; padding: 10px 12px; min-height: 44px; border: 1px solid var(--line); border-radius: 9px; background: white; color: var(--accent-strong); cursor: pointer; margin: 0 0 4px 6px; }
+.inventory-table .inventory-delete { color: var(--red); }.inventory-number { direction: ltr; unicode-bidi: isolate; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.inventory-ledger { min-width: 960px; }.inventory-ledger details { min-width: 230px; }.inventory-ledger summary { cursor: pointer; min-height: 30px; color: var(--accent-strong); }.inventory-ledger li { margin-block: 8px; line-height: 1.8; }.inventory-ledger ul { padding-inline-start: 18px; }
+.inventory-chart { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin-top: 24px; direction: rtl; }
+.inventory-chart-group { border: 1px solid #ffffff24; border-radius: 16px; padding: 16px 10px; min-width: 0; }.inventory-chart-group.is-selected { border: 2px solid #bba5ff; background: #ffffff08; }
+.inventory-chart-bars { height: 235px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+.inventory-chart-bar { min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 4px 8px; border: 0; border-radius: 10px; background: transparent; color: #fff; font: inherit; cursor: pointer; }
+.inventory-chart-bar:hover,.inventory-chart-bar:focus-visible,.inventory-chart-bar[aria-pressed="true"] { background: #ffffff12; outline: 2px solid #ffffff99; outline-offset: 2px; }
+.inventory-chart-bar .inventory-column { display: block; width: min(100%,72px); min-height: 3px; background: #65dcd0; border-radius: 8px 8px 0 0; }
+.inventory-chart-bar.inventory-stock .inventory-column { background: #bba5ff; }.inventory-chart-bar .inventory-bar-label { display: block; margin-top: 10px; font-size: 11px; line-height: 1.7; }
+.inventory-chart-group h4 { text-align: center; color: #e0e6f5; font-size: 13px; margin: 18px 0 0; line-height: 1.8; }
+.inventory-chart-detail { margin-top: 20px; padding: 18px; border: 1px solid #ffffff33; border-radius: 14px; background: #ffffff0d; color: #fff; line-height: 1.9; font-size: 14px; overflow-wrap: anywhere; min-height: 90px; }
+.inventory-solid-key { border-top-style: solid !important; }
+.inventory-page .depreciation-chart-card { min-width: 0; overflow: hidden; }
+@media (max-width: 900px) { .inventory-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }.inventory-toolbar { grid-template-columns: 1fr; gap: 8px; } }
+@media (max-width: 600px) { .inventory-fields { grid-template-columns: 1fr; }.inventory-table-panel { padding: 20px 14px; }.inventory-chart { gap: 7px; }.inventory-chart-group { padding: 12px 5px; }.inventory-chart-bars { height: 180px; gap: 6px; }.inventory-chart-bar { padding-inline: 1px; }.inventory-chart-bar .inventory-bar-label { font-size: 10px; }.inventory-chart-group h4 { font-size: 11px; }.inventory-page .depreciation-chart-card { padding: 24px 14px; }.inventory-section { margin-top: 30px; } }
